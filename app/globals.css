@@ -1,0 +1,186 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #009797;
+  --color-secondary: #58595b;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  color: var(--color-secondary);
+  background-color: #ffffff;
+  overflow-x: hidden;
+}
+
+/* PROHIBIDO: No usar border-radius */
+/* Todas las formas deben ser rectangulares o hexagonales */
+
+/* Clase utilitaria para formas hexagonales */
+.hexagon {
+  clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%);
+}
+
+/* Hexágono más suave para overlays */
+.hexagon-overlay {
+  clip-path: polygon(25% 0%, 75% 0%, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0% 75%, 0% 25%);
+}
+
+/* Corte diagonal para secciones */
+.diagonal-cut-top {
+  clip-path: polygon(0 10%, 100% 0, 100% 100%, 0 100%);
+}
+
+.diagonal-cut-bottom {
+  clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
+}
+
+/* Transiciones nítidas y profesionales */
+.transition-sharp {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Efectos de hover */
+.hover-scale {
+  transition: transform 0.3s ease;
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
+/* Gradiente corporativo */
+.gradient-primary {
+  background: linear-gradient(135deg, #009797 0%, #007575 100%);
+}
+
+/* Overlay oscuro para imágenes */
+.overlay-dark {
+  position: relative;
+}
+
+.overlay-dark::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+}
+
+.overlay-dark > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Animación de aparición */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* Estilos para botones sin border-radius */
+.btn {
+  padding: 1rem 2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+  display: inline-block;
+  text-align: center;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #007575;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 151, 151, 0.3);
+}
+
+.btn-secondary {
+  background-color: var(--color-secondary);
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 151, 151, 0.3);
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: white;
+  border: 2px solid white;
+}
+
+.btn-outline:hover {
+  background-color: white;
+  color: var(--color-primary);
+}
+
+/* Enlaces sin decoración */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Contenedor principal */
+.container-custom {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+@media (min-width: 768px) {
+  .container-custom {
+    padding: 0 2rem;
+  }
+}
+
+/* Secciones con padding consistente */
+.section-padding {
+  padding: 4rem 0;
+}
+
+@media (min-width: 768px) {
+  .section-padding {
+    padding: 6rem 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .section-padding {
+    padding: 8rem 0;
+  }
+}
