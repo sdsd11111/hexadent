@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { v4 as uuidv4 } from 'uuid';
 
+// Route Segment Config
+export const maxDuration = 300; // Allow more time for processing large images
+
 async function ensureTableExists() {
     // Tabla de Pacientes (Maestra)
     await db.execute(`
@@ -95,6 +98,30 @@ export async function GET(request) {
         await ensureTableExists();
         const { searchParams } = new URL(request.url);
         const type = searchParams.get('type');
+        const summary = searchParams.get('summary');
+
+        if (summary === 'true') {
+            const [rows] = await db.execute(`
+                SELECT type, COUNT(DISTINCT cedula) as count 
+                FROM fichas 
+                GROUP BY type
+            `);
+
+            // Map to a more useful format
+            const counts = {
+                odontologia: 0,
+                ortopedia: 0,
+                ortodoncia: 0
+            };
+
+            rows.forEach(row => {
+                if (counts.hasOwnProperty(row.type)) {
+                    counts[row.type] = row.count;
+                }
+            });
+
+            return NextResponse.json({ counts }, { status: 200 });
+        }
 
         let query = `
             SELECT f.*, p.nombre as patient_nombre, p.apellido as patient_apellido 
@@ -108,12 +135,18 @@ export async function GET(request) {
             params.push(type);
         }
 
+        const cedula = searchParams.get('cedula');
+        if (cedula) {
+            query += type ? ' AND f.cedula = ?' : ' WHERE f.cedula = ?';
+            params.push(cedula);
+        }
+
         query += ' ORDER BY f.created_at DESC';
 
         const [rows] = await db.execute(query, params);
 
         const formattedFichas = rows.map(row => {
-            const fichaData = JSON.parse(row.data);
+            const fichaData = row.data ? JSON.parse(row.data) : {};
             // Consolidar nombre/apellido desde la tabla pacientes si están disponibles
             if (row.patient_nombre) fichaData.nombre = row.patient_nombre;
             if (row.patient_apellido) fichaData.apellido = row.patient_apellido;
@@ -146,19 +179,19 @@ export async function PUT(request) {
     try {
         await ensureTableExists();
         const body = await request.json();
-        const { id, data } = body;
+        const { id, data, updateType, imagenes } = body;
 
-        if (!id || !data) {
-            return NextResponse.json(
-                { error: 'ID y datos son requeridos para actualizar' },
-                { status: 400 }
-            );
+        if (!id) {
+            return NextResponse.json({ error: 'ID es requerido' }, { status: 400 });
         }
 
-        const cedula = data.cedula || null;
+        // Full update requires data
+        if (!updateType && !data) {
+            return NextResponse.json({ error: 'Datos son requeridos para actualización completa' }, { status: 400 });
+        }
 
-        // 1. Sincronizar Paciente (Upsert)
-        if (cedula) {
+        // 1. Sincronizar Paciente (Solo si es actualización completa y hay cédula)
+        if (!updateType && data && data.cedula) {
             const patientMetadata = JSON.stringify({
                 telefono: data.telefono,
                 email: data.email,
@@ -174,16 +207,32 @@ export async function PUT(request) {
                  nombre = VALUES(nombre), 
                  apellido = VALUES(apellido), 
                  data = VALUES(data)`,
-                [cedula, data.nombre || '', data.apellido || '', patientMetadata]
+                [data.cedula, data.nombre || '', data.apellido || '', patientMetadata]
             );
         }
 
-        // 2. Actualizar Ficha
         const jsonData = JSON.stringify(data);
-        await db.execute(
-            'UPDATE fichas SET data = ?, cedula = ? WHERE id = ?',
-            [jsonData, cedula, id]
-        );
+
+        // 2. Handle partial or full update
+        if (updateType === 'imagenes_only' && imagenes) {
+            // Get current data first to merge
+            const [current] = await db.execute('SELECT data FROM fichas WHERE id = ?', [id]);
+            if (current.length > 0) {
+                const currentData = JSON.parse(current[0].data);
+                currentData.imagenes = imagenes;
+                await db.execute(
+                    'UPDATE fichas SET data = ? WHERE id = ?',
+                    [JSON.stringify(currentData), id]
+                );
+            }
+        } else {
+            // Full update
+            const cedula = data?.cedula || null;
+            await db.execute(
+                'UPDATE fichas SET data = ?, cedula = ? WHERE id = ?',
+                [jsonData, cedula, id]
+            );
+        }
 
         return NextResponse.json({ message: 'Ficha y datos de paciente actualizados exitosamente' });
     } catch (error) {

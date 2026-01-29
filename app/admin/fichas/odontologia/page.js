@@ -8,12 +8,13 @@ import {
     TrashIcon,
     DocumentTextIcon
 } from '@heroicons/react/24/outline';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 // Import New Modal
 import ModalFichaOdontologiaGeneral from '@/components/modals/ModalFichaOdontologiaGeneral';
 
 export default function OdontologiaFichasPage() {
+    const router = useRouter();
     const [clients, setClients] = useState([]);
     const [filteredClients, setFilteredClients] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -30,7 +31,7 @@ export default function OdontologiaFichasPage() {
     useEffect(() => {
         if (searchTerm) {
             const filtered = clients.filter(client => {
-                const fullName = `${client.data.nombre} ${client.data.apellido}`.toLowerCase();
+                const fullName = `${client.data.nombre || ''} ${client.data.apellido || ''}`.toLowerCase().trim();
                 return fullName.includes(searchTerm.toLowerCase()) || client.id.toLowerCase().includes(searchTerm.toLowerCase());
             });
             setFilteredClients(filtered);
@@ -86,12 +87,12 @@ export default function OdontologiaFichasPage() {
             <div className="mb-8 flex items-center justify-between">
                 <div>
                     <div className="flex items-center gap-3 mb-2">
-                        <Link
-                            href="/admin/fichas"
-                            className="text-gray-500 hover:text-gray-700 transition-colors"
+                        <button
+                            onClick={() => router.push('/admin/fichas')}
+                            className="text-gray-500 hover:text-gray-700 transition-colors flex items-center gap-1"
                         >
                             ← Volver
-                        </Link>
+                        </button>
                     </div>
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">Odontología General</h1>
                     <p className="text-gray-600">Gestión de fichas clínicas especializadas</p>
@@ -179,7 +180,7 @@ export default function OdontologiaFichasPage() {
                             </div>
 
                             <h3 className="font-bold text-gray-900 text-lg mb-1 group-hover:text-blue-600 transition-colors uppercase truncate">
-                                {client.data.nombre} {client.data.apellido}
+                                {client.data.nombre || ''} {client.data.apellido || ''}
                             </h3>
                             <p className="text-xs text-slate-500 mb-4 font-medium flex items-center gap-1">
                                 <span className="w-1 h-1 bg-slate-300 rounded-full" />

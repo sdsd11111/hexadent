@@ -39,6 +39,20 @@ const styles = StyleSheet.create({
         height: '100%',
         objectFit: 'fill',
     },
+    backgroundImageContainer: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        bottom: 0,
+        right: 0,
+        height: '100%',
+        width: '100%',
+    },
+    backgroundImage: {
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+    },
     content: {
         flexDirection: 'column',
     },
@@ -72,7 +86,7 @@ const styles = StyleSheet.create({
         marginTop: 10,
         width: '100%',
         height: 200,
-        backgroundColor: '#F9FAFB',
+        backgroundColor: 'transparent',
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 1,
@@ -141,6 +155,9 @@ const FichaDocument = ({ data = {}, logoUrl = '/pdf-header.jpg', footerUrl = '/p
     return (
         <Document>
             <Page size="A4" style={styles.page}>
+                <View style={styles.backgroundImageContainer} fixed>
+                    <Image src="/pdf-background.jpg" style={styles.backgroundImage} />
+                </View>
                 {/* Header */}
                 <View style={styles.header} fixed>
                     <Image src={logoUrl} style={styles.headerImage} />

@@ -7,7 +7,6 @@ const styles = StyleSheet.create({
         paddingBottom: 90,
         paddingHorizontal: 30,
         fontFamily: 'Helvetica',
-        backgroundColor: '#FFFFFF',
         color: '#000',
     },
     header: {
@@ -34,13 +33,27 @@ const styles = StyleSheet.create({
         height: 80,
         objectFit: 'fill',
     },
+    backgroundImageContainer: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        bottom: 0,
+        right: 0,
+        height: '100%',
+        width: '100%',
+    },
+    backgroundImage: {
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+    },
     section: {
         marginBottom: 3,
     },
     sectionTitle: {
         fontSize: 10,
         fontFamily: 'Helvetica-Bold',
-        backgroundColor: '#F3F4F6',
+        backgroundColor: 'transparent',
         paddingVertical: 1,
         paddingHorizontal: 6,
         borderLeft: '4 solid #374151',
@@ -74,7 +87,7 @@ const styles = StyleSheet.create({
         border: '1 solid #E5E7EB',
         borderRadius: 8,
         padding: 5,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: 'transparent',
     },
     // Nuevos estilos para la Tabla de Sección 4
     table: {
@@ -84,6 +97,12 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#000',
         marginBottom: 3,
+    },
+    tableHeader: {
+        flexDirection: 'row',
+        backgroundColor: 'transparent',
+        borderBottomWidth: 1,
+        borderBottomColor: '#000',
     },
     tableRow: {
         flexDirection: 'row',
@@ -297,6 +316,9 @@ const FichaOdontologiaDocument = ({ data = {} }) => {
     return (
         <Document>
             <Page size="A4" style={styles.page}>
+                <View style={styles.backgroundImageContainer} fixed>
+                    <Image src="/pdf-background.jpg" style={styles.backgroundImage} />
+                </View>
                 <View style={styles.header} fixed>
                     <Image src="/pdf-header.jpg" style={styles.headerImage} />
                 </View>
@@ -585,6 +607,9 @@ const FichaOdontologiaDocument = ({ data = {} }) => {
 
             {/* Page 2: Clinical Indices & Legend */}
             <Page size="A4" style={styles.page}>
+                <View style={styles.backgroundImageContainer} fixed>
+                    <Image src="/pdf-background.jpg" style={styles.backgroundImage} />
+                </View>
                 <View style={styles.header} fixed>
                     <Image src="/pdf-header.jpg" style={styles.headerImage} />
                 </View>
