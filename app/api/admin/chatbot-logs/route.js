@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
     try {
         const [rows] = await db.execute('SELECT id, timestamp, phone, user_msg as userMsg, bot_resp as botResp FROM chatbot_logs ORDER BY timestamp DESC LIMIT 50');

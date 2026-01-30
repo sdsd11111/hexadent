@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { processChatbotMessage } from '@/lib/chatbot/logic';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request) {
     try {
         const payload = await request.json();
