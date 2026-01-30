@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { processChatbotMessage } from '@/lib/chatbot/logic';
+import { processChatbotMessage } from '../../../lib/chatbot/logic';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,7 +10,7 @@ export async function POST(request) {
 
         let messages = [];
 
-        // 1. Handle YCloud Format (v2 API)
+        // 1. Handle YCloud Format (whatsappInboundMessage key)
         if (payload.whatsappInboundMessage) {
             const msg = payload.whatsappInboundMessage;
             messages.push({
@@ -44,8 +44,8 @@ export async function POST(request) {
         }
 
         if (!messages || messages.length === 0) {
-            console.log("No messages found in payload structure. Structure Keys:", Object.keys(payload));
-            return NextResponse.json({ status: 'no_messages', received: Object.keys(payload) });
+            console.log("No messages found in payload structure. Keys:", Object.keys(payload));
+            return NextResponse.json({ status: 'no_messages', receivedKeys: Object.keys(payload) }, { status: 200 });
         }
 
         for (const msg of messages) {
@@ -58,10 +58,14 @@ export async function POST(request) {
             }
         }
 
-        return NextResponse.json({ status: 'ok' });
+        return NextResponse.json({ status: 'ok' }, { status: 200 });
     } catch (error) {
-        console.error('Webhook Error:', error);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+        console.error('Webhook Error Trace:', error);
+        return NextResponse.json({
+            error: 'Internal Server Error',
+            message: error.message,
+            stack: error.stack
+        }, { status: 500 });
     }
 }
 
