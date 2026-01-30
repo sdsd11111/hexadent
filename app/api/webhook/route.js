@@ -10,24 +10,36 @@ export async function POST(request) {
 
         let messages = [];
 
-        // 1. Handle YCloud Format (whatsapp.inbound_message_received)
-        if (payload.event === 'whatsapp.inbound_message_received' && payload.whatsapp?.message) {
-            messages.push({
-                from: payload.whatsapp.message.from,
-                text: payload.whatsapp.message.text?.body || payload.whatsapp.message.body
-            });
+        // 1. Handle YCloud Format (whatsapp.inbound_message_received or direct message)
+        const isYCloud = payload.event?.startsWith('whatsapp.inbound_message') || payload.whatsapp?.message;
+
+        if (isYCloud) {
+            const msg = payload.whatsapp?.message || payload.message;
+            if (msg) {
+                messages.push({
+                    from: msg.from,
+                    text: msg.text?.body || msg.body || msg.text
+                });
+            }
         }
         // 2. Handle Meta/WhatsApp Cloud API Format
         else {
             const entry = payload.entry?.[0];
             const change = entry?.changes?.[0];
             const value = change?.value;
-            messages = value?.messages || payload.messages || [];
+            const metaMessages = value?.messages || payload.messages || [];
+
+            for (const m of metaMessages) {
+                messages.push({
+                    from: m.from,
+                    text: m.text?.body || m.body || m.text
+                });
+            }
         }
 
         if (!messages || messages.length === 0) {
-            console.log("No messages found in payload.");
-            return NextResponse.json({ status: 'no_messages' });
+            console.log("No messages found in payload structure. Structure Keys:", Object.keys(payload));
+            return NextResponse.json({ status: 'no_messages', received: Object.keys(payload) });
         }
 
         for (const msg of messages) {
