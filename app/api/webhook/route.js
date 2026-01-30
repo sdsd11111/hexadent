@@ -10,10 +10,16 @@ export async function POST(request) {
 
         let messages = [];
 
-        // 1. Handle YCloud Format (whatsapp.inbound_message_received or direct message)
-        const isYCloud = payload.event?.startsWith('whatsapp.inbound_message') || payload.whatsapp?.message;
-
-        if (isYCloud) {
+        // 1. Handle YCloud Format (v2 API)
+        if (payload.whatsappInboundMessage) {
+            const msg = payload.whatsappInboundMessage;
+            messages.push({
+                from: msg.from,
+                text: msg.text?.body || msg.body || msg.text
+            });
+        }
+        // 2. Handle older YCloud or other variations
+        else if (payload.event?.startsWith('whatsapp.inbound_message') || payload.whatsapp?.message) {
             const msg = payload.whatsapp?.message || payload.message;
             if (msg) {
                 messages.push({
@@ -22,7 +28,7 @@ export async function POST(request) {
                 });
             }
         }
-        // 2. Handle Meta/WhatsApp Cloud API Format
+        // 3. Handle Meta/WhatsApp Cloud API Format
         else {
             const entry = payload.entry?.[0];
             const change = entry?.changes?.[0];
