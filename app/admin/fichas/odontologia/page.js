@@ -8,13 +8,13 @@ import {
     TrashIcon,
     DocumentTextIcon
 } from '@heroicons/react/24/outline';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 // Import New Modal
 import ModalFichaOdontologiaGeneral from '@/components/modals/ModalFichaOdontologiaGeneral';
 
 export default function OdontologiaFichasPage() {
-    const router = useRouter();
+
     const [clients, setClients] = useState([]);
     const [filteredClients, setFilteredClients] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -87,12 +87,12 @@ export default function OdontologiaFichasPage() {
             <div className="mb-8 flex items-center justify-between">
                 <div>
                     <div className="flex items-center gap-3 mb-2">
-                        <button
-                            onClick={() => router.push('/admin/fichas')}
+                        <Link
+                            href="/admin/fichas"
                             className="text-gray-500 hover:text-gray-700 transition-colors flex items-center gap-1"
                         >
                             ← Volver
-                        </button>
+                        </Link>
                     </div>
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">Odontología General</h1>
                     <p className="text-gray-600">Gestión de fichas clínicas especializadas</p>
