@@ -15,6 +15,7 @@ export async function POST(request) {
             const msg = payload.whatsappInboundMessage;
             messages.push({
                 from: msg.from,
+                to: msg.to, // Clinic number
                 text: msg.text?.body || msg.body || msg.text
             });
         }
@@ -51,10 +52,11 @@ export async function POST(request) {
         for (const msg of messages) {
             const from = msg.from;
             const text = msg.text?.body || msg.body || msg.text;
+            const to = msg.to; // Clinic number from YCloud v2
 
             if (from && text) {
-                console.log(`Processing message from ${from}: ${text}`);
-                await processChatbotMessage(from, text);
+                console.log(`Processing message from ${from} to ${to}: ${text}`);
+                await processChatbotMessage(from, text, to);
             }
         }
 

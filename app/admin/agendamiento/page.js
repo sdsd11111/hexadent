@@ -137,7 +137,7 @@ export default function AgendamientoPage() {
                                             <tr key={log.id} className="hover:bg-blue-50/30 transition-colors group">
                                                 <td className="px-6 py-5">
                                                     <div className="flex flex-col">
-                                                        <span className="font-bold text-gray-900 group-hover:text-blue-700 transition-colors">+{log.phone}</span>
+                                                        <span className="font-bold text-gray-900 group-hover:text-blue-700 transition-colors">{log.phone}</span>
                                                         <span className="text-[10px] text-gray-400 flex items-center gap-1">
                                                             <ClockIcon className="h-3 w-3" />
                                                             {new Date(log.timestamp).toLocaleTimeString()}
