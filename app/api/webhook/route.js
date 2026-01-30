@@ -1,20 +1,39 @@
 import { NextResponse } from 'next/server';
-const { processChatbotMessage } = require('@/lib/chatbot/logic');
+import { processChatbotMessage } from '@/lib/chatbot/logic';
 
 export async function POST(request) {
     try {
         const payload = await request.json();
+        console.log('Webhook Payload Received:', JSON.stringify(payload, null, 2));
 
-        // YCloud WhatsApp payload structure (simplified)
-        // Adjust this based on actual YCloud/Meta webhook format
-        const messages = payload.value?.messages || payload.messages || [];
+        let messages = [];
+
+        // 1. Handle YCloud Format (whatsapp.inbound_message_received)
+        if (payload.event === 'whatsapp.inbound_message_received' && payload.whatsapp?.message) {
+            messages.push({
+                from: payload.whatsapp.message.from,
+                text: payload.whatsapp.message.text?.body || payload.whatsapp.message.body
+            });
+        }
+        // 2. Handle Meta/WhatsApp Cloud API Format
+        else {
+            const entry = payload.entry?.[0];
+            const change = entry?.changes?.[0];
+            const value = change?.value;
+            messages = value?.messages || payload.messages || [];
+        }
+
+        if (!messages || messages.length === 0) {
+            console.log("No messages found in payload.");
+            return NextResponse.json({ status: 'no_messages' });
+        }
 
         for (const msg of messages) {
             const from = msg.from;
-            const text = msg.text?.body || msg.body;
+            const text = msg.text?.body || msg.body || msg.text;
 
             if (from && text) {
-                console.log(`Received message from ${from}: ${text}`);
+                console.log(`Processing message from ${from}: ${text}`);
                 await processChatbotMessage(from, text);
             }
         }

@@ -1,16 +1,12 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
+import db from '@/lib/db';
 
 export async function GET() {
     try {
-        const logPath = path.join(process.cwd(), 'chatbot_logs.json');
-        if (fs.existsSync(logPath)) {
-            const logs = JSON.parse(fs.readFileSync(logPath, 'utf8'));
-            return NextResponse.json(logs);
-        }
-        return NextResponse.json([]);
+        const [rows] = await db.execute('SELECT id, timestamp, phone, user_msg as userMsg, bot_resp as botResp FROM chatbot_logs ORDER BY timestamp DESC LIMIT 50');
+        return NextResponse.json(rows || []);
     } catch (error) {
+        console.error("Admin Log Fetch Error:", error);
         return NextResponse.json({ error: 'Failed to read logs' }, { status: 500 });
     }
 }
