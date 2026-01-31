@@ -11,7 +11,9 @@
 - **Promotion**: Free consultation during specific months (e.g., "Fiesta de Loja").
 
 ### Orthodontics (Brackets)
-- **General Rule**: Requires a clinical evaluation first. Patient must have "zero cavities" (or start restoring them) before placement.
+- **General Rule**: Requires a clinical evaluation first ($15). Patient must have "zero cavities" (or start restoring them) before placement.
+- **Radiographs**: Essential before placement. The patient should get them as soon as possible for planning.
+- **Timeline**: We can place brackets as soon as the day after getting the radiographs and clinical planning.
 - **Brackets Autoligado**: $1200
   - Entrance: $250
   - Monthly installment: $50
@@ -22,7 +24,7 @@
 - **Range**: Usually between $800 - $1500 depending on complexity.
 
 ### General Dentistry
-- **Molar Filling (Calce)**: $25+ (depends on level of destruction).
+- **Molar Filling (Calce)**: $25+ (depends on level of destruction). If the tooth is very destroyed, the cost is determined after evaluation.
 - **Cavity Restoration**: $20 per cavity.
 - **Dental Cleaning / Gingivitis Treatment**: $20.
 - **Third Molar Surgery**: $150.
@@ -33,6 +35,9 @@
 3. **Availability**: Ask for preferred day and time.
 4. **Confirmation**: Confirm the "turnito" and remind them of the time.
 5. **Rescheduling**: Valid and handled politely.
+
+## Promotions
+- **Fiesta de Loja**: During this month, the Clinical Evaluation consultation is free (normally $15). Check current month status.
 
 ## FAQ
 - **Where to get X-rays (Radiografías)?**: The clinic refers patients to specialized radiological centers.
