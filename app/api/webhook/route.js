@@ -3,6 +3,29 @@ import { processChatbotMessage } from '../../../lib/chatbot/logic';
 
 export const dynamic = 'force-dynamic';
 
+const VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN;
+
+/**
+ * Handle Meta Webhook Verification (GET)
+ */
+export async function GET(request) {
+    const { searchParams } = new URL(request.url);
+    const mode = searchParams.get('hub.mode');
+    const token = searchParams.get('hub.verify_token');
+    const challenge = searchParams.get('hub.challenge');
+
+    if (mode === 'subscribe' && token === VERIFY_TOKEN) {
+        console.log('[Meta Webhook] Verification SUCCESS');
+        return new Response(challenge, { status: 200 });
+    } else {
+        console.error('[Meta Webhook] Verification FAILED');
+        return new Response('Forbidden', { status: 403 });
+    }
+}
+
+/**
+ * Handle Incoming Messages (POST)
+ */
 export async function POST(request) {
     try {
         const payload = await request.json();
@@ -10,53 +33,48 @@ export async function POST(request) {
 
         let messages = [];
 
-        // 1. Handle YCloud Format (whatsappInboundMessage key)
-        if (payload.whatsappInboundMessage) {
-            const msg = payload.whatsappInboundMessage;
-            messages.push({
-                from: msg.from,
-                to: msg.to, // Clinic number
-                text: msg.text?.body || msg.body || msg.text
-            });
-        }
-        // 2. Handle older YCloud or other variations
-        else if (payload.event?.startsWith('whatsapp.inbound_message') || payload.whatsapp?.message) {
-            const msg = payload.whatsapp?.message || payload.message;
-            if (msg) {
+        // 1. Evolution API Format (messages.upsert) - PRIMARY
+        if (payload.event === 'messages.upsert') {
+            const data = payload.data;
+            const msg = data?.message;
+            const from = data?.key?.remoteJid?.split('@')[0];
+            const text = msg?.conversation || msg?.extendedTextMessage?.text;
+
+            if (from && text && !data?.key?.fromMe) {
                 messages.push({
-                    from: msg.from,
-                    text: msg.text?.body || msg.body || msg.text
+                    from: from,
+                    to: 'evolution_instance',
+                    text: text
                 });
             }
         }
-        // 3. Handle Meta/WhatsApp Cloud API Format
-        else {
+        // 2. Meta/WhatsApp Cloud API Format (Legacy Fallback)
+        else if (payload.object === 'whatsapp_business_account') {
             const entry = payload.entry?.[0];
             const change = entry?.changes?.[0];
             const value = change?.value;
-            const metaMessages = value?.messages || payload.messages || [];
+            const metaMessages = value?.messages || [];
 
             for (const m of metaMessages) {
-                messages.push({
-                    from: m.from,
-                    text: m.text?.body || m.body || m.text
-                });
+                if (m.type === 'text') {
+                    messages.push({
+                        from: m.from,
+                        to: value.metadata?.display_phone_number,
+                        text: m.text?.body
+                    });
+                }
             }
         }
 
-        if (!messages || messages.length === 0) {
-            console.log("No messages found in payload structure. Keys:", Object.keys(payload));
-            return NextResponse.json({ status: 'no_messages', receivedKeys: Object.keys(payload) }, { status: 200 });
+        if (messages.length === 0) {
+            console.log("No messages found in payload structure.");
+            return NextResponse.json({ status: 'no_messages' }, { status: 200 });
         }
 
         for (const msg of messages) {
-            const from = msg.from;
-            const text = msg.text?.body || msg.body || msg.text;
-            const to = msg.to; // Clinic number from YCloud v2
-
-            if (from && text) {
-                console.log(`Processing message from ${from} to ${to}: ${text}`);
-                await processChatbotMessage(from, text, to);
+            if (msg.from && msg.text) {
+                console.log(`Processing message from ${msg.from} to ${msg.to}: ${msg.text}`);
+                await processChatbotMessage(msg.from, msg.text, msg.to);
             }
         }
 
@@ -65,12 +83,7 @@ export async function POST(request) {
         console.error('Webhook Error Trace:', error);
         return NextResponse.json({
             error: 'Internal Server Error',
-            message: error.message,
-            stack: error.stack
+            message: error.message
         }, { status: 500 });
     }
-}
-
-export async function GET() {
-    return NextResponse.json({ message: 'Webhook is active' });
 }

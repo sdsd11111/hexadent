@@ -1,52 +1,45 @@
-/**
- * Boilerplate for WhatsApp API integration.
- * Current setup is compatible with Meta Graph API directly or via providers like YCloud.
- * 
- * NOTE: For "Coexistence Mode" (API + Business App), ensure you go through 
- * the Meta Embedded Signup process (supported by YCloud).
- */
+import axios from 'axios';
+
+const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN;
+const PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID;
 
 /**
- * WhatsApp API integration using YCloud.
- * This script is configured for the Hexadent project.
- */
-
-const axios = require('axios');
-
-// Using environment variables for security
-const YCLOUD_API_KEY = process.env.YCLOUD_API_KEY;
-const FROM_NUMBER = process.env.WHATSAPP_PHONE_NUMBER_ID;
-process.env.WHATSAPP_PHONE_NUMBER_ID;
-
-/**
- * Sends a WhatsApp message via YCloud.
- * @param {string} phoneNumber - Recipient number with country code (e.g., 593983237491).
+ * Sends a WhatsApp message via Meta Cloud API.
+ * @param {string} phoneNumber - Recipient number.
  * @param {string} message - The message text.
  */
-async function sendWhatsAppMessage(phoneNumber, message) {
-    const url = 'https://api.ycloud.com/v1/whatsapp/messages';
+export async function sendWhatsAppMessage(phoneNumber, message) {
+    if (!WHATSAPP_TOKEN || !PHONE_NUMBER_ID) {
+        console.error("[WhatsApp Meta] Missing configuration: TOKEN or PHONE_ID");
+        throw new Error("Meta API configuration missing.");
+    }
 
-    // Formatting phoneNumber to YCloud standards
-    const formattedNumber = phoneNumber.replace('+', '').replace(/\s/g, '');
+    const url = `https://graph.facebook.com/v17.0/${PHONE_NUMBER_ID}/messages`;
+
+    // Ensure phoneNumber starts with + and has no spaces (E.164 standard)
+    let formattedNumber = phoneNumber.replace(/\s/g, '').replace(/\+/g, '');
+
+    console.log(`[WhatsApp Meta] Sending to ${formattedNumber}`);
 
     try {
         const response = await axios.post(url, {
-            from: FROM_NUMBER,
+            messaging_product: "whatsapp",
+            recipient_type: "individual",
             to: formattedNumber,
             type: "text",
             text: { body: message }
         }, {
             headers: {
-                'X-API-Key': YCLOUD_API_KEY,
+                'Authorization': `Bearer ${WHATSAPP_TOKEN}`,
                 'Content-Type': 'application/json'
             }
         });
-        console.log("Message sent via YCloud:", response.data);
+
+        console.log("[WhatsApp Meta] Success:", response.data.messages?.[0]?.id);
         return response.data;
     } catch (error) {
-        console.error("YCloud API Error:", error.response ? error.response.data : error.message);
-        throw error;
+        const errorData = error.response ? error.response.data : error.message;
+        console.error("[WhatsApp Meta] FAILURE Details:", JSON.stringify(errorData, null, 2));
+        throw new Error(`Meta API Error: ${JSON.stringify(errorData)}`);
     }
 }
-
-module.exports = { sendWhatsAppMessage };

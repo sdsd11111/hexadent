@@ -3,38 +3,65 @@
 import { useState, useEffect } from 'react';
 import {
     ClockIcon,
-    UserIcon,
-    ChatBubbleLeftRightIcon,
     ArrowPathIcon,
     CheckCircleIcon
 } from '@heroicons/react/24/outline';
 
 export default function AgendamientoPage() {
-    const [logs, setLogs] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [evolutionStatus, setEvolutionStatus] = useState({ status: 'loading', qr: null });
+    const [ignoredNumbers, setIgnoredNumbers] = useState([]);
+    const [newIgnoredNumber, setNewIgnoredNumber] = useState('');
 
-    // In a real app, this would be an API call
-    // For now, we'll try to fetch the logs from a temporary endpoint or just mock them
     useEffect(() => {
-        fetchLogs();
-        const interval = setInterval(fetchLogs, 10000); // Polling
+        fetchAll();
+        const interval = setInterval(fetchAll, 10000); // Polling
         return () => clearInterval(interval);
     }, []);
 
-    const fetchLogs = async () => {
+    const fetchAll = () => {
+        fetchEvolutionStatus();
+        fetchIgnoredNumbers();
+    };
+
+    const fetchEvolutionStatus = async () => {
         try {
-            // We'll create a simple API route for this too
-            const res = await fetch('/api/admin/chatbot-logs');
-            if (res.ok) {
-                const data = await res.json();
-                setLogs(data);
-            }
-        } catch (error) {
-            console.error("Error fetching logs:", error);
-        } finally {
-            setIsLoading(false);
+            const res = await fetch('/api/admin/evolution');
+            const data = await res.json();
+            setEvolutionStatus(data);
+        } catch (e) {
+            console.error("Error fetching evolution status:", e);
         }
     };
+
+    const fetchIgnoredNumbers = async () => {
+        try {
+            const res = await fetch('/api/admin/ignored-numbers');
+            const data = await res.json();
+            setIgnoredNumbers(data || []);
+        } catch (e) {
+            console.error("Error fetching ignored numbers:", e);
+        }
+    };
+
+    const handleAddIgnored = async () => {
+        if (!newIgnoredNumber) return;
+        await fetch('/api/admin/ignored-numbers', {
+            method: 'POST',
+            body: JSON.stringify({ phone: newIgnoredNumber, action: 'add' })
+        });
+        setNewIgnoredNumber('');
+        fetchIgnoredNumbers();
+    };
+
+    const handleRemoveIgnored = async (phone) => {
+        await fetch('/api/admin/ignored-numbers', {
+            method: 'POST',
+            body: JSON.stringify({ phone, action: 'remove' })
+        });
+        fetchIgnoredNumbers();
+    };
+
 
     return (
         <div className="max-w-7xl mx-auto pb-20">
@@ -74,93 +101,131 @@ export default function AgendamientoPage() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Stats */}
-                <div className="lg:col-span-1 space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Evolution API Connection */}
+                <div className="space-y-6">
+                    {/* Conexión WhatsApp */}
+                    <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-xl">
+                        <h3 className="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
+                            <span className="w-2 h-8 bg-blue-600 rounded-full" />
+                            Conexión WhatsApp
+                        </h3>
+                        <div className="flex flex-col items-center gap-6 py-4">
+                            {evolutionStatus.status === 'open' ? (
+                                <div className="text-center p-8 bg-green-50 rounded-3xl w-full border border-green-100">
+                                    <div className="bg-green-500 text-white px-6 py-2 rounded-full text-sm font-black uppercase tracking-widest inline-block mb-4">
+                                        Bot Conectado
+                                    </div>
+                                    <p className="text-gray-600 font-medium">Instancia activa: <span className="text-blue-600">{evolutionStatus.instance}</span></p>
+                                    <p className="text-xs text-gray-400 mt-2">El bot está listo para procesar citas.</p>
 
-                    <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
-                        <h3 className="text-sm font-bold text-gray-400 uppercase mb-4">Resumen</h3>
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <span className="text-gray-600">Total Consultas</span>
-                                <span className="font-bold text-blue-600">{logs.length}</span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-gray-600">Citas por confirmar</span>
-                                <span className="font-bold text-orange-600">--</span>
-                            </div>
+                                    <button
+                                        onClick={async () => {
+                                            if (confirm('¿Estás seguro de cerrar sesión en WhatsApp?')) {
+                                                await fetch('/api/admin/evolution', {
+                                                    method: 'POST',
+                                                    body: JSON.stringify({ action: 'logout' })
+                                                });
+                                                fetchEvolutionStatus();
+                                            }
+                                        }}
+                                        className="mt-6 text-xs text-red-500 font-bold uppercase tracking-widest hover:underline"
+                                    >
+                                        Cerrar Sesión WhatsApp
+                                    </button>
+                                </div>
+                            ) : evolutionStatus.qr ? (
+                                <div className="text-center">
+                                    <p className="text-sm text-gray-600 mb-4 font-bold">Escanea con tu WhatsApp Business:</p>
+                                    <div className="p-4 bg-white border-4 border-dashed border-blue-100 rounded-3xl shadow-inner">
+                                        {evolutionStatus.qr.length > 100 ? (
+                                            <img
+                                                src={evolutionStatus.qr.includes('base64') ? evolutionStatus.qr : `data:image/png;base64,${evolutionStatus.qr}`}
+                                                alt="WhatsApp QR"
+                                                className="w-64 h-64 object-contain"
+                                            />
+                                        ) : (
+                                            <div className="w-64 h-64 flex flex-col items-center justify-center p-4">
+                                                <p className="text-[10px] text-gray-400 mb-2">Código de conexión:</p>
+                                                <code className="text-xs break-all bg-gray-50 p-2 rounded border border-gray-100">{evolutionStatus.qr}</code>
+                                                <p className="text-[10px] text-blue-500 mt-4 font-bold">Intenta recargar para ver el código QR</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <button
+                                        onClick={fetchEvolutionStatus}
+                                        className="mt-6 text-xs text-blue-600 font-bold uppercase tracking-widest hover:underline"
+                                    >
+                                        Recargar Estado / QR
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="text-center py-12">
+                                    <ArrowPathIcon className="h-12 w-12 text-blue-200 animate-spin mx-auto" />
+                                    <p className="text-sm text-gray-400 mt-4">Obteniendo QR de Evolution API...</p>
+                                </div>
+                            )}
                         </div>
-                    </div>
-
-                    <div className="bg-gradient-to-br from-blue-600 to-indigo-700 p-6 rounded-3xl text-white shadow-xl">
-                        <h3 className="font-bold mb-2">Recordatorio</h3>
-                        <p className="text-blue-100 text-sm leading-relaxed">
-                            Recuerda que el bot guía al paciente. Si detectas una urgencia en los logs, puedes intervenir manualmente desde la App de WhatsApp Business.
-                        </p>
                     </div>
                 </div>
 
-                {/* Logs Table */}
-                <div className="lg:col-span-2">
-                    <div className="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden">
-                        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-                            <h2 className="font-bold text-gray-800 flex items-center gap-2">
-                                <ChatBubbleLeftRightIcon className="h-5 w-5 text-blue-500" />
-                                Últimas Interacciones
-                            </h2>
-                            <button
-                                onClick={fetchLogs}
-                                className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
-                            >
-                                <ArrowPathIcon className={`h-5 w-5 ${isLoading ? 'animate-spin' : ''}`} />
-                            </button>
+                {/* Right Column: Exclusion and Stats */}
+                <div className="space-y-6">
+                    {/* Blacklist / Ignored Numbers */}
+                    <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-xl">
+                        <h3 className="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
+                            <span className="w-2 h-8 bg-red-500 rounded-full" />
+                            Exclusión del Bot
+                        </h3>
+                        <div className="space-y-4">
+                            <p className="text-xs text-gray-500 mb-2">Ingresa los números a los que el bot NO debe contestar automáticamente.</p>
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    placeholder="Número (ej. 593963410409)"
+                                    className="flex-1 text-sm border-2 border-gray-100 rounded-2xl px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-0 transition-all font-bold"
+                                    value={newIgnoredNumber}
+                                    onChange={(e) => setNewIgnoredNumber(e.target.value)}
+                                />
+                                <button
+                                    onClick={handleAddIgnored}
+                                    className="bg-blue-600 text-white px-6 py-3 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all"
+                                >
+                                    Añadir
+                                </button>
+                            </div>
+                            <div className="max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+                                {ignoredNumbers.length === 0 ? (
+                                    <div className="text-center py-8 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-100 italic text-gray-400 text-sm">
+                                        No hay números en la lista negra.
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 gap-2">
+                                        {ignoredNumbers.map(phone => (
+                                            <div key={phone} className="flex items-center justify-between bg-gray-50 hover:bg-red-50 px-4 py-3 rounded-2xl group transition-all">
+                                                <span className="text-sm font-bold text-gray-700">{phone}</span>
+                                                <button
+                                                    onClick={() => handleRemoveIgnored(phone)}
+                                                    className="text-gray-300 hover:text-red-500 font-bold p-1"
+                                                >
+                                                    Eliminar
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </div>
+                    </div>
 
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left">
-                                <thead>
-                                    <tr className="text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-50 border-b border-gray-100">
-                                        <th className="px-6 py-4">Paciente / Hora</th>
-                                        <th className="px-6 py-4">Mensaje Usuario</th>
-                                        <th className="px-6 py-4">Respuesta Bot</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-50">
-                                    {logs.length === 0 ? (
-                                        <tr>
-                                            <td colSpan="3" className="px-6 py-12 text-center text-gray-400 italic">
-                                                No hay interacciones registradas aún.
-                                            </td>
-                                        </tr>
-                                    ) : (
-                                        logs.map((log) => (
-                                            <tr key={log.id} className="hover:bg-blue-50/30 transition-colors group">
-                                                <td className="px-6 py-5">
-                                                    <div className="flex flex-col">
-                                                        <span className="font-bold text-gray-900 group-hover:text-blue-700 transition-colors">{log.phone}</span>
-                                                        <span className="text-[10px] text-gray-400 flex items-center gap-1">
-                                                            <ClockIcon className="h-3 w-3" />
-                                                            {new Date(log.timestamp).toLocaleTimeString()}
-                                                        </span>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-5">
-                                                    <p className="text-sm text-gray-600 max-w-xs">{log.userMsg}</p>
-                                                </td>
-                                                <td className="px-6 py-5">
-                                                    <div className="flex items-start gap-2">
-                                                        <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-                                                            <CheckCircleIcon className="h-4 w-4 text-blue-600" />
-                                                        </div>
-                                                        <p className="text-sm text-gray-500 italic line-clamp-2">{log.botResp}</p>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </table>
+                    <div className="bg-gradient-to-br from-indigo-600 to-blue-700 p-8 rounded-3xl text-white shadow-2xl relative overflow-hidden">
+                        <div className="relative z-10">
+                            <h3 className="font-black uppercase tracking-widest text-blue-200 text-xs mb-2">Recordatorio Importante</h3>
+                            <p className="text-sm leading-relaxed opacity-90 font-medium">
+                                El bot gestionará las citas mediante Evolution API. Monitorea los chats desde tu móvil para emergencias o casos especiales.
+                            </p>
                         </div>
+                        <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
                     </div>
                 </div>
             </div>
