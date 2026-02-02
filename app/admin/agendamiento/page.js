@@ -222,7 +222,7 @@ export default function AgendamientoPage() {
                         <div className="relative z-10">
                             <h3 className="font-black uppercase tracking-widest text-blue-200 text-xs mb-2">Recordatorio Importante</h3>
                             <p className="text-sm leading-relaxed opacity-90 font-medium">
-                                El bot gestionará las citas mediante Evolution API. Monitorea los chats desde tu móvil para emergencias o casos especiales.
+                                Monitorea los chats desde tu móvil para emergencias o casos especiales.
                             </p>
                         </div>
                         <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
