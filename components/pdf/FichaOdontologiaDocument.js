@@ -731,7 +731,7 @@ const FichaOdontologiaDocument = ({ data = {} }) => {
                         ].map((item, i) => (
                             <View key={i} style={{ flexDirection: 'row', alignItems: 'center', width: '16.6%', marginBottom: 1 }}>
                                 <Text style={{ fontSize: 7, color: item.c, width: 15, fontFamily: 'Helvetica-Bold' }}>{item.s}</Text>
-                                <Text style={{ fontSize: 5, color: '#374151' }}>{item.label}</Text>
+                                <Text style={{ fontSize: 6, color: '#374151' }}>{item.label}</Text>
                             </View>
                         ))}
                     </View>
@@ -849,15 +849,15 @@ const FichaOdontologiaDocument = ({ data = {} }) => {
                         </View>
                         {(data.tratamiento || []).map((item, idx) => (
                             <View key={idx} style={[styles.tableRow, { borderBottomWidth: 1, minHeight: 25 }]} wrap={false}>
-                                <View style={[styles.tableCell, { width: 45, borderRightWidth: 1 }]}><Text style={[styles.tableCellValue, { fontSize: 5, fontWeight: 'bold' }]}>{item.fecha || ''}</Text></View>
-                                <View style={[styles.tableCell, { flex: 1, borderRightWidth: 1, paddingLeft: 3 }]}><Text style={[styles.tableCellValue, { textAlign: 'left', fontSize: 5 }]}>{item.diagnostico || ''}</Text></View>
-                                <View style={[styles.tableCell, { flex: 1, borderRightWidth: 1, paddingLeft: 3 }]}><Text style={[styles.tableCellValue, { textAlign: 'left', fontSize: 5 }]}>{item.procedimiento || ''}</Text></View>
-                                <View style={[styles.tableCell, { flex: 0.6, borderRightWidth: 1, paddingLeft: 3 }]}><Text style={[styles.tableCellValue, { textAlign: 'left', fontSize: 5 }]}>{item.resumen || ''}</Text></View>
-                                <View style={[styles.tableCell, { flex: 0.6, borderRightWidth: 1, paddingLeft: 3 }]}><Text style={[styles.tableCellValue, { textAlign: 'left', fontSize: 5 }]}>{item.recomendaciones || ''}</Text></View>
-                                <View style={[styles.tableCell, { flex: 0.6, borderRightWidth: 1, paddingLeft: 3 }]}><Text style={[styles.tableCellValue, { textAlign: 'left', fontSize: 5 }]}>{item.indicaciones || ''}</Text></View>
-                                <View style={[styles.tableCell, { flex: 0.8, borderRightWidth: 1, paddingLeft: 3 }]}><Text style={[styles.tableCellValue, { textAlign: 'left', fontSize: 5 }]}>{item.observaciones || ''}</Text></View>
-                                <View style={[styles.tableCell, { width: 35, borderRightWidth: 1 }]}><Text style={[styles.tableCellValue, { fontSize: 5 }]}>{item.pago || ''}</Text></View>
-                                <View style={[styles.tableCell, { width: 40, borderRightWidth: 0 }]}><Text style={[styles.tableCellValue, { fontSize: 5 }]}>{item.firma || ''}</Text></View>
+                                <View style={[styles.tableCell, { width: 45, borderRightWidth: 1 }]}><Text style={[styles.tableCellValue, { fontSize: 7, fontWeight: 'bold' }]}>{item.fecha || ''}</Text></View>
+                                <View style={[styles.tableCell, { flex: 1, borderRightWidth: 1, paddingLeft: 3 }]}><Text style={[styles.tableCellValue, { textAlign: 'left', fontSize: 7 }]}>{item.diagnostico || ''}</Text></View>
+                                <View style={[styles.tableCell, { flex: 1, borderRightWidth: 1, paddingLeft: 3 }]}><Text style={[styles.tableCellValue, { textAlign: 'left', fontSize: 7 }]}>{item.procedimiento || ''}</Text></View>
+                                <View style={[styles.tableCell, { flex: 0.6, borderRightWidth: 1, paddingLeft: 3 }]}><Text style={[styles.tableCellValue, { textAlign: 'left', fontSize: 7 }]}>{item.resumen || ''}</Text></View>
+                                <View style={[styles.tableCell, { flex: 0.6, borderRightWidth: 1, paddingLeft: 3 }]}><Text style={[styles.tableCellValue, { textAlign: 'left', fontSize: 7 }]}>{item.recomendaciones || ''}</Text></View>
+                                <View style={[styles.tableCell, { flex: 0.6, borderRightWidth: 1, paddingLeft: 3 }]}><Text style={[styles.tableCellValue, { textAlign: 'left', fontSize: 7 }]}>{item.indicaciones || ''}</Text></View>
+                                <View style={[styles.tableCell, { flex: 0.8, borderRightWidth: 1, paddingLeft: 3 }]}><Text style={[styles.tableCellValue, { textAlign: 'left', fontSize: 7 }]}>{item.observaciones || ''}</Text></View>
+                                <View style={[styles.tableCell, { width: 35, borderRightWidth: 1 }]}><Text style={[styles.tableCellValue, { fontSize: 7 }]}>{item.pago || ''}</Text></View>
+                                <View style={[styles.tableCell, { width: 40, borderRightWidth: 0 }]}><Text style={[styles.tableCellValue, { fontSize: 7 }]}>{item.firma || ''}</Text></View>
                             </View>
                         ))}
                     </View>

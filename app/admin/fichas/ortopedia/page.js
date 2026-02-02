@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, Fragment, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { Dialog, Transition, Disclosure } from '@headlessui/react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import {
@@ -22,7 +23,6 @@ import {
     TrashIcon
 } from '@heroicons/react/24/outline';
 import dynamic from 'next/dynamic';
-import Link from 'next/link';
 
 // Dynamically import PDF components
 const PDFDownloadLink = dynamic(
@@ -210,6 +210,7 @@ import OrtopediaDocument from '@/components/pdf/OrtopediaDocument';
 import ModalGalleryFicha from '@/components/modals/ModalGalleryFicha';
 
 export default function OrtopediaFichasPage() {
+    const router = useRouter();
     const [clients, setClients] = useState([]);
     const [filteredClients, setFilteredClients] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -482,12 +483,13 @@ export default function OrtopediaFichasPage() {
             <div className="mb-8 flex items-center justify-between">
                 <div>
                     <div className="flex items-center gap-3 mb-2">
-                        <Link
-                            href="/admin/fichas"
-                            className="text-gray-500 hover:text-gray-700 transition-colors"
+                        <button
+                            type="button"
+                            onClick={() => router.push('/admin/fichas')}
+                            className="text-gray-500 hover:text-gray-700 transition-colors cursor-pointer z-10"
                         >
                             ← Volver
-                        </Link>
+                        </button>
                     </div>
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">Ortopedia</h1>
                     <p className="text-gray-600">Gestión de fichas de clientes</p>

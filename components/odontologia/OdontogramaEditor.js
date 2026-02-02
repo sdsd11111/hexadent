@@ -188,6 +188,56 @@ const ToothEditorModal = ({ isOpen, onClose, toothId, data = {}, onConfirm }) =>
     );
 };
 
+const InputBox = ({ field, label, value, onChange }) => (
+    <div className="w-8 h-8 flex items-center justify-center">
+        <input
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            maxLength={2}
+            className="w-full h-full text-xs border-2 border-slate-300 rounded-lg text-center focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all font-black placeholder:text-slate-300 text-slate-700"
+            value={value || ''}
+            placeholder={label}
+            onChange={(e) => {
+                const val = e.target.value.replace(/[^0-9]/g, '').slice(0, 2);
+                onChange(field, val);
+            }}
+        />
+    </div>
+);
+
+const ToothInteractiveBlock = ({ id, toothData, onToothClick, onValueChange, isCircle, reverse = false, hideRM = false }) => {
+    return (
+        <div key={id} className="flex flex-col items-center gap-1 w-[28px] sm:w-[32px]">
+            {!hideRM && !reverse && (
+                <>
+                    <InputBox field="recesion" label="R" value={toothData.recesion} onChange={(field, val) => onValueChange(id.toString(), field, val)} />
+                    <InputBox field="movilidad" label="M" value={toothData.movilidad} onChange={(field, val) => onValueChange(id.toString(), field, val)} />
+                </>
+            )}
+            <div
+                onClick={() => onToothClick(id.toString())}
+                className="flex flex-col items-center gap-1 cursor-pointer transform hover:scale-110 active:scale-95 transition-all p-0.5"
+            >
+                <span className="text-[7px] font-black text-slate-400 mb-0.5">{id}</span>
+                <Tooth5Parts
+                    toothId={id.toString()}
+                    data={toothData}
+                    size={24}
+                    isCircle={isCircle}
+                    interactive={false}
+                />
+            </div>
+            {!hideRM && reverse && (
+                <>
+                    <InputBox field="movilidad" label="M" value={toothData.movilidad} onChange={(field, val) => onValueChange(id.toString(), field, val)} />
+                    <InputBox field="recesion" label="R" value={toothData.recesion} onChange={(field, val) => onValueChange(id.toString(), field, val)} />
+                </>
+            )}
+        </div>
+    );
+};
+
 export default function OdontogramaEditor({ value = {}, onChange }) {
     const [selectedTooth, setSelectedTooth] = useState(null);
 
@@ -199,59 +249,6 @@ export default function OdontogramaEditor({ value = {}, onChange }) {
 
     const handleConfirm = (id, data) => {
         onChange({ ...value, [id]: data });
-    };
-
-    // Componente individual alineado verticalmente
-    const ToothInteractiveBlock = ({ id, isCircle, reverse = false, hideRM = false }) => {
-        const toothData = value[id.toString()] || {};
-
-        const InputBox = ({ field, label }) => (
-            <div className="w-8 h-8 flex items-center justify-center">
-                <input
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    maxLength={2}
-                    className="w-full h-full text-xs border-2 border-slate-300 rounded-lg text-center focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all font-black placeholder:text-slate-300 text-slate-700"
-                    value={toothData[field] || ''}
-                    placeholder={label}
-                    onChange={(e) => {
-                        const val = e.target.value.replace(/[^0-9]/g, '').slice(0, 2);
-                        handleValueChange(id.toString(), field, val);
-                    }}
-                />
-            </div>
-        );
-
-        return (
-            <div key={id} className="flex flex-col items-center gap-1 w-[28px] sm:w-[32px]">
-                {!hideRM && !reverse && (
-                    <>
-                        <InputBox field="recesion" label="R" />
-                        <InputBox field="movilidad" label="M" />
-                    </>
-                )}
-                <div
-                    onClick={() => handleToothClick(id.toString())}
-                    className="flex flex-col items-center gap-1 cursor-pointer transform hover:scale-110 active:scale-95 transition-all p-0.5"
-                >
-                    <span className="text-[7px] font-black text-slate-400 mb-0.5">{id}</span>
-                    <Tooth5Parts
-                        toothId={id.toString()}
-                        data={toothData}
-                        size={24}
-                        isCircle={isCircle}
-                        interactive={false}
-                    />
-                </div>
-                {!hideRM && reverse && (
-                    <>
-                        <InputBox field="movilidad" label="M" />
-                        <InputBox field="recesion" label="R" />
-                    </>
-                )}
-            </div>
-        );
     };
 
     const LabelColumn = ({ labels, colors }) => (
@@ -270,10 +267,24 @@ export default function OdontogramaEditor({ value = {}, onChange }) {
             <div className="flex justify-center items-center gap-2 mb-6 w-full">
                 <LabelColumn labels={['RECESIÓN', 'MOVILIDAD', 'VESTIBULAR']} />
                 <div className="flex gap-1 border-r-[3px] border-black/30 pr-2">
-                    {[18, 17, 16, 15, 14, 13, 12, 11].map(id => <ToothInteractiveBlock key={id} id={id} />)}
+                    {[18, 17, 16, 15, 14, 13, 12, 11].map(id => (
+                        <ToothInteractiveBlock
+                            key={id} id={id}
+                            toothData={value[id.toString()] || {}}
+                            onToothClick={handleToothClick}
+                            onValueChange={handleValueChange}
+                        />
+                    ))}
                 </div>
                 <div className="flex gap-1">
-                    {[21, 22, 23, 24, 25, 26, 27, 28].map(id => <ToothInteractiveBlock key={id} id={id} />)}
+                    {[21, 22, 23, 24, 25, 26, 27, 28].map(id => (
+                        <ToothInteractiveBlock
+                            key={id} id={id}
+                            toothData={value[id.toString()] || {}}
+                            onToothClick={handleToothClick}
+                            onValueChange={handleValueChange}
+                        />
+                    ))}
                 </div>
             </div>
 
@@ -283,19 +294,47 @@ export default function OdontogramaEditor({ value = {}, onChange }) {
                 <div className="flex flex-col gap-4">
                     <div className="flex gap-2">
                         <div className="flex gap-1 pr-2 border-r-[3px] border-black/30">
-                            {[55, 54, 53, 52, 51].map(id => <ToothInteractiveBlock key={id} id={id} isCircle hideRM />)}
+                            {[55, 54, 53, 52, 51].map(id => (
+                                <ToothInteractiveBlock
+                                    key={id} id={id} isCircle hideRM
+                                    toothData={value[id.toString()] || {}}
+                                    onToothClick={handleToothClick}
+                                    onValueChange={handleValueChange}
+                                />
+                            ))}
                         </div>
                         <div className="flex gap-1 pl-2">
-                            {[61, 62, 63, 64, 65].map(id => <ToothInteractiveBlock key={id} id={id} isCircle hideRM />)}
+                            {[61, 62, 63, 64, 65].map(id => (
+                                <ToothInteractiveBlock
+                                    key={id} id={id} isCircle hideRM
+                                    toothData={value[id.toString()] || {}}
+                                    onToothClick={handleToothClick}
+                                    onValueChange={handleValueChange}
+                                />
+                            ))}
                         </div>
                     </div>
                     <div className="border-t-[3px] border-black/20 mx-4" />
                     <div className="flex gap-2">
                         <div className="flex gap-1 pr-2 border-r-[3px] border-black/30">
-                            {[85, 84, 83, 82, 81].map(id => <ToothInteractiveBlock key={id} id={id} isCircle hideRM />)}
+                            {[85, 84, 83, 82, 81].map(id => (
+                                <ToothInteractiveBlock
+                                    key={id} id={id} isCircle hideRM
+                                    toothData={value[id.toString()] || {}}
+                                    onToothClick={handleToothClick}
+                                    onValueChange={handleValueChange}
+                                />
+                            ))}
                         </div>
                         <div className="flex gap-1 pl-2">
-                            {[71, 72, 73, 74, 75].map(id => <ToothInteractiveBlock key={id} id={id} isCircle hideRM />)}
+                            {[71, 72, 73, 74, 75].map(id => (
+                                <ToothInteractiveBlock
+                                    key={id} id={id} isCircle hideRM
+                                    toothData={value[id.toString()] || {}}
+                                    onToothClick={handleToothClick}
+                                    onValueChange={handleValueChange}
+                                />
+                            ))}
                         </div>
                     </div>
                 </div>
@@ -305,10 +344,24 @@ export default function OdontogramaEditor({ value = {}, onChange }) {
             <div className="flex justify-center items-center gap-2 w-full">
                 <LabelColumn labels={['VESTIBULAR', 'MOVILIDAD', 'RECESIÓN']} />
                 <div className="flex gap-1 border-r-[3px] border-black/30 pr-2">
-                    {[48, 47, 46, 45, 44, 43, 42, 41].map(id => <ToothInteractiveBlock key={id} id={id} reverse />)}
+                    {[48, 47, 46, 45, 44, 43, 42, 41].map(id => (
+                        <ToothInteractiveBlock
+                            key={id} id={id} reverse
+                            toothData={value[id.toString()] || {}}
+                            onToothClick={handleToothClick}
+                            onValueChange={handleValueChange}
+                        />
+                    ))}
                 </div>
                 <div className="flex gap-1">
-                    {[31, 32, 33, 34, 35, 36, 37, 38].map(id => <ToothInteractiveBlock key={id} id={id} reverse />)}
+                    {[31, 32, 33, 34, 35, 36, 37, 38].map(id => (
+                        <ToothInteractiveBlock
+                            key={id} id={id} reverse
+                            toothData={value[id.toString()] || {}}
+                            onToothClick={handleToothClick}
+                            onValueChange={handleValueChange}
+                        />
+                    ))}
                 </div>
             </div>
 

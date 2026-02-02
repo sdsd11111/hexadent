@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { PlusIcon, MagnifyingGlassIcon, PencilSquareIcon, TrashIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
-import Link from 'next/link';
 import ModalFichaOrtodoncia from '@/components/modals/ModalFichaOrtodoncia';
 
 export default function OrtodonciaFichasPage() {
+    const router = useRouter();
     const [clients, setClients] = useState([]);
     const [filteredClients, setFilteredClients] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -52,7 +53,13 @@ export default function OrtodonciaFichasPage() {
         <div className="max-w-7xl mx-auto pb-20">
             <div className="mb-8 flex items-center justify-between">
                 <div>
-                    <Link href="/admin/fichas" className="text-gray-500 hover:text-gray-700">← Volver</Link>
+                    <button
+                        type="button"
+                        onClick={() => router.push('/admin/fichas')}
+                        className="text-gray-500 hover:text-gray-700 cursor-pointer z-10"
+                    >
+                        ← Volver
+                    </button>
                     <h1 className="text-3xl font-bold text-gray-900 mt-2">Fichas de Ortodoncia</h1>
                 </div>
                 <div className="flex gap-2">

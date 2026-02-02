@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import {
     PlusIcon,
     MagnifyingGlassIcon,
@@ -8,12 +9,12 @@ import {
     TrashIcon,
     DocumentTextIcon
 } from '@heroicons/react/24/outline';
-import Link from 'next/link';
 
 // Import New Modal
 import ModalFichaOdontologiaGeneral from '@/components/modals/ModalFichaOdontologiaGeneral';
 
 export default function OdontologiaFichasPage() {
+    const router = useRouter();
 
     const [clients, setClients] = useState([]);
     const [filteredClients, setFilteredClients] = useState([]);
@@ -81,18 +82,28 @@ export default function OdontologiaFichasPage() {
         setEditingClient(null);
     };
 
+    const handleGoBack = () => {
+        try {
+            router.push('/admin/fichas');
+        } catch (error) {
+            console.error('Router error:', error);
+            window.location.href = '/admin/fichas';
+        }
+    };
+
     return (
         <div className="max-w-7xl mx-auto pb-20">
             {/* Header */}
             <div className="mb-8 flex items-center justify-between">
                 <div>
                     <div className="flex items-center gap-3 mb-2">
-                        <Link
-                            href="/admin/fichas"
-                            className="text-gray-500 hover:text-gray-700 transition-colors flex items-center gap-1"
+                        <button
+                            type="button"
+                            onClick={handleGoBack}
+                            className="text-gray-500 hover:text-gray-700 transition-colors flex items-center gap-1 cursor-pointer relative z-50"
                         >
                             ← Volver
-                        </Link>
+                        </button>
                     </div>
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">Odontología General</h1>
                     <p className="text-gray-600">Gestión de fichas clínicas especializadas</p>

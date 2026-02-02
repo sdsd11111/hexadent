@@ -265,11 +265,17 @@ export default function ModalFichaOdontologiaGeneral({ isOpen, onClose, onSucces
     });
 
     // Calculate total automatically
-    const planTratamientoData = watch('plan_tratamiento') || [];
     useEffect(() => {
-        const total = planTratamientoData.reduce((acc, curr) => acc + (Number(curr.valor) || 0), 0);
-        setValue('plan_tratamiento_total', total);
-    }, [planTratamientoData, setValue]);
+        const subscription = watch((value, { name }) => {
+            // Only react to changes in plan_tratamiento
+            if (name?.startsWith('plan_tratamiento.') || name === 'plan_tratamiento') {
+                const planTratamientoData = value.plan_tratamiento || [];
+                const total = planTratamientoData.reduce((acc, curr) => acc + (Number(curr.valor) || 0), 0);
+                setValue('plan_tratamiento_total', total);
+            }
+        });
+        return () => subscription.unsubscribe();
+    }, [watch, setValue]);
 
     // Reset step when modal is closed or load edit data
     useEffect(() => {
