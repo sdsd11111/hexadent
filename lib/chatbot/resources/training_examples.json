@@ -1,0 +1,588 @@
+[
+    {
+        "category": "greetings",
+        "examples": [
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "hola"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "¡Hola! 😊 ¿En qué te puedo ayudar?"
+                    }
+                ]
+            },
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "buenos dias"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "¡Buenos días! 😊 ¿Cómo te puedo ayudar?"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "category": "scheduling_basic",
+        "examples": [
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "para mañana hay?"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "Claro 😊 ¿En la mañana o en la tarde?"
+                    }
+                ]
+            },
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "quiero cita"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "Con gusto 😊 ¿Para qué día la deseas?"
+                    }
+                ]
+            },
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "mañana"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "Perfecto 😊 ¿En la mañana o en la tarde?"
+                    }
+                ]
+            },
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "para hoy"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "¿En qué horario te queda mejor, mañana o tarde? 😊"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "category": "children",
+        "examples": [
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "es para niño"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "Perfecto 🦷 ¿Qué edad tiene el niño?"
+                    }
+                ]
+            },
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "mi hijo"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "Claro 😊 ¿Qué edad tiene tu hijo y para qué día deseas la cita?"
+                    }
+                ]
+            },
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "para niño mañana"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "Perfecto 🦷 ¿Qué edad tiene el niño y en la mañana o tarde?"
+                    }
+                ]
+            },
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "es para mi hijo"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "Perfecto 🦷 ¿Qué edad tiene tu hijo y para qué día deseas la cita?"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "category": "pricing",
+        "examples": [
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "cuanto cuesta"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "¿Consulta, limpieza u otro tratamiento? 😊"
+                    }
+                ]
+            },
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "limpieza"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "La limpieza tiene un precio aproximado 😊 Para confirmar el valor exacto se necesita valoración. ¿Deseas agendar?"
+                    }
+                ]
+            },
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "precio endodoncia"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "El valor es aproximado 😊 Se confirma con valoración. ¿Deseas agendar?"
+                    }
+                ]
+            },
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "limpieza cuanto vale"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "La limpieza dental tiene un precio aproximado 😊 Para darte el valor exacto, es mejor una valoración previa. ¿Deseas agendar?"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "category": "payment_methods",
+        "examples": [
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "aceptan tarjeta"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "Sí 😊 aceptamos efectivo y tarjeta. ¿Deseas agendar una cita?"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "category": "hours_location",
+        "examples": [
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "atienden sabado"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "Sí 😊 atendemos los sábados en la mañana."
+                    }
+                ]
+            },
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "donde quedan"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "Estamos ubicados en Loja 😊 ¿Deseas que te envíe la ubicación?"
+                    }
+                ]
+            },
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "estan abiertos"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "Nuestro horario es de lunes a viernes y sábados en la mañana 😊"
+                    }
+                ]
+            },
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "seguro atienden?"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "Sí 😊 atendemos en nuestro horario habitual. ¿Deseas agendar una cita?"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "category": "urgencies",
+        "examples": [
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "me duele el diente"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "Lamento eso 😔 ¿El dolor es fuerte o constante? Te puedo comunicar con nuestra asistente."
+                    }
+                ]
+            },
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "me duele mucho"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "Siento que estés así 😔 Para ayudarte mejor, te comunicaré con nuestra asistente."
+                    }
+                ]
+            },
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "me duele feo"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "Lamento eso 😔 ¿El dolor es fuerte o constante? Te puedo comunicar con nuestra asistente para atención prioritaria."
+                    }
+                ]
+            },
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "me duele mucho el diente"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "Lamento que estés pasando por eso 😔 Para ayudarte mejor, ¿el dolor es fuerte o constante? Te puedo comunicar con nuestra asistente para atención prioritaria."
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "category": "reschedule_cancel",
+        "examples": [
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "puedo cambiar mi cita"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "Claro 😊 ¿Para qué día te gustaría cambiarla?"
+                    }
+                ]
+            },
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "ya no voy a poder ir"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "No hay problema 😊 ¿Deseas cancelar o reagendar?"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "category": "confusion_handling",
+        "examples": [
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "no se"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "No te preocupes 😊 ¿Te ayudo con información o deseas una cita?"
+                    }
+                ]
+            },
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "eso del diente"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "¿Te refieres a una cita, dolor o información de tratamiento? 😊"
+                    }
+                ]
+            },
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "rapido"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "Claro 😊 ¿Deseas información o agendar una cita?"
+                    }
+                ]
+            },
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "no se bien"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "No te preocupes 😊 ¿te gustaría información o deseas agendar una cita?"
+                    }
+                ]
+            },
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "para"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "¿Para agendar una cita o para información? 😊"
+                    }
+                ]
+            },
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "eso de ayer no pude"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "Para ayudarte mejor 😊 ¿te refieres a una cita que tenías agendada?"
+                    }
+                ]
+            },
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "eso del diente"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "Para ayudarte mejor 😊 ¿te refieres a una cita, un dolor o información de un tratamiento?"
+                    }
+                ]
+            },
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "rapido por favor"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "Claro 😊 ¿Deseas agendar una cita o necesitas información rápida?"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "category": "repetition",
+        "examples": [
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "cuanto cuesta"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "Con gusto 😊 ¿Consulta, limpieza u otro tratamiento?"
+                    },
+                    {
+                        "role": "user",
+                        "content": "cuanto cuesta"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "Para ayudarte mejor 😊 dime qué tratamiento te interesa."
+                    }
+                ]
+            },
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "mañana"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "Claro 😊 ¿En la mañana o en la tarde?"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "category": "topic_change",
+        "examples": [
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "quiero cita"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "Claro 😊 ¿Para qué día la deseas?"
+                    },
+                    {
+                        "role": "user",
+                        "content": "donde quedan"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "Estamos ubicados en Loja 😊 ¿Deseas agendar la cita también?"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "category": "handoff_request",
+        "examples": [
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "quiero hablar con alguien"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "Claro 😊 Te comunico con nuestra asistente para que te ayude personalmente."
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "category": "closing",
+        "examples": [
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "ok"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "A la orden 😊 cualquier consulta me escribes."
+                    }
+                ]
+            },
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "gracias"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "Con gusto 😊"
+                    }
+                ]
+            },
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "ok gracias"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "Con gusto 😊 cualquier consulta me escribes."
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "category": "full_scheduling_flow",
+        "examples": [
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "hola"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "¡Hola! 😊 Bienvenido a la clínica dental. ¿En qué te puedo ayudar?"
+                    },
+                    {
+                        "role": "user",
+                        "content": "para mañana hay?"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "Claro 😊 ¿Sería en la mañana o en la tarde? ¿Y para adulto o niño?"
+                    }
+                ]
+            }
+        ]
+    }
+]

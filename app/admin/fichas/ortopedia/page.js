@@ -496,25 +496,7 @@ export default function OrtopediaFichasPage() {
                 </div>
 
                 <div className="flex gap-2">
-                    <a
-                        href="/indicaciones-postquirurgicas.pdf"
-                        download
-                        className="flex items-center gap-2 px-4 py-3 bg-white border-2 border-purple-600 text-purple-600 rounded-xl font-medium hover:bg-purple-50 transition-all shadow-md"
-                    >
-                        <DocumentTextIconOutline className="h-5 w-5" />
-                        <span className="hidden sm:inline">Indicaciones Postquirúrgicas</span>
-                        <span className="sm:hidden">Post-Op</span>
-                    </a>
 
-                    <a
-                        href="/recomendaciones-clareamiento.pdf"
-                        download
-                        className="flex items-center gap-2 px-4 py-3 bg-white border-2 border-pink-600 text-pink-600 rounded-xl font-medium hover:bg-pink-50 transition-all shadow-md"
-                    >
-                        <DocumentTextIconOutline className="h-5 w-5" />
-                        <span className="hidden sm:inline">Recomendaciones Clareamiento</span>
-                        <span className="sm:hidden">Clareamiento</span>
-                    </a>
 
                     <button
                         onClick={openModal}
@@ -1805,8 +1787,8 @@ export default function OrtopediaFichasPage() {
                                                                 )}
                                                             </div>
 
-                                                            {/* Main Accordion 3: Presupuesto Ortopedia Personalizado */}
-                                                            <div ref={acc3Ref} className={`rounded-xl border-2 transition-all ${mainAccordion === 3 ? 'border-purple-500 bg-purple-50/10 shadow-lg' : 'border-slate-200 bg-white'}`}>
+                                                            {/* HIDDEN: Main Accordion 3: Presupuesto Ortopedia Personalizado */}
+                                                            {/* <div ref={acc3Ref} className={`rounded-xl border-2 transition-all ${mainAccordion === 3 ? 'border-purple-500 bg-purple-50/10 shadow-lg' : 'border-slate-200 bg-white'}`}>
                                                                 <button
                                                                     type="button"
                                                                     onClick={() => {
@@ -1866,7 +1848,7 @@ export default function OrtopediaFichasPage() {
                                                                         </div>
                                                                     </div>
                                                                 )}
-                                                            </div>
+                                                            </div> */}
 
                                                             {/* Main Accordion 4: Registro de pago por tratamiento Ortodoncia */}
                                                             <div ref={acc4Ref} className={`rounded-xl border-2 transition-all ${mainAccordion === 4 ? 'border-purple-500 bg-purple-50/10 shadow-lg' : 'border-slate-200 bg-white'}`}>
@@ -1884,8 +1866,8 @@ export default function OrtopediaFichasPage() {
                                                                             <ShieldCheckIcon className="h-5 w-5" />
                                                                         </div>
                                                                         <div>
-                                                                            <p className="text-xs font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Paso 2.4</p>
-                                                                            <h3 className={`text-sm font-black uppercase ${mainAccordion === 4 ? 'text-purple-700' : 'text-slate-700'}`}>4. Registro de pago por tratamiento Ortopedia</h3>
+                                                                            <p className="text-xs font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Paso 2.3</p>
+                                                                            <h3 className={`text-sm font-black uppercase ${mainAccordion === 4 ? 'text-purple-700' : 'text-slate-700'}`}>3. Registro de pago por tratamiento Ortopedia</h3>
                                                                         </div>
                                                                     </div>
                                                                     <ChevronDownIcon className={`h-5 w-5 text-slate-400 transition-transform ${mainAccordion === 4 ? 'rotate-180' : ''}`} />

@@ -63,25 +63,7 @@ export default function OrtodonciaFichasPage() {
                     <h1 className="text-3xl font-bold text-gray-900 mt-2">Fichas de Ortodoncia</h1>
                 </div>
                 <div className="flex gap-2">
-                    <a
-                        href="/indicaciones-postquirurgicas.pdf"
-                        download
-                        className="flex items-center gap-2 px-4 py-3 bg-white border-2 border-purple-600 text-purple-600 rounded-xl font-medium hover:bg-purple-50 transition-all shadow-md"
-                    >
-                        <DocumentTextIcon className="h-5 w-5" />
-                        <span className="hidden sm:inline">Indicaciones Postquirúrgicas</span>
-                        <span className="sm:hidden">Post-Op</span>
-                    </a>
 
-                    <a
-                        href="/recomendaciones-clareamiento.pdf"
-                        download
-                        className="flex items-center gap-2 px-4 py-3 bg-white border-2 border-pink-600 text-pink-600 rounded-xl font-medium hover:bg-pink-50 transition-all shadow-md"
-                    >
-                        <DocumentTextIcon className="h-5 w-5" />
-                        <span className="hidden sm:inline">Recomendaciones Clareamiento</span>
-                        <span className="sm:hidden">Clareamiento</span>
-                    </a>
 
                     <button onClick={() => setIsModalOpen(true)} className="px-6 py-3 bg-gradient-to-r from-orange-600 to-amber-500 text-white rounded-xl font-bold shadow-lg uppercase text-xs flex items-center gap-2">
                         <PlusIcon className="h-4 w-4 stroke-[3px]" /> Nueva Ficha Ortodoncia

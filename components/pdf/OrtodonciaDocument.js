@@ -291,17 +291,21 @@ const ProcedimientosPage = ({ data }) => (
             <Text style={{ fontSize: 10, fontFamily: 'Helvetica-Bold', textAlign: 'center', marginBottom: 5 }}>ADHESIÓN DE BRACKETS</Text>
 
             <View style={{ flexDirection: 'row', gap: 5, alignItems: 'center', fontSize: 8 }}>
-                <Text style={styles.label}>REFERENCIA DE ADHESIÓN ARCO U ({data.s16_proc_adhesion_u_check ? 'X' : ' '})</Text>
+                <Text style={styles.label}>REFERENCIA DE ADHESIÓN ARCO U (</Text>
+                <Text style={{ borderBottom: '1 solid #000', minWidth: 15, fontSize: 8 }}>{data.s16_proc_adhesion_u_check || '   '}</Text>
+                <Text style={styles.label}>)</Text>
                 {[11, 12, 13, 14, 15, 16, 37].map(num => (
-                    <Text key={num} style={{ marginLeft: 5 }}>{num} <Text style={{ borderBottom: '1 solid #000', minWidth: 15 }}>{data[`s16_proc_adhesion_u_${num}`] || '   '}</Text></Text>
+                    <Text key={num} style={{ marginLeft: 5 }}><Text style={{ color: '#2A9D8F', fontFamily: 'Helvetica-Bold' }}>{num}</Text> <Text style={{ borderBottom: '1 solid #000', minWidth: 15 }}>{data[`s16_proc_adhesion_u_${num}`] || '   '}</Text></Text>
                 ))}
             </View>
 
             <View style={{ flexDirection: 'row', gap: 5, alignItems: 'center', fontSize: 8, marginTop: 4 }}>
-                <Text style={styles.label}>REFERENCIA DE ADHESIÓN ARCO L ({data.s16_proc_adhesion_l_check ? 'X' : ' '})</Text>
-                <Text style={{ marginLeft: 5 }}>41/42 <Text style={{ borderBottom: '1 solid #000', minWidth: 15 }}>{data.s16_proc_adhesion_l_41_42 || '   '}</Text></Text>
+                <Text style={styles.label}>REFERENCIA DE ADHESIÓN ARCO L (</Text>
+                <Text style={{ borderBottom: '1 solid #000', minWidth: 15, fontSize: 8 }}>{data.s16_proc_adhesion_l_check || '   '}</Text>
+                <Text style={styles.label}>)</Text>
+                <Text style={{ marginLeft: 5 }}><Text style={{ color: '#2A9D8F', fontFamily: 'Helvetica-Bold' }}>41/42</Text> <Text style={{ borderBottom: '1 solid #000', minWidth: 15 }}>{data.s16_proc_adhesion_l_41_42 || '   '}</Text></Text>
                 {[43, 44, 45, 46, 47].map(num => (
-                    <Text key={num} style={{ marginLeft: 5 }}>{num} <Text style={{ borderBottom: '1 solid #000', minWidth: 15 }}>{data[`s16_proc_adhesion_l_${num}`] || '   '}</Text></Text>
+                    <Text key={num} style={{ marginLeft: 5 }}><Text style={{ color: '#2A9D8F', fontFamily: 'Helvetica-Bold' }}>{num}</Text> <Text style={{ borderBottom: '1 solid #000', minWidth: 15 }}>{data[`s16_proc_adhesion_l_${num}`] || '   '}</Text></Text>
                 ))}
             </View>
         </View>
@@ -433,6 +437,7 @@ const RegistroPagoPage = ({ data }) => (
                     <View style={[styles.borderRight, { width: 80 }]}><Text style={styles.cellHeader}>FECHA</Text></View>
                     <View style={[styles.borderRight, { flex: 1 }]}><Text style={styles.cellHeader}>DESCRIPCION</Text></View>
                     <View style={[styles.borderRight, { width: 50 }]}><Text style={styles.cellHeader}>VALOR</Text></View>
+                    <View style={[styles.borderRight, { width: 70 }]}><Text style={styles.cellHeader}>FORMA DE PAGO</Text></View>
                     <View style={{ width: 60 }}><Text style={styles.cellHeader}>FIRMA</Text></View>
                 </View>
                 {(data.s16_ppto_perdida_filas || []).filter(row => row.fecha || row.mes || row.valor).map((row, i) => (
@@ -440,6 +445,7 @@ const RegistroPagoPage = ({ data }) => (
                         <View style={[styles.borderRight, { width: 80 }]}><Text style={styles.cellValue}>{formatDate(row.fecha)}</Text></View>
                         <View style={[styles.borderRight, { flex: 1 }]}><Text style={styles.cellValueLeft}>{row.mes || ''}</Text></View>
                         <View style={[styles.borderRight, { width: 50 }]}><Text style={styles.cellValue}>{row.valor || ''}</Text></View>
+                        <View style={[styles.borderRight, { width: 70 }]}><Text style={styles.cellValueLeft}>{row.forma_pago || ''}</Text></View>
                         <View style={{ width: 60 }}><Text style={styles.cellValue}></Text></View>
                     </View>
                 ))}
@@ -456,6 +462,7 @@ const RegistroPagoPage = ({ data }) => (
                     <View style={[styles.borderRight, { width: 80 }]}><Text style={styles.cellHeader}>FECHA</Text></View>
                     <View style={[styles.borderRight, { flex: 1 }]}><Text style={styles.cellHeader}>DESCRIPCION</Text></View>
                     <View style={[styles.borderRight, { width: 50 }]}><Text style={styles.cellHeader}>VALOR</Text></View>
+                    <View style={[styles.borderRight, { width: 70 }]}><Text style={styles.cellHeader}>FORMA DE PAGO</Text></View>
                     <View style={{ width: 60 }}><Text style={styles.cellHeader}>FIRMA</Text></View>
                 </View>
                 {(data.s16_ppto_readhesion_filas || []).filter(row => row.fecha || row.mes || row.valor).map((row, i) => (
@@ -463,6 +470,7 @@ const RegistroPagoPage = ({ data }) => (
                         <View style={[styles.borderRight, { width: 80 }]}><Text style={styles.cellValue}>{formatDate(row.fecha)}</Text></View>
                         <View style={[styles.borderRight, { flex: 1 }]}><Text style={styles.cellValueLeft}>{row.mes || ''}</Text></View>
                         <View style={[styles.borderRight, { width: 50 }]}><Text style={styles.cellValue}>{row.valor || ''}</Text></View>
+                        <View style={[styles.borderRight, { width: 70 }]}><Text style={styles.cellValueLeft}>{row.forma_pago || ''}</Text></View>
                         <View style={{ width: 60 }}><Text style={styles.cellValue}></Text></View>
                     </View>
                 ))}
@@ -597,8 +605,8 @@ const ConsentimientoPage = ({ data }) => {
                 {[
                     'Para iniciar el tratamiento de ortodoncia, la boca tiene que estar sana y los dientes sin caries.',
                     'El tratamiento de Ortodoncia, no incluye extracción de terceros molares (Dientes del juicio), u otros dientes.',
-                    'Con el tiempo se pueden despegar los brackets por varias causas, como la mala mordida, se acomoda mal el alimento, se muerde alimentos duros, pegajosos etc, por lo que se re adhiere el bracket sin costo hasta los 6 meses, pasado ese tiempo tiene un costo adicional de $ 10.',
-                    'En caso de pérdida de brackets, el repuesto tiene un costo adicional de $ 20.',
+                    'Con el tiempo se pueden despegar los brackets por varias causas, como la mala mordida, se acomoda mal el alimento, se muerde alimentos duros, pegajosos etc, por lo que se re adhiere el bracket sin costo hasta los 6 meses, pasado ese tiempo tiene un costo adicional de $ ' + (data.s16_consent_readhesion_costo || '10') + '.',
+                    'En caso de pérdida de brackets, el repuesto tiene un costo adicional de $ ' + (data.s16_consent_bracket_perdida_costo || '20') + '.',
                     'AL final del tratamiento se colocan retenedores, para mantener los dientes en la posición final, por lo que queda a responsabilidad del paciente el cuidado e higiene del mismo.',
                     'El costo de tratamiento de ortodoncia solo incluye el tratamiento mencionado, en caso de necesitar otra especialidad como Rehabilitación Oral, Endodoncista etc., no se incluye en el costo del tratamiento de ortodoncia',
                     'La limpieza dental se recomienda cada 6 meses no se incluye en el tratamiento de ortodoncia.',

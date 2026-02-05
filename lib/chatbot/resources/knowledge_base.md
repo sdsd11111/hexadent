@@ -1,45 +1,62 @@
 # Hexadent Knowledge Base
 
-## Clinic Info
-- **Name**: Hexadent Odontología Especializada
-- **Tone**: Professional, friendly, empathetic. Use terms like "con mucho gusto", "estimada/o", "turnito".
+## Información de la Clínica
+- **Nombre**: Hexadent Odontología Especializada
+- **Ubicación**: Loja, Ecuador
+- **Zona Horaria**: UTC-5 (Ecuador)
+- **Métodos de Pago**: Efectivo y tarjeta
 
-## Services & Pricing
+## Horarios de Atención
+- **Lunes a Viernes**: Mañana y tarde
+- **Sábados**: Solo en la mañana
+- **Domingos**: Cerrado
 
-### General Consultation
-- **Clinical Evaluation**: $15.
-- **Promotion**: Free consultation during specific months (e.g., "Fiesta de Loja").
+## Servicios y Precios Aproximados
 
-### Orthodontics (Brackets)
-- **General Rule**: Requires a clinical evaluation first ($15). Patient must have "zero cavities" (or start restoring them) before placement.
-- **Radiographs**: Essential before placement. The patient should get them as soon as possible for planning.
-- **Timeline**: We can place brackets as soon as the day after getting the radiographs and clinical planning.
+### Consulta General
+- **Evaluación Clínica**: $15
+- **Promoción**: Consulta gratis durante meses específicos (ej. "Fiesta de Loja")
+
+### Ortodoncia (Brackets)
+- **Requisito**: Evaluación clínica previa ($15). El paciente debe tener "cero caries" (o empezar a restaurarlas) antes de la colocación.
+- **Radiografías**: Esenciales antes de la colocación. El paciente debe obtenerlas lo antes posible para planificación.
+- **Tiempo**: Podemos colocar brackets al día siguiente de obtener las radiografías y planificación clínica.
 - **Brackets Autoligado**: $1200
-  - Entrance: $250
-  - Monthly installment: $50
-  - Estimated duration: 19 months
+  - Entrada: $250
+  - Cuota mensual: $50
+  - Duración estimada: 19 meses
 - **Brackets Convencionales**: $1050
-  - Entrance: $250
-  - Monthly installment: $50
-- **Range**: Usually between $800 - $1500 depending on complexity.
+  - Entrada: $250
+  - Cuota mensual: $50
+- **Rango**: Usualmente entre $800 - $1500 dependiendo de la complejidad.
 
-### General Dentistry
-- **Molar Filling (Calce)**: $25+ (depends on level of destruction). If the tooth is very destroyed, the cost is determined after evaluation.
-- **Cavity Restoration**: $20 per cavity.
-- **Dental Cleaning / Gingivitis Treatment**: $20.
-- **Third Molar Surgery**: $150.
+### Odontología General
+- **Calce de Molar**: $25+ (depende del nivel de destrucción). Si el diente está muy destruido, el costo se determina después de la evaluación.
+- **Restauración de Caries**: $20 por caries
+- **Limpieza Dental / Tratamiento de Gingivitis**: $20
+- **Cirugía de Tercera Molar**: $150
 
-## Scheduling Workflow
-1. **Greeting**: "Gracias por comunicarte con Hexadent odontología especializada. ¿Cómo podemos ayudarte?"
-2. **Info Request**: Ask for Full Name, Age/ID (Cédula).
-3. **Availability**: Ask for preferred day and time.
-4. **Confirmation**: Confirm the "turnito" and remind them of the time.
-5. **Rescheduling**: Valid and handled politely.
+## Proceso de Agendamiento
+1. Preguntar día deseado
+2. Preguntar horario (mañana o tarde)
+3. Preguntar si es adulto o niño
+4. Si es niño, preguntar edad
+5. Pedir nombre completo
+6. Pedir cédula o edad
+7. Confirmar la cita
 
-## Promotions
-- **Fiesta de Loja**: During this month, the Clinical Evaluation consultation is free (normally $15). Check current month status.
+**IMPORTANTE**: Hacer preguntas de una en una.
 
-## FAQ
-- **Where to get X-rays (Radiografías)?**: The clinic refers patients to specialized radiological centers.
-- **Payment flexibility?**: Installments are available for long-term treatments (Orthodontics).
-- **Emergencies**: "Empezamos por el tratamiento más urgente".
+## Promociones Actuales
+- **Fiesta de Loja**: Durante este mes, la consulta de Evaluación Clínica es gratis (normalmente $15).
+
+## Preguntas Frecuentes
+- **¿Dónde obtener radiografías?**: La clínica refiere a pacientes a centros radiológicos especializados.
+- **¿Flexibilidad de pago?**: Hay cuotas disponibles para tratamientos a largo plazo (Ortodoncia).
+- **Emergencias**: "Empezamos por el tratamiento más urgente".
+
+## RECORDATORIOS CRÍTICOS
+- **SIEMPRE** indica que los precios son aproximados
+- **SIEMPRE** menciona que se necesita valoración para confirmar costos exactos
+- **NUNCA** hagas diagnósticos ni recomiendes medicamentos
+- **DERIVA** a humano en caso de urgencias, quejas o confusión

@@ -149,6 +149,10 @@ const COLORS = {
     caries: '#D00000',
     sellante_nec: '#D00000',
     endodoncia: '#D00000',
+    corona_nec: '#D00000',
+    prot_total_nec: '#D00000',
+    removible_nec: '#D00000',
+    fija_nec: '#D00000',
     obturado: '#0066FF',
     sellante_realizado: '#0066FF',
     endodoncia_real: '#0066FF',
@@ -162,28 +166,46 @@ const COLORS = {
 };
 
 const SYMBOLS = {
-    caries: 'O',
     sellante_nec: '*',
-    endodoncia: 'â–³',
-    obturado: 'O',
     sellante_realizado: '*',
-    endodoncia_real: 'â–³',
     prot_total: '===',
+    prot_total_nec: '===',
     removible: '(---)',
+    removible_nec: '(---)',
     fija: '[--]',
-    perdida_otra: 'âŠ—',
-    corona: 'â–£',
+    fija_nec: '[--]',
+    perdida_otra: 'X',
 };
 
-const Tooth5PartsPDF = ({ id, data = {}, isCircle = false, size = 24 }) => {
+const Tooth5PartsPDF = ({ id, data = {}, isCircle = false, size = 24, connectedLeft = false, connectedRight = false }) => {
+    const status = data.status || 'normal';
+    const coronaProperty = data.corona || 'normal';
+    // Helper to check if corona is present in status (legacy) OR independent property OR any part (legacy)
+    const hasCorona = ['corona', 'corona_nec'].some(s =>
+        status === s || coronaProperty === s || ['top', 'bottom', 'left', 'right', 'center'].some(p => data[p] === s)
+    );
+    // Helper to check if any protesis is active
+    const hasProtesis = ['prot_total', 'prot_total_nec', 'removible', 'removible_nec', 'fija', 'fija_nec'].some(s => status === s);
+
     const getFill = (part) => {
+        // Corona and prótesis are now external, so we ALLOW fills inside.
+        // if (hasCorona || hasProtesis) return '#FFFFFF'; (REMOVED)
+
         const val = data[part];
+        // Endodoncia and Corona should not fill
+        if (['endodoncia', 'endodoncia_real', 'corona', 'corona_nec'].includes(val)) {
+            return '#FFFFFF';
+        }
         return COLORS[val] || '#FFFFFF';
     };
 
-    const status = data.status || 'normal';
+    const coronaColor = hasCorona ? (
+        (status === 'corona_nec' || coronaProperty === 'corona_nec' || ['top', 'bottom', 'left', 'right', 'center'].some(p => data[p] === 'corona_nec'))
+            ? COLORS.corona_nec
+            : COLORS.corona
+    ) : '#000000';
     const isAbsent = ['ausente', 'perdida_caries', 'perdida_otra', 'extraccion_ind'].includes(status);
-    const sColor = status.includes('corona') ? '#FBBF24' : '#000000';
+    const sColor = '#000000'; // Standard black border for tooth
     const sWidth = 0.8;
     const scale = size / 100;
 
@@ -193,18 +215,38 @@ const Tooth5PartsPDF = ({ id, data = {}, isCircle = false, size = 24 }) => {
         return (
             <Text
                 x={cx}
-                y={cy + (isCircle ? 1 : 1)} // Vertical adjustment for better centering
+                y={cy + 1}
+                fill="#FFFFFF"
                 style={{
                     fontSize: isCircle ? 14 : 16,
                     fontFamily: 'Helvetica-Bold',
-                    fill: '#FFFFFF',
-                    textAlign: 'center'
                 }}
             >
                 {SYMBOLS[pStatus]}
             </Text>
         );
     };
+
+    const renderEndodonciaSymbol = () => {
+        const hasEndo = ['top', 'bottom', 'left', 'right', 'center'].some(
+            part => data[part] === 'endodoncia' || data[part] === 'endodoncia_real'
+        );
+        if (!hasEndo) return null;
+
+        const color = ['top', 'bottom', 'left', 'right', 'center'].some(
+            part => data[part] === 'endodoncia'
+        ) ? '#D00000' : '#0066FF';
+
+        return (
+            <Path
+                d="M 95 85 L 110 110 L 80 110 Z"
+                stroke={color}
+                strokeWidth={3}
+                fill="none"
+            />
+        );
+    };
+
 
     if (isCircle) {
         return (
@@ -220,13 +262,53 @@ const Tooth5PartsPDF = ({ id, data = {}, isCircle = false, size = 24 }) => {
                 {renderSymbol('left', 8, 45)}
                 {renderSymbol('right', 78, 45)}
                 {renderSymbol('center', 42, 45)}
+                {renderEndodonciaSymbol()}
 
-                {isAbsent && <Line x1="10" y1="10" x2="90" y2="90" stroke={status === 'extraccion_ind' ? '#D00000' : '#0066FF'} strokeWidth={5} />}
-                {(status === 'prot_total' || status === 'removible' || status === 'fija') && (
-                    <Text x="50" y="55" style={{ fontSize: 20, fontFamily: 'Helvetica-Bold', fill: '#0066FF', textAlign: 'center' }}>
-                        {SYMBOLS[status]}
-                    </Text>
+                {hasCorona && (
+                    <Circle cx="50" cy="50" r="55" fill="none" stroke={coronaColor} strokeWidth={4} />
                 )}
+
+                {isAbsent ? (
+                    <G>
+                        <Line x1={10} y1={10} x2={90} y2={90} stroke={status === 'extraccion_ind' ? '#D00000' : '#0066FF'} strokeWidth={5} />
+                        <Line x1={90} y1={10} x2={10} y2={90} stroke={status === 'extraccion_ind' ? '#D00000' : '#0066FF'} strokeWidth={5} />
+                    </G>
+                ) : null}
+
+                {status === 'implante' && (
+                    <Text x={35} y={75} fill="#059669" style={{ fontSize: 45, fontFamily: 'Helvetica-Bold' }}>I</Text>
+                )}
+
+                {/* Visualizations for Prosthesis (Connected Borders - PDF Circle) */}
+                {(() => {
+                    const activeProt = ['prot_total', 'prot_total_nec', 'removible', 'removible_nec', 'fija', 'fija_nec'].find(s => status === s);
+                    if (!activeProt) return null;
+
+                    const color = COLORS[activeProt];
+                    const isDashed = activeProt.includes('removible');
+                    const isBracket = activeProt.includes('fija');
+
+                    const dash = isDashed ? "4, 4" : undefined;
+
+                    // Expanded Coordinates for PDF
+                    const Y_TOP = -25;
+                    const Y_BOT = 125;
+                    const X_LEFT = -25;
+                    const X_RIGHT = 125;
+
+                    return (
+                        <G>
+                            <Line x1={X_LEFT} y1={Y_TOP} x2={X_RIGHT} y2={Y_TOP} stroke={color} strokeWidth={5} strokeDasharray={dash} />
+                            <Line x1={X_LEFT} y1={Y_BOT} x2={X_RIGHT} y2={Y_BOT} stroke={color} strokeWidth={5} strokeDasharray={dash} />
+                            {!connectedLeft && (
+                                <Line x1={X_LEFT} y1={Y_TOP} x2={X_LEFT} y2={Y_BOT} stroke={color} strokeWidth={5} strokeDasharray={dash} />
+                            )}
+                            {!connectedRight && (
+                                <Line x1={X_RIGHT} y1={Y_TOP} x2={X_RIGHT} y2={Y_BOT} stroke={color} strokeWidth={5} strokeDasharray={dash} />
+                            )}
+                        </G>
+                    );
+                })()}
             </G>
         );
     }
@@ -244,14 +326,52 @@ const Tooth5PartsPDF = ({ id, data = {}, isCircle = false, size = 24 }) => {
             {renderSymbol('left', 6, 45)}
             {renderSymbol('right', 82, 45)}
             {renderSymbol('center', 42, 45)}
+            {renderEndodonciaSymbol()}
 
-            {isAbsent && <Line x1="10" y1="10" x2="90" y2="90" stroke={status === 'extraccion_ind' ? '#D00000' : '#0066FF'} strokeWidth={5} />}
-            {status === 'implante' && <Text x="35" y="75" style={{ fontSize: 50, fontFamily: 'Helvetica-Bold', fill: '#059669' }}>I</Text>}
-            {(status === 'prot_total' || status === 'removible' || status === 'fija') && (
-                <Text x="50" y="60" style={{ fontSize: 20, fontFamily: 'Helvetica-Bold', fill: '#0066FF', textAlign: 'center' }}>
-                    {SYMBOLS[status]}
-                </Text>
+            {hasCorona && (
+                <Rect x="-10" y="-10" width="120" height="120" rx="4" fill="none" stroke={coronaColor} strokeWidth={4} />
             )}
+
+            {isAbsent ? (
+                <G>
+                    <Line x1={10} y1={10} x2={90} y2={90} stroke={status === 'extraccion_ind' ? '#D00000' : '#0066FF'} strokeWidth={5} />
+                    <Line x1={90} y1={10} x2={10} y2={90} stroke={status === 'extraccion_ind' ? '#D00000' : '#0066FF'} strokeWidth={5} />
+                </G>
+            ) : null}
+            {status === 'implante' && (
+                <Text x={35} y={75} fill="#059669" style={{ fontSize: 45, fontFamily: 'Helvetica-Bold' }}>I</Text>
+            )}
+
+
+            {/* Visualizations for Prosthesis (Connected Borders - PDF Square) */}
+            {(() => {
+                const activeProt = ['prot_total', 'prot_total_nec', 'removible', 'removible_nec', 'fija', 'fija_nec'].find(s => status === s);
+                if (!activeProt) return null;
+
+                const color = COLORS[activeProt];
+                const isDashed = activeProt.includes('removible');
+                const isBracket = activeProt.includes('fija');
+
+                const dash = isDashed ? "4, 4" : undefined;
+
+                const Y_TOP = -25;
+                const Y_BOT = 125;
+                const X_LEFT = -25;
+                const X_RIGHT = 125;
+
+                return (
+                    <G>
+                        <Line x1={X_LEFT} y1={Y_TOP} x2={X_RIGHT} y2={Y_TOP} stroke={color} strokeWidth={5} strokeDasharray={dash} />
+                        <Line x1={X_LEFT} y1={Y_BOT} x2={X_RIGHT} y2={Y_BOT} stroke={color} strokeWidth={5} strokeDasharray={dash} />
+                        {!connectedLeft && (
+                            <Line x1={X_LEFT} y1={Y_TOP} x2={X_LEFT} y2={Y_BOT} stroke={color} strokeWidth={5} strokeDasharray={dash} />
+                        )}
+                        {!connectedRight && (
+                            <Line x1={X_RIGHT} y1={Y_TOP} x2={X_RIGHT} y2={Y_BOT} stroke={color} strokeWidth={5} strokeDasharray={dash} />
+                        )}
+                    </G>
+                );
+            })()}
         </G>
     );
 };
@@ -262,55 +382,89 @@ const FichaOdontologiaDocument = ({ data = {} }) => {
     const odontograma = data.odontograma || {};
     const formatDate = (dateStr) => dateStr ? new Date(dateStr).toLocaleDateString('es-ES') : '—';
 
-    // Renders a single tooth block (FDI, Shapes, R, M)
-    const renderToothBlock = (id, x, y, isCircle = false, reverse = false, hideRM = false) => {
+    const renderToothBlock = (id, x, y, isCircle = false, reverse = false, hideRM = false, connectedLeft = false, connectedRight = false) => {
         const toothData = odontograma[id.toString()] || {};
         const rVal = toothData.recesion;
         const mVal = toothData.movilidad;
 
         return (
-            <G transform={`translate(${x}, ${y})`}>
-                {!reverse ? (
-                    <>
-                        {!hideRM && (
-                            <>
-                                <Rect x="0" y="0" width="14" height="10" stroke="#000" strokeWidth={0.5} fill="#fff" />
-                                <Text x="7" y="7.5" style={{ fontSize: 7, fill: '#000000' }} textAnchor="middle">{rVal || ''}</Text>
+            <G transform={`translate(${x - 5}, ${y})`}>
+                <Svg width={30} height={hideRM ? 45 : 70} viewBox={`-5 0 30 ${hideRM ? 45 : 70}`}>
+                    {!reverse ? (
+                        <G>
+                            {!hideRM && (
+                                <G>
+                                    <Rect x={0} y={0} width={14} height={10} stroke="#000" strokeWidth={0.5} fill="#fff" />
+                                    <Text x={7} y={7.5} fill="#000000" textAnchor="middle" style={{ fontSize: 7 }}>{rVal || ''}</Text>
 
-                                <Rect x="0" y="11" width="14" height="10" stroke="#000" strokeWidth={0.5} fill="#fff" />
-                                <Text x="7" y="18.5" style={{ fontSize: 7, fill: '#000000' }} textAnchor="middle">{mVal || ''}</Text>
-                            </>
-                        )}
-                        <Text x="7" y={hideRM ? 6 : 29} style={{ fontSize: 7, fontFamily: 'Helvetica-Bold', fill: '#64748b' }} textAnchor="middle">{id}</Text>
-                        <G transform={`translate(0, ${hideRM ? 8 : 34})`}>
-                            <Tooth5PartsPDF id={id} data={toothData} isCircle={isCircle} size={20} />
+                                    <Rect x={0} y={11} width={14} height={10} stroke="#000" strokeWidth={0.5} fill="#fff" />
+                                    <Text x={7} y={18.5} fill="#000000" textAnchor="middle" style={{ fontSize: 7 }}>{mVal || ''}</Text>
+                                </G>
+                            )}
+                            <Text x={7} y={hideRM ? 3 : 32} fill="#64748b" textAnchor="middle" style={{ fontSize: 7, fontFamily: 'Helvetica-Bold' }}>{id}</Text>
+                            <G transform={`translate(0, ${hideRM ? 14 : 42})`}>
+                                <Tooth5PartsPDF
+                                    id={id}
+                                    data={toothData}
+                                    isCircle={isCircle}
+                                    size={20}
+                                    connectedLeft={connectedLeft}
+                                    connectedRight={connectedRight}
+                                />
+                            </G>
                         </G>
-                    </>
-                ) : (
-                    <>
-                        <G transform="translate(0, 0)">
-                            <Tooth5PartsPDF id={id} data={toothData} isCircle={isCircle} size={20} />
-                        </G>
-                        <Text x="7" y="28" style={{ fontSize: 7, fontFamily: 'Helvetica-Bold', fill: '#64748b' }} textAnchor="middle">{id}</Text>
-                        {!hideRM && (
-                            <>
-                                <Rect x="0" y="32" width="14" height="10" stroke="#000" strokeWidth={0.5} fill="#fff" />
-                                <Text x="7" y="39.5" style={{ fontSize: 7, fill: '#000000' }} textAnchor="middle">{mVal || ''}</Text>
+                    ) : (
+                        <G>
+                            <G transform="translate(0, 0)">
+                                <Tooth5PartsPDF
+                                    id={id}
+                                    data={toothData}
+                                    isCircle={isCircle}
+                                    size={20}
+                                    connectedLeft={connectedLeft}
+                                    connectedRight={connectedRight}
+                                />
+                            </G>
+                            <Text x={7} y={28} fill="#64748b" textAnchor="middle" style={{ fontSize: 7, fontFamily: 'Helvetica-Bold' }}>{id}</Text>
+                            {!hideRM && (
+                                <G>
+                                    <Rect x={0} y={32} width={14} height={10} stroke="#000" strokeWidth={0.5} fill="#fff" />
+                                    <Text x={7} y={39.5} fill="#000000" textAnchor="middle" style={{ fontSize: 7 }}>{mVal || ''}</Text>
 
-                                <Rect x="0" y="43" width="14" height="10" stroke="#000" strokeWidth={0.5} fill="#fff" />
-                                <Text x="7" y="50.5" style={{ fontSize: 7, fill: '#000000' }} textAnchor="middle">{rVal || ''}</Text>
-                            </>
-                        )}
-                    </>
-                )}
+                                    <Rect x={0} y={43} width={14} height={10} stroke="#000" strokeWidth={0.5} fill="#fff" />
+                                    <Text x={7} y={50.5} fill="#000000" textAnchor="middle" style={{ fontSize: 7 }}>{rVal || ''}</Text>
+                                </G>
+                            )}
+                        </G>
+                    )}
+                </Svg>
             </G>
         );
     };
 
     const renderQuadrant = (ids, startX, startY, isCircle = false, reverse = false, hideRM = false) => {
-        return ids.map((id, i) => (
-            <G key={id}>{renderToothBlock(id, startX + (i * 28), startY, isCircle, reverse, hideRM)}</G>
-        ));
+        const getConnectionProps = (id, index, array) => {
+            const currentStatus = odontograma[id.toString()]?.status;
+            const relevant = ['prot_total', 'prot_total_nec', 'removible', 'removible_nec', 'fija', 'fija_nec'];
+            if (!currentStatus || !relevant.includes(currentStatus)) return { connectedLeft: false, connectedRight: false };
+
+            const prevId = index > 0 ? array[index - 1] : null;
+            const prevStatus = prevId ? odontograma[prevId.toString()]?.status : null;
+            const connectedLeft = prevStatus === currentStatus;
+
+            const nextId = index < array.length - 1 ? array[index + 1] : null;
+            const nextStatus = nextId ? odontograma[nextId.toString()]?.status : null;
+            const connectedRight = nextStatus === currentStatus;
+
+            return { connectedLeft, connectedRight };
+        };
+
+        return ids.map((id, i) => {
+            const { connectedLeft, connectedRight } = getConnectionProps(id, i, ids);
+            return (
+                <G key={id}>{renderToothBlock(id, startX + (i * 28), startY, isCircle, reverse, hideRM, connectedLeft, connectedRight)}</G>
+            );
+        });
     };
 
     return (
@@ -415,7 +569,7 @@ const FichaOdontologiaDocument = ({ data = {} }) => {
                                             <View key={c.id} style={[styles.tableCell, { flexBasis: '10%', borderRightWidth: i === 9 ? 0 : 1 }]}>
                                                 <Text style={styles.tableCellHeader}>{c.id}. {c.label}</Text>
                                                 <Text style={styles.tableCellValue}>
-                                                    {isChecked ? 'X' : ' '}
+                                                    {isChecked ? 'P' : 'NO'}
                                                 </Text>
                                             </View>
                                         );
@@ -552,10 +706,10 @@ const FichaOdontologiaDocument = ({ data = {} }) => {
                     <Svg width="520" height="300" viewBox="0 0 520 340">
                         {/* Labels Side Top */}
                         <G transform="translate(15, 35)">
-                            <Text y="7" style={{ fontSize: 6, fontFamily: 'Helvetica-Bold' }}>RECESIÓN</Text>
-                            <Text y="18" style={{ fontSize: 6, fontFamily: 'Helvetica-Bold' }}>MOVILIDAD</Text>
-                            <Text y="29" style={{ fontSize: 6, fontFamily: 'Helvetica-Bold' }}>PIEZA</Text>
-                            <Text y="44" style={{ fontSize: 6, fontFamily: 'Helvetica-Bold' }}>VESTIBULAR</Text>
+                            <Text x={0} y={7} fill="#000" style={{ fontSize: 6, fontFamily: 'Helvetica-Bold' }}>RECESIÓN</Text>
+                            <Text x={0} y={18} fill="#000" style={{ fontSize: 6, fontFamily: 'Helvetica-Bold' }}>MOVILIDAD</Text>
+                            <Text x={0} y={29} fill="#000" style={{ fontSize: 6, fontFamily: 'Helvetica-Bold' }}>PIEZA</Text>
+                            <Text x={0} y={44} fill="#000" style={{ fontSize: 6, fontFamily: 'Helvetica-Bold' }}>VESTIBULAR</Text>
                         </G>
 
                         {/* Q1 & Q2 */}
@@ -581,10 +735,10 @@ const FichaOdontologiaDocument = ({ data = {} }) => {
 
                         {/* Labels Side Bottom */}
                         <G transform="translate(15, 230)">
-                            <Text y="10" style={{ fontSize: 6, fontFamily: 'Helvetica-Bold' }}>VESTIBULAR</Text>
-                            <Text y="28" style={{ fontSize: 6, fontFamily: 'Helvetica-Bold' }}>PIEZA</Text>
-                            <Text y="37" style={{ fontSize: 6, fontFamily: 'Helvetica-Bold' }}>MOVILIDAD</Text>
-                            <Text y="48" style={{ fontSize: 6, fontFamily: 'Helvetica-Bold' }}>RECESIÓN</Text>
+                            <Text x={0} y={10} fill="#000" style={{ fontSize: 6, fontFamily: 'Helvetica-Bold' }}>VESTIBULAR</Text>
+                            <Text x={0} y={28} fill="#000" style={{ fontSize: 6, fontFamily: 'Helvetica-Bold' }}>PIEZA</Text>
+                            <Text x={0} y={37} fill="#000" style={{ fontSize: 6, fontFamily: 'Helvetica-Bold' }}>MOVILIDAD</Text>
+                            <Text x={0} y={48} fill="#000" style={{ fontSize: 6, fontFamily: 'Helvetica-Bold' }}>RECESIÓN</Text>
                         </G>
 
                         {/* Q4 & Q3 */}
@@ -834,10 +988,11 @@ const FichaOdontologiaDocument = ({ data = {} }) => {
 
                 {/* 12. TRATAMIENTO */}
                 <View style={[styles.section, { marginTop: 4 }]} wrap={true}>
-                    <Text style={styles.sectionTitle}>12. TRATAMIENTO</Text>
+                    <Text style={styles.sectionTitle}>12. PLAN DE TRATAMIENTO</Text>
                     <View style={styles.table}>
                         <View style={[styles.tableRow, { backgroundColor: '#F3F4F6', borderBottomWidth: 1 }]}>
                             <View style={[styles.tableCell, { width: 45, borderRightWidth: 1 }]}><Text style={styles.tableCellHeader}>FECHA</Text></View>
+                            <View style={[styles.tableCell, { width: 30, borderRightWidth: 1 }]}><Text style={styles.tableCellHeader}>PZ</Text></View>
                             <View style={[styles.tableCell, { flex: 1, borderRightWidth: 1 }]}><Text style={styles.tableCellHeader}>DIAGNÓSTICO / COMPLICACIONES</Text></View>
                             <View style={[styles.tableCell, { flex: 1, borderRightWidth: 1 }]}><Text style={styles.tableCellHeader}>PROCEDIMIENTOS / PRESCRIPCIÓN</Text></View>
                             <View style={[styles.tableCell, { flex: 0.6, borderRightWidth: 1 }]}><Text style={styles.tableCellHeader}>RESUMEN</Text></View>
@@ -845,18 +1000,21 @@ const FichaOdontologiaDocument = ({ data = {} }) => {
                             <View style={[styles.tableCell, { flex: 0.6, borderRightWidth: 1 }]}><Text style={styles.tableCellHeader}>IND.</Text></View>
                             <View style={[styles.tableCell, { flex: 0.8, borderRightWidth: 1 }]}><Text style={styles.tableCellHeader}>OBSERVACIONES</Text></View>
                             <View style={[styles.tableCell, { width: 35, borderRightWidth: 1 }]}><Text style={styles.tableCellHeader}>PAGO</Text></View>
+                            <View style={[styles.tableCell, { width: 45, borderRightWidth: 1 }]}><Text style={styles.tableCellHeader}>F. PAGO</Text></View>
                             <View style={[styles.tableCell, { width: 40, borderRightWidth: 0 }]}><Text style={styles.tableCellHeader}>FIRMA</Text></View>
                         </View>
                         {(data.tratamiento || []).map((item, idx) => (
                             <View key={idx} style={[styles.tableRow, { borderBottomWidth: 1, minHeight: 25 }]} wrap={false}>
                                 <View style={[styles.tableCell, { width: 45, borderRightWidth: 1 }]}><Text style={[styles.tableCellValue, { fontSize: 7, fontWeight: 'bold' }]}>{item.fecha || ''}</Text></View>
-                                <View style={[styles.tableCell, { flex: 1, borderRightWidth: 1, paddingLeft: 3 }]}><Text style={[styles.tableCellValue, { textAlign: 'left', fontSize: 7 }]}>{item.diagnostico || ''}</Text></View>
-                                <View style={[styles.tableCell, { flex: 1, borderRightWidth: 1, paddingLeft: 3 }]}><Text style={[styles.tableCellValue, { textAlign: 'left', fontSize: 7 }]}>{item.procedimiento || ''}</Text></View>
-                                <View style={[styles.tableCell, { flex: 0.6, borderRightWidth: 1, paddingLeft: 3 }]}><Text style={[styles.tableCellValue, { textAlign: 'left', fontSize: 7 }]}>{item.resumen || ''}</Text></View>
-                                <View style={[styles.tableCell, { flex: 0.6, borderRightWidth: 1, paddingLeft: 3 }]}><Text style={[styles.tableCellValue, { textAlign: 'left', fontSize: 7 }]}>{item.recomendaciones || ''}</Text></View>
-                                <View style={[styles.tableCell, { flex: 0.6, borderRightWidth: 1, paddingLeft: 3 }]}><Text style={[styles.tableCellValue, { textAlign: 'left', fontSize: 7 }]}>{item.indicaciones || ''}</Text></View>
-                                <View style={[styles.tableCell, { flex: 0.8, borderRightWidth: 1, paddingLeft: 3 }]}><Text style={[styles.tableCellValue, { textAlign: 'left', fontSize: 7 }]}>{item.observaciones || ''}</Text></View>
-                                <View style={[styles.tableCell, { width: 35, borderRightWidth: 1 }]}><Text style={[styles.tableCellValue, { fontSize: 7 }]}>{item.pago || ''}</Text></View>
+                                <View style={[styles.tableCell, { width: 30, borderRightWidth: 1 }]}><Text style={[styles.tableCellValue, { fontSize: 7 }]}>{item.pieza || ''}</Text></View>
+                                <View style={[styles.tableCell, { flex: 1, borderRightWidth: 1, paddingLeft: 3 }]}><Text style={[styles.tableCellValue, { textAlign: 'left', fontSize: 6.5 }]}>{item.diagnostico || ''}</Text></View>
+                                <View style={[styles.tableCell, { flex: 1, borderRightWidth: 1, paddingLeft: 3 }]}><Text style={[styles.tableCellValue, { textAlign: 'left', fontSize: 6.5 }]}>{item.procedimiento || ''}</Text></View>
+                                <View style={[styles.tableCell, { flex: 0.6, borderRightWidth: 1, paddingLeft: 3 }]}><Text style={[styles.tableCellValue, { textAlign: 'left', fontSize: 6.5 }]}>{item.resumen || ''}</Text></View>
+                                <View style={[styles.tableCell, { flex: 0.6, borderRightWidth: 1, paddingLeft: 3 }]}><Text style={[styles.tableCellValue, { textAlign: 'left', fontSize: 6.5 }]}>{item.recomendaciones || ''}</Text></View>
+                                <View style={[styles.tableCell, { flex: 0.6, borderRightWidth: 1, paddingLeft: 3 }]}><Text style={[styles.tableCellValue, { textAlign: 'left', fontSize: 6.5 }]}>{item.indicaciones || ''}</Text></View>
+                                <View style={[styles.tableCell, { flex: 0.8, borderRightWidth: 1, paddingLeft: 3 }]}><Text style={[styles.tableCellValue, { textAlign: 'left', fontSize: 6.5 }]}>{item.observaciones || ''}</Text></View>
+                                <View style={[styles.tableCell, { width: 35, borderRightWidth: 1 }]}><Text style={[styles.tableCellValue, { fontSize: 6.5, fontWeight: 'bold' }]}>{item.pago || ''}</Text></View>
+                                <View style={[styles.tableCell, { width: 45, borderRightWidth: 1 }]}><Text style={[styles.tableCellValue, { fontSize: 6.5 }]}>{item.forma_pago || ''}</Text></View>
                                 <View style={[styles.tableCell, { width: 40, borderRightWidth: 0 }]}><Text style={[styles.tableCellValue, { fontSize: 7 }]}>{item.firma || ''}</Text></View>
                             </View>
                         ))}
@@ -896,9 +1054,39 @@ const FichaOdontologiaDocument = ({ data = {} }) => {
                                 <Text style={{ fontSize: 7, fontFamily: 'Helvetica-Bold', width: 100 }}>Dirección:</Text>
                                 <Text style={{ fontSize: 7, flex: 1 }}>{data.consentimiento?.direccion || ''}</Text>
                             </View>
+
+                            {/* DATOS DE FACTURACIÓN (Nested inside Section 13 - as requested) */}
+                            {data.usa_datos_facturacion && (
+                                <View style={{ marginTop: 10, borderTopWidth: 1, borderTopColor: '#000', paddingTop: 5 }}>
+                                    <Text style={{ fontSize: 7, fontFamily: 'Helvetica-Bold', marginBottom: 5, color: '#92400E' }}>DATOS PARA FACTURACIÓN:</Text>
+                                    <View style={{ gap: 4 }}>
+                                        <View style={{ flexDirection: 'row', borderBottomWidth: 0.5, borderBottomColor: '#000', paddingVertical: 2 }}>
+                                            <Text style={{ fontSize: 7, fontFamily: 'Helvetica-Bold', width: 120 }}>Nombres:</Text>
+                                            <Text style={{ fontSize: 7, flex: 1 }}>{data.datos_facturacion?.nombre_completo || ''}</Text>
+                                            <Text style={{ fontSize: 7, fontFamily: 'Helvetica-Bold', width: 35 }}>C.I./RUC:</Text>
+                                            <Text style={{ fontSize: 7, width: 100 }}>{data.datos_facturacion?.ci_ruc || ''}</Text>
+                                        </View>
+
+                                        <View style={{ flexDirection: 'row', borderBottomWidth: 0.5, borderBottomColor: '#000', paddingVertical: 2 }}>
+                                            <Text style={{ fontSize: 7, fontFamily: 'Helvetica-Bold', width: 100 }}>Correo:</Text>
+                                            <Text style={{ fontSize: 7, flex: 1 }}>{data.datos_facturacion?.correo || ''}</Text>
+                                            <Text style={{ fontSize: 7, fontFamily: 'Helvetica-Bold', width: 50 }}>Teléfono:</Text>
+                                            <Text style={{ fontSize: 7, width: 100 }}>{data.datos_facturacion?.telefono || ''}</Text>
+                                        </View>
+
+                                        <View style={{ flexDirection: 'row', borderBottomWidth: 0.5, borderBottomColor: '#000', paddingVertical: 2 }}>
+                                            <Text style={{ fontSize: 7, fontFamily: 'Helvetica-Bold', width: 100 }}>Dirección:</Text>
+                                            <Text style={{ fontSize: 7, flex: 1 }}>{data.datos_facturacion?.direccion || ''}</Text>
+                                            <Text style={{ fontSize: 7, fontFamily: 'Helvetica-Bold', width: 50 }}>Firma:</Text>
+                                            <Text style={{ fontSize: 7, width: 100 }}>{data.datos_facturacion?.firma || ''}</Text>
+                                        </View>
+                                    </View>
+                                </View>
+                            )}
                         </View>
                     </View>
                 </View>
+
 
                 <View style={styles.footer} fixed>
                     <Image src="/pdf-footer.jpg" style={styles.footerImage} />

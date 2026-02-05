@@ -8,9 +8,11 @@ import {
     UserIcon,
     PlusIcon,
     MagnifyingGlassIcon,
-    ArrowPathIcon
+    ArrowPathIcon,
+    FolderPlusIcon
 } from '@heroicons/react/24/outline';
 import { useEffect } from 'react';
+import ModalArchivosComplemento from '@/components/modals/ModalArchivosComplemento';
 
 export default function FichasPage() {
     const router = useRouter();
@@ -20,6 +22,7 @@ export default function FichasPage() {
         ortodoncia: 0
     });
     const [isLoading, setIsLoading] = useState(true);
+    const [isComplementOpen, setIsComplementOpen] = useState(false);
 
     const fetchCounts = async () => {
         try {
@@ -65,6 +68,15 @@ export default function FichasPage() {
             icon: DocumentTextIcon,
             color: 'from-orange-500 to-amber-500',
             clientCount: counts.ortodoncia,
+        },
+        {
+            id: 'archivos_complemento',
+            title: 'Archivos de complemento',
+            description: 'Gestión de documentos PDF adicionales',
+            icon: FolderPlusIcon,
+            color: 'from-emerald-500 to-teal-500',
+            isSpecial: true,
+            action: () => setIsComplementOpen(true)
         }
     ];
 
@@ -95,7 +107,7 @@ export default function FichasPage() {
                     return (
                         <button
                             key={ficha.id}
-                            onClick={() => goToFichaTipo(ficha.id)}
+                            onClick={() => ficha.action ? ficha.action() : goToFichaTipo(ficha.id)}
                             disabled={ficha.disabled}
                             className={`
                 relative overflow-hidden rounded-2xl p-6 text-left transition-all
@@ -116,7 +128,12 @@ export default function FichasPage() {
                                 <h3 className="text-xl font-bold text-gray-900 mb-2">{ficha.title}</h3>
                                 <p className="text-sm text-gray-600 mb-4">{ficha.description}</p>
 
-                                {!ficha.disabled && (
+                                {ficha.isSpecial ? (
+                                    <div className="text-sm font-bold text-emerald-600 group-hover:translate-x-1 transition-transform flex items-center gap-1">
+                                        Subir y gestionar archivos
+                                        <span className="text-lg">→</span>
+                                    </div>
+                                ) : !ficha.disabled && (
                                     <>
                                         <div className="flex items-center gap-3 mb-5">
                                             {isLoading ? (
@@ -141,6 +158,11 @@ export default function FichasPage() {
                     );
                 })}
             </div>
+
+            <ModalArchivosComplemento
+                isOpen={isComplementOpen}
+                onClose={() => setIsComplementOpen(false)}
+            />
         </div>
     );
 }

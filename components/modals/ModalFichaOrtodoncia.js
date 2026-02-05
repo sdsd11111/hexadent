@@ -261,7 +261,7 @@ const fichaSchema = z.object({
     s16_proc_habitos: z.string().optional().or(z.literal('')).nullable(),
     s16_proc_alteraciones_atm: z.string().optional().or(z.literal('')).nullable(),
     // Adhesion Reference (Structured)
-    s16_proc_adhesion_u_check: z.boolean().optional().default(false),
+    s16_proc_adhesion_u_check: z.string().optional().or(z.literal('')).nullable(),
     s16_proc_adhesion_u_11: z.string().optional().or(z.literal('')).nullable(),
     s16_proc_adhesion_u_12: z.string().optional().or(z.literal('')).nullable(),
     s16_proc_adhesion_u_13: z.string().optional().or(z.literal('')).nullable(),
@@ -269,7 +269,7 @@ const fichaSchema = z.object({
     s16_proc_adhesion_u_15: z.string().optional().or(z.literal('')).nullable(),
     s16_proc_adhesion_u_16: z.string().optional().or(z.literal('')).nullable(),
     s16_proc_adhesion_u_37: z.string().optional().or(z.literal('')).nullable(),
-    s16_proc_adhesion_l_check: z.boolean().optional().default(false),
+    s16_proc_adhesion_l_check: z.string().optional().or(z.literal('')).nullable(),
     s16_proc_adhesion_l_41_42: z.string().optional().or(z.literal('')).nullable(),
     s16_proc_adhesion_l_43: z.string().optional().or(z.literal('')).nullable(),
     s16_proc_adhesion_l_44: z.string().optional().or(z.literal('')).nullable(),
@@ -295,6 +295,8 @@ const fichaSchema = z.object({
     s16_consent_costo_total: z.string().optional().or(z.literal('')).nullable(),
     s16_consent_costo_mensual: z.string().optional().or(z.literal('')).nullable(),
     s16_consent_tiempo_estimado: z.string().optional().or(z.literal('')).nullable(),
+    s16_consent_readhesion_costo: z.string().optional().or(z.literal('')).nullable(),
+    s16_consent_bracket_perdida_costo: z.string().optional().or(z.literal('')).nullable(),
     s16_consent_acepta_tratamiento: z.boolean().optional().default(false),
     s16_consent_acepta_uso_registros: z.boolean().optional().default(false),
 });
@@ -351,8 +353,12 @@ export default function ModalFichaOrtodoncia({ isOpen, onClose, onSuccess, editD
             s16_consent_costo_total: '',
             s16_consent_costo_mensual: '',
             s16_consent_tiempo_estimado: '',
+            s16_consent_readhesion_costo: '10',
+            s16_consent_bracket_perdida_costo: '20',
             s16_consent_acepta_tratamiento: false,
             s16_consent_acepta_uso_registros: false,
+            s16_proc_adhesion_u_check: '',
+            s16_proc_adhesion_l_check: '',
         }
     });
 
@@ -427,8 +433,12 @@ export default function ModalFichaOrtodoncia({ isOpen, onClose, onSuccess, editD
                 s16_consent_costo_total: '',
                 s16_consent_costo_mensual: '',
                 s16_consent_tiempo_estimado: '',
+                s16_consent_readhesion_costo: '10',
+                s16_consent_bracket_perdida_costo: '20',
                 s16_consent_acepta_tratamiento: false,
                 s16_consent_acepta_uso_registros: false,
+                s16_proc_adhesion_u_check: '',
+                s16_proc_adhesion_l_check: '',
             });
             setActiveSection(1);
             setMainAccordion(1);
@@ -1267,6 +1277,17 @@ export default function ModalFichaOrtodoncia({ isOpen, onClose, onSuccess, editD
                                                                 </div>
                                                             </div>
 
+                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
+                                                                <div className="space-y-1">
+                                                                    <label className="text-[10px] font-bold text-slate-500 uppercase">Costo Readhesión ($)</label>
+                                                                    <input {...register('s16_consent_readhesion_costo')} className="w-full p-2.5 bg-white border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-orange-500 font-bold" placeholder="10" />
+                                                                </div>
+                                                                <div className="space-y-1">
+                                                                    <label className="text-[10px] font-bold text-slate-500 uppercase">Costo Pérdida Bracket ($)</label>
+                                                                    <input {...register('s16_consent_bracket_perdida_costo')} className="w-full p-2.5 bg-white border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-orange-500 font-bold" placeholder="20" />
+                                                                </div>
+                                                            </div>
+
                                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                                 <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200">
                                                                     <span className="text-[10px] font-bold text-slate-600 uppercase">Acepta Costo y Tratamiento</span>
@@ -1437,8 +1458,9 @@ export default function ModalFichaOrtodoncia({ isOpen, onClose, onSuccess, editD
                                                                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[10px] font-bold">
                                                                     <span className="uppercase text-slate-500 w-full md:w-auto">Referencia de Adhesión Arco U:</span>
                                                                     <div className="flex items-center gap-1">
-                                                                        <input type="checkbox" {...register('s16_proc_adhesion_u_check')} className="rounded border-slate-300 text-teal-600 focus:ring-teal-500 h-3 w-3" />
-                                                                        <span>( )</span>
+                                                                        <span>(</span>
+                                                                        <input type="text" {...register('s16_proc_adhesion_u_check')} className="w-6 p-0 bg-transparent border-b border-slate-300 border-t-0 border-l-0 border-r-0 focus:ring-0 text-center font-bold text-teal-600 h-4" />
+                                                                        <span>)</span>
                                                                     </div>
                                                                     {[11, 12, 13, 14, 15, 16, 37].map(num => (
                                                                         <div key={num} className="flex items-center gap-1">
@@ -1452,8 +1474,9 @@ export default function ModalFichaOrtodoncia({ isOpen, onClose, onSuccess, editD
                                                                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[10px] font-bold">
                                                                     <span className="uppercase text-slate-500 w-full md:w-auto">Referencia de Adhesión Arco L:</span>
                                                                     <div className="flex items-center gap-1">
-                                                                        <input type="checkbox" {...register('s16_proc_adhesion_l_check')} className="rounded border-slate-300 text-teal-600 focus:ring-teal-500 h-3 w-3" />
-                                                                        <span>( )</span>
+                                                                        <span>(</span>
+                                                                        <input type="text" {...register('s16_proc_adhesion_l_check')} className="w-6 p-0 bg-transparent border-b border-slate-300 border-t-0 border-l-0 border-r-0 focus:ring-0 text-center font-bold text-teal-600 h-4" />
+                                                                        <span>)</span>
                                                                     </div>
                                                                     <div className="flex items-center gap-1">
                                                                         <span>41/42</span>
@@ -1600,315 +1623,226 @@ export default function ModalFichaOrtodoncia({ isOpen, onClose, onSuccess, editD
                                                     </button>
                                                     {mainAccordion === 4 && (
                                                         <div className="px-5 pb-5 pt-2 space-y-4">
-                                                            {/* Sub-Accordion 3.1: Ortodoncia */}
-                                                            <div className={`rounded-xl border-2 transition-all ${subAccordion === 1 ? 'border-orange-500 bg-orange-50/10' : 'border-slate-200 bg-white'}`}>
-                                                                <button type="button" onClick={() => setSubAccordion(subAccordion === 1 ? null : 1)} className="flex w-full items-center justify-between px-4 py-3 text-left">
-                                                                    <span className="text-xs font-black uppercase text-slate-600">3.1 REGISTRO DE PAGO POR TRATAMIENTO DE ORTODONCIA</span>
-                                                                    <ChevronDownIcon className={`h-4 w-4 text-slate-400 transition-transform ${subAccordion === 1 ? 'rotate-180' : ''}`} />
-                                                                </button>
-                                                                {subAccordion === 1 && (
-                                                                    <div className="px-4 pb-4 space-y-4">
-                                                                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                                                            <div className="space-y-1">
-                                                                                <label className="text-[10px] font-bold text-slate-500 uppercase">Fecha</label>
-                                                                                <input type="date" {...register('s16_ppto_fecha')} className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold" />
-                                                                            </div>
-                                                                            <div className="space-y-1">
-                                                                                <label className="text-[10px] font-bold text-slate-500 uppercase">Total Tratamiento</label>
-                                                                                <input type="text" {...register('s16_ppto_total_tratamiento')} className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold" />
-                                                                            </div>
-                                                                            <div className="space-y-1">
-                                                                                <label className="text-[10px] font-bold text-slate-500 uppercase">Tiempo Estimado</label>
-                                                                                <input type="text" {...register('s16_ppto_tiempo_estimado')} className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold" />
-                                                                            </div>
-                                                                            <div className="space-y-1">
-                                                                                <label className="text-[10px] font-bold text-slate-500 uppercase">Cuota Mensual</label>
-                                                                                <input type="text" {...register('s16_ppto_cuota_mensual')} className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold" />
-                                                                            </div>
-                                                                            <div className="space-y-1">
-                                                                                <label className="text-[10px] font-bold text-slate-500 uppercase">Costo Brackets Nuevo</label>
-                                                                                <input type="text" {...register('s16_ppto_costo_brackets_nuevo')} className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold" />
-                                                                            </div>
-                                                                            <div className="space-y-1">
-                                                                                <label className="text-[10px] font-bold text-slate-500 uppercase">Readhesion pasado 6 meses</label>
-                                                                                <input type="text" {...register('s16_ppto_readhesion')} className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold" />
-                                                                            </div>
-                                                                            <div className="space-y-1 md:col-span-2">
-                                                                                <label className="text-[10px] font-bold text-slate-500 uppercase">Tratamiento con Extracciones</label>
-                                                                                <input type="text" {...register('s16_ppto_extracciones')} className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold" />
-                                                                            </div>
-                                                                            <div className="space-y-1 md:col-span-2">
-                                                                                <label className="text-[10px] font-bold text-slate-500 uppercase">Cirugia de Terceros Molares</label>
-                                                                                <input type="text" {...register('s16_ppto_cirugia_terceros')} className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold" />
-                                                                            </div>
-                                                                            <div className="space-y-1 md:col-span-2">
-                                                                                <label className="text-[10px] font-bold text-slate-500 uppercase">Caninos</label>
-                                                                                <input type="text" {...register('s16_ppto_caninos')} className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold" />
-                                                                            </div>
-                                                                        </div>
+                                                            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                                                                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                                                    <div className="space-y-1">
+                                                                        <label className="text-[10px] font-bold text-slate-500 uppercase">Fecha</label>
+                                                                        <input type="date" {...register('s16_ppto_fecha')} className="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs font-bold" />
+                                                                    </div>
+                                                                    <div className="space-y-1">
+                                                                        <label className="text-[10px] font-bold text-slate-500 uppercase">Total Tratamiento</label>
+                                                                        <input type="text" {...register('s16_ppto_total_tratamiento')} className="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs font-bold" />
+                                                                    </div>
+                                                                    <div className="space-y-1">
+                                                                        <label className="text-[10px] font-bold text-slate-500 uppercase">Tiempo Estimado</label>
+                                                                        <input type="text" {...register('s16_ppto_tiempo_estimado')} className="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs font-bold" />
+                                                                    </div>
+                                                                    <div className="space-y-1">
+                                                                        <label className="text-[10px] font-bold text-slate-500 uppercase">Cuota Mensual</label>
+                                                                        <input type="text" {...register('s16_ppto_cuota_mensual')} className="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs font-bold" />
+                                                                    </div>
+                                                                    <div className="space-y-1">
+                                                                        <label className="text-[10px] font-bold text-slate-500 uppercase">Costo Brackets Nuevo</label>
+                                                                        <input type="text" {...register('s16_ppto_costo_brackets_nuevo')} className="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs font-bold" />
+                                                                    </div>
+                                                                    <div className="space-y-1">
+                                                                        <label className="text-[10px] font-bold text-slate-500 uppercase">Readhesion pasado 6 meses</label>
+                                                                        <input type="text" {...register('s16_ppto_readhesion')} className="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs font-bold" />
+                                                                    </div>
+                                                                    <div className="space-y-1 md:col-span-2">
+                                                                        <label className="text-[10px] font-bold text-slate-500 uppercase">Tratamiento con Extracciones</label>
+                                                                        <input type="text" {...register('s16_ppto_extracciones')} className="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs font-bold" />
+                                                                    </div>
+                                                                    <div className="space-y-1 md:col-span-2">
+                                                                        <label className="text-[10px] font-bold text-slate-500 uppercase">Cirugia de Terceros Molares</label>
+                                                                        <input type="text" {...register('s16_ppto_cirugia_terceros')} className="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs font-bold" />
+                                                                    </div>
+                                                                    <div className="space-y-1 md:col-span-2">
+                                                                        <label className="text-[10px] font-bold text-slate-500 uppercase">Caninos</label>
+                                                                        <input type="text" {...register('s16_ppto_caninos')} className="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs font-bold" />
+                                                                    </div>
+                                                                </div>
 
-                                                                        <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-                                                                            <table className="w-full text-left border-collapse bg-white">
-                                                                                <thead>
-                                                                                    <tr className="bg-slate-100 border-b border-slate-200">
-                                                                                        <th className="px-4 py-3 text-[10px] font-black uppercase text-slate-600 border-r border-slate-200 w-12 text-center">N°</th>
-                                                                                        <th className="px-4 py-3 text-[10px] font-black uppercase text-slate-600 border-r border-slate-200">Fecha</th>
-                                                                                        <th className="px-4 py-3 text-[10px] font-black uppercase text-slate-600 border-r border-slate-200">Mes</th>
-                                                                                        <th className="px-4 py-3 text-[10px] font-black uppercase text-slate-600 border-r border-slate-200">Valor</th>
-                                                                                        <th className="px-4 py-3 text-[10px] font-black uppercase text-slate-600">Forma de Pago</th>
-                                                                                    </tr>
-                                                                                </thead>
-                                                                                <tbody>
-                                                                                    {pagoFields.map((field, index) => (
-                                                                                        <tr key={field.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                                                                                            <td className="px-4 py-2 text-xs font-bold text-slate-400 border-r border-slate-200 text-center">{index + 1}</td>
-                                                                                            <td className="px-2 py-1 border-r border-slate-200">
-                                                                                                <input type="date" {...register(`s16_ppto_pagos_filas.${index}.fecha`)} className="w-full p-1 bg-transparent border-none text-xs font-bold focus:ring-0" />
-                                                                                            </td>
-                                                                                            <td className="px-2 py-1 border-r border-slate-200">
-                                                                                                <input type="text" {...register(`s16_ppto_pagos_filas.${index}.mes`)} className="w-full p-1 bg-transparent border-none text-[11px] font-bold focus:ring-0 uppercase" placeholder="MES" />
-                                                                                            </td>
-                                                                                            <td className="px-2 py-1 border-r border-slate-200">
-                                                                                                <input type="text" {...register(`s16_ppto_pagos_filas.${index}.valor`)} className="w-full p-1 bg-transparent border-none text-[11px] font-bold focus:ring-0" placeholder="$" />
-                                                                                            </td>
-                                                                                            <td className="px-2 py-1">
-                                                                                                <input type="text" {...register(`s16_ppto_pagos_filas.${index}.forma_pago`)} className="w-full p-1 bg-transparent border-none text-[11px] font-bold focus:ring-0" />
-                                                                                            </td>
-                                                                                        </tr>
-                                                                                    ))}
-                                                                                    <tr className="bg-slate-50 font-black">
-                                                                                        <td colSpan="3" className="px-4 py-2 text-[10px] uppercase text-slate-600 border-r border-slate-200 text-right">TOTAL</td>
+                                                                <div className="mt-4 border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                                                                    <table className="w-full text-left border-collapse bg-white">
+                                                                        <thead>
+                                                                            <tr className="bg-slate-100 border-b border-slate-200">
+                                                                                <th className="px-4 py-3 text-[10px] font-black uppercase text-slate-600 border-r border-slate-200 w-12 text-center">N°</th>
+                                                                                <th className="px-4 py-3 text-[10px] font-black uppercase text-slate-600 border-r border-slate-200">Fecha</th>
+                                                                                <th className="px-4 py-3 text-[10px] font-black uppercase text-slate-600 border-r border-slate-200">Mes</th>
+                                                                                <th className="px-4 py-3 text-[10px] font-black uppercase text-slate-600 border-r border-slate-200">Valor</th>
+                                                                                <th className="px-4 py-3 text-[10px] font-black uppercase text-slate-600">Forma de Pago</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            {pagoFields.map((field, index) => (
+                                                                                <tr key={field.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                                                                                    <td className="px-4 py-2 text-xs font-bold text-slate-400 border-r border-slate-200 text-center">{index + 1}</td>
+                                                                                    <td className="px-2 py-1 border-r border-slate-200">
+                                                                                        <input type="date" {...register(`s16_ppto_pagos_filas.${index}.fecha`)} className="w-full p-1 bg-transparent border-none text-xs font-bold focus:ring-0" />
+                                                                                    </td>
+                                                                                    <td className="px-2 py-1 border-r border-slate-200">
+                                                                                        <input type="text" {...register(`s16_ppto_pagos_filas.${index}.mes`)} className="w-full p-1 bg-transparent border-none text-[11px] font-bold focus:ring-0 uppercase" placeholder="MES" />
+                                                                                    </td>
+                                                                                    <td className="px-2 py-1 border-r border-slate-200">
+                                                                                        <input type="text" {...register(`s16_ppto_pagos_filas.${index}.valor`)} className="w-full p-1 bg-transparent border-none text-[11px] font-bold focus:ring-0" placeholder="$" />
+                                                                                    </td>
+                                                                                    <td className="px-2 py-1">
+                                                                                        <input type="text" {...register(`s16_ppto_pagos_filas.${index}.forma_pago`)} className="w-full p-1 bg-transparent border-none text-[11px] font-bold focus:ring-0" />
+                                                                                    </td>
+                                                                                </tr>
+                                                                            ))}
+                                                                            <tr className="bg-slate-50 font-black">
+                                                                                <td colSpan="3" className="px-4 py-2 text-[10px] uppercase text-slate-600 border-r border-slate-200 text-right">TOTAL</td>
+                                                                                <td className="px-2 py-1 border-r border-slate-200">
+                                                                                    <input type="text" {...register('s16_ppto_total_general')} className="w-full p-1 bg-transparent border-none text-[11px] font-bold focus:ring-0" placeholder="$ TOTAL" />
+                                                                                </td>
+                                                                                <td className="px-2 py-1"></td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+
+                                                                <div className="px-4 py-3 bg-slate-50 border border-slate-200 border-t-0 rounded-b-xl flex justify-between items-center">
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => appendPago({ fecha: '', mes: '', valor: '', forma_pago: '' })}
+                                                                        className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all text-[10px] font-bold uppercase"
+                                                                    >
+                                                                        <PlusIcon className="h-4 w-4" />
+                                                                        Añadir Fila
+                                                                    </button>
+                                                                    {pagoFields.length > 1 && (
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => removePago(pagoFields.length - 1)}
+                                                                            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all text-[10px] font-bold uppercase"
+                                                                        >
+                                                                            <XMarkIcon className="h-4 w-4" />
+                                                                            Eliminar Última
+                                                                        </button>
+                                                                    )}
+                                                                </div>
+
+                                                                <div className="space-y-2 mt-4">
+                                                                    <div className="bg-slate-100 p-2 rounded-t-lg border-x border-t border-slate-200">
+                                                                        <span className="text-[10px] font-black uppercase text-slate-600">COSTO ADICIONAL POR PERDIDA DE BRACKETS- TUBOS</span>
+                                                                    </div>
+                                                                    <div className="border border-slate-200 rounded-b-xl overflow-hidden shadow-sm">
+                                                                        <table className="w-full text-left border-collapse bg-white">
+                                                                            <thead>
+                                                                                <tr className="bg-slate-50 border-b border-slate-200">
+                                                                                    <th className="px-4 py-2 text-[10px] font-black uppercase text-slate-600 border-r border-slate-200 w-12 text-center">N°</th>
+                                                                                    <th className="px-4 py-2 text-[10px] font-black uppercase text-slate-600 border-r border-slate-200">Fecha</th>
+                                                                                    <th className="px-4 py-2 text-[10px] font-black uppercase text-slate-600 border-r border-slate-200">Descripción</th>
+                                                                                    <th className="px-4 py-2 text-[10px] font-black uppercase text-slate-600 border-r border-slate-200">Valor</th>
+                                                                                    <th className="px-4 py-2 text-[10px] font-black uppercase text-slate-600 border-r border-slate-200">Forma de Pago</th>
+                                                                                    <th className="px-4 py-2 text-[10px] font-black uppercase text-slate-600">Firma</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                {perditaFields.map((field, index) => (
+                                                                                    <tr key={field.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                                                                                        <td className="px-4 py-1.5 text-xs font-bold text-slate-400 border-r border-slate-200 text-center">{index + 1}</td>
                                                                                         <td className="px-2 py-1 border-r border-slate-200">
-                                                                                            <input type="text" {...register('s16_ppto_total_general')} className="w-full p-1 bg-transparent border-none text-[11px] font-bold focus:ring-0" placeholder="$ TOTAL" />
+                                                                                            <input type="date" {...register(`s16_ppto_perdida_filas.${index}.fecha`)} className="w-full p-1 bg-transparent border-none text-xs font-bold focus:ring-0" />
                                                                                         </td>
-                                                                                        <td className="px-2 py-1"></td>
+                                                                                        <td className="px-2 py-1 border-r border-slate-200">
+                                                                                            <input type="text" {...register(`s16_ppto_perdida_filas.${index}.mes`)} className="w-full p-1 bg-transparent border-none text-[11px] font-bold focus:ring-0 uppercase" placeholder="MOTIVO" />
+                                                                                        </td>
+                                                                                        <td className="px-2 py-1 border-r border-slate-200">
+                                                                                            <input type="text" {...register(`s16_ppto_perdida_filas.${index}.valor`)} className="w-full p-1 bg-transparent border-none text-[11px] font-bold focus:ring-0" placeholder="$" />
+                                                                                        </td>
+                                                                                        <td className="px-2 py-1 border-r border-slate-200">
+                                                                                            <select {...register(`s16_ppto_perdida_filas.${index}.forma_pago`)} className="w-full p-1 bg-transparent border-none text-[11px] font-bold focus:ring-0 uppercase">
+                                                                                                <option value="">SELECCIONAR</option>
+                                                                                                <option value="EFECTIVO">EFECTIVO</option>
+                                                                                                <option value="TRANSFERENCIA">TRANSFERENCIA</option>
+                                                                                                <option value="TARJETA DE CRÉDITO">TARJETA DE CRÉDITO</option>
+                                                                                                <option value="TARJETA DE DÉBITO">TARJETA DE DÉBITO</option>
+                                                                                            </select>
+                                                                                        </td>
+                                                                                        <td className="px-2 py-1">
+                                                                                        </td>
                                                                                     </tr>
-                                                                                </tbody>
-                                                                            </table>
-                                                                        </div>
-
-                                                                        <div className="px-4 py-3 bg-slate-50 border border-slate-200 border-t-0 rounded-b-xl flex justify-between items-center">
-                                                                            <button
-                                                                                type="button"
-                                                                                onClick={() => appendPago({ fecha: '', mes: '', valor: '', forma_pago: '' })}
-                                                                                className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all text-[10px] font-bold uppercase"
-                                                                            >
-                                                                                <PlusIcon className="h-4 w-4" />
-                                                                                Añadir Fila
+                                                                                ))}
+                                                                            </tbody>
+                                                                        </table>
+                                                                        <div className="px-4 py-2 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
+                                                                            <button type="button" onClick={() => appendPerdita({ fecha: '', mes: '', valor: '', forma_pago: '' })} className="text-[10px] font-bold text-teal-600 uppercase hover:text-teal-700 flex items-center gap-1">
+                                                                                <PlusIcon className="h-3 w-3" /> Añadir
                                                                             </button>
-                                                                            {pagoFields.length > 1 && (
-                                                                                <button
-                                                                                    type="button"
-                                                                                    onClick={() => removePago(pagoFields.length - 1)}
-                                                                                    className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all text-[10px] font-bold uppercase"
-                                                                                >
-                                                                                    <XMarkIcon className="h-4 w-4" />
-                                                                                    Eliminar Última
+                                                                            {perditaFields.length > 1 && (
+                                                                                <button type="button" onClick={() => removePerdita(perditaFields.length - 1)} className="text-[10px] font-bold text-red-600 uppercase hover:text-red-700 flex items-center gap-1">
+                                                                                    <XMarkIcon className="h-3 w-3" /> Eliminar
                                                                                 </button>
                                                                             )}
                                                                         </div>
-
-                                                                        {/* Perdida de Brackets */}
-                                                                        <div className="space-y-2">
-                                                                            <div className="bg-slate-100 p-2 rounded-t-lg border-x border-t border-slate-200">
-                                                                                <span className="text-[10px] font-black uppercase text-slate-600">COSTO ADICIONAL POR PERDIDA DE BRACKETS- TUBOS</span>
-                                                                            </div>
-                                                                            <div className="border border-slate-200 rounded-b-xl overflow-hidden shadow-sm">
-                                                                                <table className="w-full text-left border-collapse bg-white">
-                                                                                    <thead>
-                                                                                        <tr className="bg-slate-50 border-b border-slate-200">
-                                                                                            <th className="px-4 py-2 text-[10px] font-black uppercase text-slate-600 border-r border-slate-200 w-12 text-center">N°</th>
-                                                                                            <th className="px-4 py-2 text-[10px] font-black uppercase text-slate-600 border-r border-slate-200">Fecha</th>
-                                                                                            <th className="px-4 py-2 text-[10px] font-black uppercase text-slate-600 border-r border-slate-200">Descripción</th>
-                                                                                            <th className="px-4 py-2 text-[10px] font-black uppercase text-slate-600 border-r border-slate-200">Valor</th>
-                                                                                            <th className="px-4 py-2 text-[10px] font-black uppercase text-slate-600">Firma</th>
-                                                                                        </tr>
-                                                                                    </thead>
-                                                                                    <tbody>
-                                                                                        {perditaFields.map((field, index) => (
-                                                                                            <tr key={field.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                                                                                                <td className="px-4 py-1.5 text-xs font-bold text-slate-400 border-r border-slate-200 text-center">{index + 1}</td>
-                                                                                                <td className="px-2 py-1 border-r border-slate-200">
-                                                                                                    <input type="date" {...register(`s16_ppto_perdida_filas.${index}.fecha`)} className="w-full p-1 bg-transparent border-none text-xs font-bold focus:ring-0" />
-                                                                                                </td>
-                                                                                                <td className="px-2 py-1 border-r border-slate-200">
-                                                                                                    <input type="text" {...register(`s16_ppto_perdida_filas.${index}.mes`)} className="w-full p-1 bg-transparent border-none text-[11px] font-bold focus:ring-0 uppercase" placeholder="MOTIVO" />
-                                                                                                </td>
-                                                                                                <td className="px-2 py-1 border-r border-slate-200">
-                                                                                                    <input type="text" {...register(`s16_ppto_perdida_filas.${index}.valor`)} className="w-full p-1 bg-transparent border-none text-[11px] font-bold focus:ring-0" placeholder="$" />
-                                                                                                </td>
-                                                                                                <td className="px-2 py-1">
-                                                                                                    <input type="text" {...register(`s16_ppto_perdida_filas.${index}.forma_pago`)} className="w-full p-1 bg-transparent border-none text-[11px] font-bold focus:ring-0" />
-                                                                                                </td>
-                                                                                            </tr>
-                                                                                        ))}
-                                                                                    </tbody>
-                                                                                </table>
-                                                                                <div className="px-4 py-2 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
-                                                                                    <button type="button" onClick={() => appendPerdita({ fecha: '', mes: '', valor: '', forma_pago: '' })} className="text-[10px] font-bold text-teal-600 uppercase hover:text-teal-700 flex items-center gap-1">
-                                                                                        <PlusIcon className="h-3 w-3" /> Añadir
-                                                                                    </button>
-                                                                                    {perditaFields.length > 1 && (
-                                                                                        <button type="button" onClick={() => removePerdita(perditaFields.length - 1)} className="text-[10px] font-bold text-red-600 uppercase hover:text-red-700 flex items-center gap-1">
-                                                                                            <XMarkIcon className="h-3 w-3" /> Eliminar
-                                                                                        </button>
-                                                                                    )}
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-
-                                                                        {/* Readhesion de Brackets */}
-                                                                        <div className="space-y-2">
-                                                                            <div className="bg-slate-100 p-2 rounded-t-lg border-x border-t border-slate-200">
-                                                                                <span className="text-[10px] font-black uppercase text-slate-600">READHESION DE BRACKETS</span>
-                                                                            </div>
-                                                                            <div className="border border-slate-200 rounded-b-xl overflow-hidden shadow-sm">
-                                                                                <table className="w-full text-left border-collapse bg-white">
-                                                                                    <thead>
-                                                                                        <tr className="bg-slate-50 border-b border-slate-200">
-                                                                                            <th className="px-4 py-2 text-[10px] font-black uppercase text-slate-600 border-r border-slate-200 w-12 text-center">N°</th>
-                                                                                            <th className="px-4 py-2 text-[10px] font-black uppercase text-slate-600 border-r border-slate-200">Fecha</th>
-                                                                                            <th className="px-4 py-2 text-[10px] font-black uppercase text-slate-600 border-r border-slate-200">Descripción</th>
-                                                                                            <th className="px-4 py-2 text-[10px] font-black uppercase text-slate-600 border-r border-slate-200">Valor</th>
-                                                                                            <th className="px-4 py-2 text-[10px] font-black uppercase text-slate-600">Firma</th>
-                                                                                        </tr>
-                                                                                    </thead>
-                                                                                    <tbody>
-                                                                                        {readhesionFields.map((field, index) => (
-                                                                                            <tr key={field.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                                                                                                <td className="px-4 py-1.5 text-xs font-bold text-slate-400 border-r border-slate-200 text-center">{index + 1}</td>
-                                                                                                <td className="px-2 py-1 border-r border-slate-200">
-                                                                                                    <input type="date" {...register(`s16_ppto_readhesion_filas.${index}.fecha`)} className="w-full p-1 bg-transparent border-none text-xs font-bold focus:ring-0" />
-                                                                                                </td>
-                                                                                                <td className="px-2 py-1 border-r border-slate-200">
-                                                                                                    <input type="text" {...register(`s16_ppto_readhesion_filas.${index}.mes`)} className="w-full p-1 bg-transparent border-none text-[11px] font-bold focus:ring-0 uppercase" placeholder="MOTIVO" />
-                                                                                                </td>
-                                                                                                <td className="px-2 py-1 border-r border-slate-200">
-                                                                                                    <input type="text" {...register(`s16_ppto_readhesion_filas.${index}.valor`)} className="w-full p-1 bg-transparent border-none text-[11px] font-bold focus:ring-0" placeholder="$" />
-                                                                                                </td>
-                                                                                                <td className="px-2 py-1">
-                                                                                                    <input type="text" {...register(`s16_ppto_readhesion_filas.${index}.forma_pago`)} className="w-full p-1 bg-transparent border-none text-[11px] font-bold focus:ring-0" />
-                                                                                                </td>
-                                                                                            </tr>
-                                                                                        ))}
-                                                                                    </tbody>
-                                                                                </table>
-                                                                                <div className="px-4 py-2 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
-                                                                                    <button type="button" onClick={() => appendReadhesion({ fecha: '', mes: '', valor: '', forma_pago: '' })} className="text-[10px] font-bold text-teal-600 uppercase hover:text-teal-700 flex items-center gap-1">
-                                                                                        <PlusIcon className="h-3 w-3" /> Añadir
-                                                                                    </button>
-                                                                                    {readhesionFields.length > 1 && (
-                                                                                        <button type="button" onClick={() => removeReadhesion(readhesionFields.length - 1)} className="text-[10px] font-bold text-red-600 uppercase hover:text-red-700 flex items-center gap-1">
-                                                                                            <XMarkIcon className="h-3 w-3" /> Eliminar
-                                                                                        </button>
-                                                                                    )}
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <div className="space-y-1">
-                                                                            <label className="text-[10px] font-bold text-slate-500 uppercase">Nota de Aparato / Otros</label>
-                                                                            <input type="text" {...register('s16_ppto_aparato_footer')} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold" />
-                                                                        </div>
                                                                     </div>
-                                                                )}
-                                                            </div>
+                                                                </div>
 
-                                                            {/* Sub-Accordion 3.2: Ortodoncia + Cirugia */}
-                                                            <div className={`rounded-xl border-2 transition-all ${subAccordion === 2 ? 'border-orange-500 bg-orange-50/10' : 'border-slate-200 bg-white'}`}>
-                                                                <button type="button" onClick={() => setSubAccordion(subAccordion === 2 ? null : 2)} className="flex w-full items-center justify-between px-4 py-3 text-left">
-                                                                    <span className="text-xs font-black uppercase text-slate-600">3.2 REGISTRO DE PAGO POR TRATAMIENTO DE ORTODONCIA Y CIRUGIA</span>
-                                                                    <ChevronDownIcon className={`h-4 w-4 text-slate-400 transition-transform ${subAccordion === 2 ? 'rotate-180' : ''}`} />
-                                                                </button>
-                                                                {subAccordion === 2 && (
-                                                                    <div className="px-4 pb-4 space-y-4">
-                                                                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                                                            <div className="space-y-1">
-                                                                                <label className="text-[10px] font-bold text-slate-500 uppercase">Fecha</label>
-                                                                                <input type="date" {...register('s16_ppto_cirugia_fecha')} className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold" />
-                                                                            </div>
-                                                                            <div className="space-y-1">
-                                                                                <label className="text-[10px] font-bold text-slate-500 uppercase">Total Tratamiento</label>
-                                                                                <input type="text" {...register('s16_ppto_cirugia_total_tratamiento')} className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold" />
-                                                                            </div>
-                                                                            <div className="space-y-1">
-                                                                                <label className="text-[10px] font-bold text-slate-500 uppercase">Tiempo Estimado</label>
-                                                                                <input type="text" {...register('s16_ppto_cirugia_tiempo_estimado')} className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold" />
-                                                                            </div>
-                                                                            <div className="space-y-1">
-                                                                                <label className="text-[10px] font-bold text-slate-500 uppercase">Cuota Mensual</label>
-                                                                                <input type="text" {...register('s16_ppto_cirugia_cuota_mensual')} className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold" />
-                                                                            </div>
-                                                                            <div className="space-y-1">
-                                                                                <label className="text-[10px] font-bold text-slate-500 uppercase">Costo Brackets Nuevo</label>
-                                                                                <input type="text" {...register('s16_ppto_cirugia_costo_brackets_nuevo')} className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold" />
-                                                                            </div>
-                                                                            <div className="space-y-1">
-                                                                                <label className="text-[10px] font-bold text-slate-500 uppercase">Readhesion pasado 6 meses</label>
-                                                                                <input type="text" {...register('s16_ppto_cirugia_readhesion')} className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold" />
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-                                                                            <table className="w-full text-left border-collapse bg-white">
-                                                                                <thead>
-                                                                                    <tr className="bg-slate-100 border-b border-slate-200">
-                                                                                        <th className="px-4 py-3 text-[10px] font-black uppercase text-slate-600 border-r border-slate-200 w-12 text-center">N°</th>
-                                                                                        <th className="px-4 py-3 text-[10px] font-black uppercase text-slate-600 border-r border-slate-200">Fecha</th>
-                                                                                        <th className="px-4 py-3 text-[10px] font-black uppercase text-slate-600 border-r border-slate-200">Mes</th>
-                                                                                        <th className="px-4 py-3 text-[10px] font-black uppercase text-slate-600 border-r border-slate-200">Valor</th>
-                                                                                        <th className="px-4 py-3 text-[10px] font-black uppercase text-slate-600">Forma de Pago</th>
+                                                                {/* Readhesion de Brackets */}
+                                                                <div className="space-y-2 mt-4">
+                                                                    <div className="bg-slate-100 p-2 rounded-t-lg border-x border-t border-slate-200">
+                                                                        <span className="text-[10px] font-black uppercase text-slate-600">READHESION DE BRACKETS</span>
+                                                                    </div>
+                                                                    <div className="border border-slate-200 rounded-b-xl overflow-hidden shadow-sm">
+                                                                        <table className="w-full text-left border-collapse bg-white">
+                                                                            <thead>
+                                                                                <tr className="bg-slate-50 border-b border-slate-200">
+                                                                                    <th className="px-4 py-2 text-[10px] font-black uppercase text-slate-600 border-r border-slate-200 w-12 text-center">N°</th>
+                                                                                    <th className="px-4 py-2 text-[10px] font-black uppercase text-slate-600 border-r border-slate-200">Fecha</th>
+                                                                                    <th className="px-4 py-2 text-[10px] font-black uppercase text-slate-600 border-r border-slate-200">Descripción</th>
+                                                                                    <th className="px-4 py-2 text-[10px] font-black uppercase text-slate-600 border-r border-slate-200">Valor</th>
+                                                                                    <th className="px-4 py-2 text-[10px] font-black uppercase text-slate-600 border-r border-slate-200">Forma de Pago</th>
+                                                                                    <th className="px-4 py-2 text-[10px] font-black uppercase text-slate-600">Firma</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                {readhesionFields.map((field, index) => (
+                                                                                    <tr key={field.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                                                                                        <td className="px-4 py-1.5 text-xs font-bold text-slate-400 border-r border-slate-200 text-center">{index + 1}</td>
+                                                                                        <td className="px-2 py-1 border-r border-slate-200">
+                                                                                            <input type="date" {...register(`s16_ppto_readhesion_filas.${index}.fecha`)} className="w-full p-1 bg-transparent border-none text-xs font-bold focus:ring-0" />
+                                                                                        </td>
+                                                                                        <td className="px-2 py-1 border-r border-slate-200">
+                                                                                            <input type="text" {...register(`s16_ppto_readhesion_filas.${index}.mes`)} className="w-full p-1 bg-transparent border-none text-[11px] font-bold focus:ring-0 uppercase" placeholder="MOTIVO" />
+                                                                                        </td>
+                                                                                        <td className="px-2 py-1 border-r border-slate-200">
+                                                                                            <input type="text" {...register(`s16_ppto_readhesion_filas.${index}.valor`)} className="w-full p-1 bg-transparent border-none text-[11px] font-bold focus:ring-0" placeholder="$" />
+                                                                                        </td>
+                                                                                        <td className="px-2 py-1 border-r border-slate-200">
+                                                                                            <select {...register(`s16_ppto_readhesion_filas.${index}.forma_pago`)} className="w-full p-1 bg-transparent border-none text-[11px] font-bold focus:ring-0 uppercase">
+                                                                                                <option value="">SELECCIONAR</option>
+                                                                                                <option value="EFECTIVO">EFECTIVO</option>
+                                                                                                <option value="TRANSFERENCIA">TRANSFERENCIA</option>
+                                                                                                <option value="TARJETA DE CRÉDITO">TARJETA DE CRÉDITO</option>
+                                                                                                <option value="TARJETA DE DÉBITO">TARJETA DE DÉBITO</option>
+                                                                                            </select>
+                                                                                        </td>
+                                                                                        <td className="px-2 py-1">
+                                                                                        </td>
                                                                                     </tr>
-                                                                                </thead>
-                                                                                <tbody>
-                                                                                    {pagoCirugiaFields.map((field, index) => (
-                                                                                        <tr key={field.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                                                                                            <td className="px-4 py-2 text-xs font-bold text-slate-400 border-r border-slate-200 text-center">{index + 1}</td>
-                                                                                            <td className="px-2 py-1 border-r border-slate-200">
-                                                                                                <input type="date" {...register(`s16_ppto_cirugia_pagos_filas.${index}.fecha`)} className="w-full p-1 bg-transparent border-none text-xs font-bold focus:ring-0" />
-                                                                                            </td>
-                                                                                            <td className="px-2 py-1 border-r border-slate-200">
-                                                                                                <input type="text" {...register(`s16_ppto_cirugia_pagos_filas.${index}.mes`)} className="w-full p-1 bg-transparent border-none text-[11px] font-bold focus:ring-0 uppercase" placeholder="MES" />
-                                                                                            </td>
-                                                                                            <td className="px-2 py-1 border-r border-slate-200">
-                                                                                                <input type="text" {...register(`s16_ppto_cirugia_pagos_filas.${index}.valor`)} className="w-full p-1 bg-transparent border-none text-[11px] font-bold focus:ring-0" placeholder="$" />
-                                                                                            </td>
-                                                                                            <td className="px-2 py-1">
-                                                                                                <input type="text" {...register(`s16_ppto_cirugia_pagos_filas.${index}.forma_pago`)} className="w-full p-1 bg-transparent border-none text-[11px] font-bold focus:ring-0" />
-                                                                                            </td>
-                                                                                        </tr>
-                                                                                    ))}
-                                                                                </tbody>
-                                                                            </table>
-                                                                        </div>
-
-                                                                        <div className="px-4 py-3 bg-slate-50 border border-slate-200 border-t-0 rounded-b-xl flex justify-between items-center">
-                                                                            <button
-                                                                                type="button"
-                                                                                onClick={() => appendPagoCirugia({ fecha: '', mes: '', valor: '', forma_pago: '' })}
-                                                                                className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all text-[10px] font-bold uppercase"
-                                                                            >
-                                                                                <PlusIcon className="h-4 w-4" />
-                                                                                Añadir Fila
+                                                                                ))}
+                                                                            </tbody>
+                                                                        </table>
+                                                                        <div className="px-4 py-2 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
+                                                                            <button type="button" onClick={() => appendReadhesion({ fecha: '', mes: '', valor: '', forma_pago: '' })} className="text-[10px] font-bold text-teal-600 uppercase hover:text-teal-700 flex items-center gap-1">
+                                                                                <PlusIcon className="h-3 w-3" /> Añadir
                                                                             </button>
-                                                                            {pagoCirugiaFields.length > 1 && (
-                                                                                <button
-                                                                                    type="button"
-                                                                                    onClick={() => removePagoCirugia(pagoCirugiaFields.length - 1)}
-                                                                                    className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all text-[10px] font-bold uppercase"
-                                                                                >
-                                                                                    <XMarkIcon className="h-4 w-4" />
-                                                                                    Eliminar Última
+                                                                            {readhesionFields.length > 1 && (
+                                                                                <button type="button" onClick={() => removeReadhesion(readhesionFields.length - 1)} className="text-[10px] font-bold text-red-600 uppercase hover:text-red-700 flex items-center gap-1">
+                                                                                    <XMarkIcon className="h-3 w-3" /> Eliminar
                                                                                 </button>
                                                                             )}
                                                                         </div>
-
-                                                                        <div className="space-y-1">
-                                                                            <label className="text-[10px] font-bold text-slate-500 uppercase">Nota de Aparato / Otros</label>
-                                                                            <input type="text" {...register('s16_ppto_cirugia_aparato_footer')} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold" />
-                                                                        </div>
                                                                     </div>
-                                                                )}
+                                                                </div>
+
+                                                                <div className="space-y-1 mt-4">
+                                                                    <label className="text-[10px] font-bold text-slate-500 uppercase">Nota de Aparato / Otros</label>
+                                                                    <input type="text" {...register('s16_ppto_aparato_footer')} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold" />
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     )}
@@ -1933,7 +1867,7 @@ export default function ModalFichaOrtodoncia({ isOpen, onClose, onSuccess, editD
                                         <PDFViewer width="100%" height="100%" showToolbar={false} className="border-none">
                                             <OrtodonciaDocument
                                                 data={pdfData}
-                                                mode={pdfData.pdfMode || (mainAccordion === 4 && subAccordion === 2 ? 4 : (mainAccordion === 2 ? 5 : (mainAccordion === 3 ? 2 : (mainAccordion || 1))))}
+                                                mode={pdfData.pdfMode || (mainAccordion === 4 ? 4 : (mainAccordion === 2 ? 5 : (mainAccordion === 3 ? 2 : (mainAccordion || 1))))}
                                             />
                                         </PDFViewer>
                                     </div>
@@ -1971,8 +1905,8 @@ export default function ModalFichaOrtodoncia({ isOpen, onClose, onSuccess, editD
                             </div>
                         </Dialog.Panel>
                     </div>
-                </div>
-            </Dialog>
+                </div >
+            </Dialog >
             <ModalGalleryFicha
                 isOpen={isGalleryOpen}
                 onClose={() => {
@@ -2004,6 +1938,6 @@ export default function ModalFichaOrtodoncia({ isOpen, onClose, onSuccess, editD
                 recordId={recordId}
                 fichaType="ortodoncia"
             />
-        </Transition>
+        </Transition >
     );
 }
