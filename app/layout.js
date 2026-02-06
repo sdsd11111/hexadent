@@ -29,7 +29,7 @@ export const metadata = {
         type: 'website',
         images: [
             {
-                url: '/og-image.jpg',
+                url: '/logo.jpg',
                 width: 1200,
                 height: 630,
                 alt: 'Hexadent - Odontología Especializada',
@@ -40,7 +40,11 @@ export const metadata = {
         card: 'summary_large_image',
         title: 'Hexadent - Ortodoncia Especializada en Loja',
         description: 'Transforma tu sonrisa con tratamientos de ortodoncia de vanguardia en el corazón de Loja.',
-        images: ['/og-image.jpg'],
+        images: ['/logo.jpg'],
+    },
+    icons: {
+        icon: '/favicon.png',
+        apple: '/favicon.png',
     },
     robots: {
         index: true,
@@ -62,7 +66,7 @@ export default function RootLayout({ children }) {
     return (
         <html lang="es-EC">
             <head>
-                <link rel="icon" href="/favicon.ico" />
+                <link rel="icon" href="/favicon.png" />
                 <meta name="geo.region" content="EC-L" />
                 <meta name="geo.placename" content="Loja" />
                 <meta name="geo.position" content="-3.9933;-79.2042" />

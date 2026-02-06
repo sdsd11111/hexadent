@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+@import 'leaflet/dist/leaflet.css';
+
+
 :root {
   --color-primary: #009797;
   --color-secondary: #58595b;

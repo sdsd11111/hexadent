@@ -183,13 +183,13 @@ export default function Footer() {
                 <div className="container-custom py-6">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-400">
                         <p>
-                            © {currentYear} <strong className="text-white">HEXADENT</strong> - Odontología Especializada. Todos los derechos reservados.
+                            Diseñado por <a href="https://cesarreyesjaramillo.com/" target="_blank" rel="noopener noreferrer" className="text-white hover:text-primary transition-sharp font-bold">Cesar Reyes</a> | Hexadent 2026
                         </p>
                         <div className="flex gap-6">
-                            <Link href="#" className="hover:text-primary transition-sharp">
+                            <Link href="/politica-de-privacidad" className="hover:text-primary transition-sharp">
                                 Política de Privacidad
                             </Link>
-                            <Link href="#" className="hover:text-primary transition-sharp">
+                            <Link href="/terminos-de-servicio" className="hover:text-primary transition-sharp">
                                 Términos de Servicio
                             </Link>
                         </div>

@@ -1,6 +1,10 @@
 'use client'
 
 import { useState } from 'react'
+import dynamic from 'next/dynamic'
+
+const LeafletMap = dynamic(() => import('./LeafletMap'), { ssr: false })
+
 
 export default function Contact() {
     const [formData, setFormData] = useState({
@@ -160,34 +164,7 @@ export default function Contact() {
                         <div className="absolute inset-0 bg-gray-100 shadow-2xl overflow-hidden"
                             style={{ clipPath: 'polygon(0 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%)' }}> {/* Marco Hexa-Tech */}
 
-                            {/* Mapa */}
-                            <iframe
-                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1991.6053335279647!2d-79.20455866113978!3d-3.996145699479133!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91cb48013665a3c9%3A0x6b80145c2f82c0b4!2sLourdes%2C%20Loja!5e0!3m2!1ses!2sec!4v1705000000000!5m2!1ses!2sec"
-                                width="100%"
-                                height="100%"
-                                style={{ border: 0 }}
-                                allowFullScreen=""
-                                loading="lazy"
-                                referrerPolicy="no-referrer-when-downgrade"
-                                className="w-full h-full"
-                            ></iframe>
-
-                            {/* Tarjeta Flotante Sobre el Mapa */}
-                            <div className="absolute bottom-6 left-6 right-6 bg-white/95 backdrop-blur-sm p-6 border-l-4 border-primary shadow-lg">
-                                <h4 className="font-black text-secondary text-lg mb-1">San Sebastián, Loja</h4>
-                                <p className="text-sm text-gray-600 mb-2 font-medium">Calles Lourdes 156-46 entre Bolívar y Sucre</p>
-                                <a
-                                    href="https://maps.google.com/?q=Lourdes+156-46,+Loja"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-primary text-xs font-bold uppercase hover:text-secondary flex items-center gap-1"
-                                >
-                                    Ver ubicación en Google Maps
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                    </svg>
-                                </a>
-                            </div>
+                            <LeafletMap />
                         </div>
                     </div>
 
