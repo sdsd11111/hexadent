@@ -74,8 +74,7 @@ export async function POST(request) {
 
         for (const msg of messages) {
             if (msg.from && msg.text) {
-                console.log(`[Webhook] Queuing message from ${msg.from}: ${msg.text}`);
-                // Use debounced processing to group rapid messages
+                console.log(`[Webhook] Queuing message (3s debounce) from ${msg.from}: ${msg.text}`);
                 await debounceMessage(msg.from, msg.text, msg.to);
             }
         }
