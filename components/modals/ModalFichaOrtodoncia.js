@@ -1914,19 +1914,6 @@ export default function ModalFichaOrtodoncia({ isOpen, onClose, onSuccess, editD
                     setSelectingImageFor(null);
                 }}
                 images={watch('imagenes') || []}
-                onSave={(imgs) => {
-                    setValue('imagenes', imgs);
-                    // If selecting for PDF image, take last uploaded image
-                    if (selectingImageFor && imgs.length > 0) {
-                        const lastDate = imgs[imgs.length - 1];
-                        const lastImages = lastDate.data;
-                        if (lastImages && lastImages.length > 0) {
-                            const fieldName = selectingImageFor === 'image1' ? 's16_proc_image1' : 's16_proc_image2';
-                            setValue(fieldName, lastImages[lastImages.length - 1]);
-                            setSelectingImageFor(null);
-                        }
-                    }
-                }}
                 onSelectImage={(imgUrl) => {
                     if (selectingImageFor) {
                         const fieldName = selectingImageFor === 'image1' ? 's16_proc_image1' : 's16_proc_image2';
@@ -1936,6 +1923,8 @@ export default function ModalFichaOrtodoncia({ isOpen, onClose, onSuccess, editD
                     }
                 }}
                 recordId={recordId}
+                cedula={watch('cedula')}
+                modulo="ortodoncia"
                 fichaType="ortodoncia"
             />
         </Transition >

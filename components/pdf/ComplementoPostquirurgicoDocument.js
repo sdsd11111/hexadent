@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 12,
-        fontFamily: 'Helvetica-BoldOblique', // Using Oblique for Italic effect
+        fontFamily: 'Helvetica-BoldOblique',
         textAlign: 'center',
         textTransform: 'uppercase',
         textDecoration: 'underline',
@@ -79,30 +79,16 @@ const styles = StyleSheet.create({
         lineHeight: 1.4,
         fontFamily: 'Helvetica',
     },
-    doctorSignature: {
-        marginTop: 50,
-        alignItems: 'flex-start', // Left aligned based on image
-        marginLeft: 20,
-    },
     doctorName: {
-        fontSize: 14,
-        fontFamily: 'Times-BoldItalic', // Trying to match the script-like font in image
-        marginBottom: 2,
+        fontSize: 11,
+        fontFamily: 'Times-Italic',
     },
-    emergencyText: {
+    phoneNumber: {
         fontSize: 10,
         fontFamily: 'Helvetica',
-        marginTop: 10,
+        textAlign: 'center',
+        marginTop: 2,
     },
-    emergencySection: {
-        marginTop: 40,
-        marginLeft: 0,
-    },
-    row: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 5
-    }
 });
 
 const ComplementoPostquirurgicoDocument = ({ data = {} }) => {
@@ -116,7 +102,8 @@ const ComplementoPostquirurgicoDocument = ({ data = {} }) => {
         "Reposo (no realizar actividad física), Mantener una postura en que la cabeza este a nivel más alto del cuerpo (dormir semi sentado).",
         "Si aparece un sangrado anormal, doble una gasa estéril, colóquela sobre la zona y muerda durante 30 minutos.",
         "Recomendamos no fumar durante el postoperatorio (por lo menos 15 días después de la intervención quirúrgica). No tome alcohol, ni bebidas carbonatadas.",
-        "Lavados con jeringa y suero fisiológico a partir del tercer día, después de cada comida."
+        "Lavados con jeringa y suero fisiológico a partir del tercer día, después de cada comida.",
+        "En caso de urgencia llamar al teléfono: Dra. Diana Rodríguez 0967885039"
     ];
 
     const recommendations = data.recommendations && data.recommendations.length > 0 ? data.recommendations : defaultRecs;
@@ -132,25 +119,29 @@ const ComplementoPostquirurgicoDocument = ({ data = {} }) => {
                 </View>
 
                 <View style={styles.titleContainer}>
-                    <Text style={styles.title}>{data.title || 'INDICACIONES Y RECOMENDACIONES POSTQUIRURGICAS'}</Text>
+                    <Text style={styles.title}>{data.title || 'INDICACIONES Y RECOMENDACIONES POSTQUIRÚRGICAS'}</Text>
                 </View>
 
                 <View style={styles.contentSection}>
                     {recommendations.map((rec, index) => {
-                        // Apply custom bolding for specific key phrases if it matches default text
-                        // Simplified approach: Render text text fragments if it matches strict criteria, else normal text.
-                        // For flexibility, we will just bold the whole line if it contains specific keywords as previously done, 
-                        // OR we can try to split by known delimiters if users edit it. 
-                        // Given the editor allows free text, robust bolding of specific words is hard without a rich text editor.
-                        // We will replicate the visual from the image for the DEFAULT text case.
-
                         let content = <Text style={styles.bulletText}>{rec}</Text>;
 
+                        // Point 6: Bold formatting for "Dieta líquida" and "No comer"
                         if (rec.includes("Dieta líquida")) {
                             content = (
                                 <Text style={styles.bulletText}>
                                     <Text style={{ fontFamily: 'Helvetica-Bold' }}>Dieta líquida</Text> primer día, segundo día dieta blanda a temperatura ambiente, beber abundantes líquidos. Evitar alimentos irritantes, masticar por el lado no intervenido si es posible. Evitar los granos y alimentos nocivos.{'\n'}
-                                    <Text style={{ fontFamily: 'Helvetica-Bold' }}>               No comer</Text> carne de chancho, mariscos, lácteos.
+                                    <Text style={{ marginLeft: 14 }}>     <Text style={{ fontFamily: 'Helvetica-Bold' }}>No comer</Text> carne de chancho, mariscos, lácteos.</Text>
+                                </Text>
+                            );
+                        }
+
+                        // Point 11: Special formatting with doctor name in italic
+                        if (rec.includes("En caso de urgencia")) {
+                            content = (
+                                <Text style={styles.bulletText}>
+                                    En caso de urgencia llamar al teléfono:  <Text style={styles.doctorName}>{data.doctorName || 'Dra. Diana Rodríguez'}</Text>{'\n'}
+                                    <Text style={{ textAlign: 'center', display: 'block', width: '100%', marginTop: 2 }}>                                                       {data.emergencyNumber || '0967885039'}</Text>
                                 </Text>
                             );
                         }
@@ -162,14 +153,6 @@ const ComplementoPostquirurgicoDocument = ({ data = {} }) => {
                             </View>
                         );
                     })}
-                </View>
-
-                <View style={styles.emergencySection}>
-                    <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' }}>
-                        <Text style={{ fontSize: 10, fontFamily: 'Helvetica' }}>11. En caso de urgencia llamar al teléfono:</Text>
-                        <Text style={styles.doctorName}>{data.doctorName || 'Dra. Diana Rodríguez'}</Text>
-                    </View>
-                    <Text style={{ fontSize: 10, fontFamily: 'Helvetica', alignSelf: 'flex-end', marginTop: 5 }}>{data.emergencyNumber || '0967885039'}</Text>
                 </View>
 
                 <View style={styles.footer} fixed>

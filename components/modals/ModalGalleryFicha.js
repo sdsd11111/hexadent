@@ -1,167 +1,253 @@
-'use client';
-
 import { useState, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
-import { XMarkIcon, PhotoIcon, CloudArrowUpIcon, TrashIcon, CalendarDaysIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
+import axios from 'axios';
+import {
+    XMarkIcon,
+    PhotoIcon,
+    CloudArrowUpIcon,
+    TrashIcon,
+    CalendarDaysIcon,
+    CheckCircleIcon,
+    VideoCameraIcon,
+    DocumentIcon,
+    PencilSquareIcon,
+    ChevronDownIcon
+} from '@heroicons/react/24/outline';
 
-export default function ModalGalleryFicha({ isOpen, onClose, images = [], historyImages = [], onSave, recordId, fichaType = 'odontologia', onSelectImage }) {
-    // get local date in YYYY-MM-DD format
-    const getLocalDate = () => new Date().toLocaleDateString('sv-SE');
-
-    const [selectedDate, setSelectedDate] = useState(getLocalDate());
+export default function ModalGalleryFicha({ isOpen, onClose, images = [], recordId, cedula, modulo, onSelectImage }) {
+    const [mediaList, setMediaList] = useState([]);
+    const [loading, setLoading] = useState(false);
     const [uploading, setUploading] = useState(false);
-    const [saveStatus, setSaveStatus] = useState(null); // 'saving', 'success', 'error'
-    const [previewImage, setPreviewImage] = useState(null);
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const [selectedCategory, setSelectedCategory] = useState('Diagnóstico');
+    const [editingMedia, setEditingMedia] = useState(null);
+    const [previewMedia, setPreviewMedia] = useState(null);
+    const [showZoomMsg, setShowZoomMsg] = useState(false);
 
-    // Refresh local date when opening modal
+    const categories = ['Diagnóstico', 'En proceso 1 año', 'En proceso 2 años', 'Finales', 'Otros'];
+
     useEffect(() => {
-        if (isOpen) {
-            setSelectedDate(getLocalDate());
+        if (isOpen && (cedula || recordId)) {
+            fetchMedia();
         }
-    }, [isOpen]);
+    }, [isOpen, cedula, recordId]);
 
-    const groupedImages = images.reduce((acc, curr) => {
-        const date = curr.date;
-        if (!acc[date]) acc[date] = [];
-        acc[date].push(...curr.data);
-        return acc;
-    }, {});
-
-    const compressImage = async (file) => {
-        return new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = (event) => {
-                const img = new Image();
-                img.src = event.target.result;
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    let width = img.width;
-                    let height = img.height;
-                    const MAX_WIDTH = 800; // Reduced for super compression
-                    const MAX_HEIGHT = 800; // Reduced for super compression
-                    if (width > height) {
-                        if (width > MAX_WIDTH) {
-                            height *= MAX_WIDTH / width;
-                            width = MAX_WIDTH;
-                        }
-                    } else {
-                        if (height > MAX_HEIGHT) {
-                            width *= MAX_HEIGHT / height;
-                            height = MAX_HEIGHT;
-                        }
-                    }
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-                    let quality = 0.2; // Aggressive initial quality
-                    let dataUrl = canvas.toDataURL('image/jpeg', quality);
-                    // Targeted for < 300KB for maximum efficiency
-                    while (dataUrl.length > 0.3 * 1024 * 1024 && quality > 0.05) {
-                        quality -= 0.05;
-                        dataUrl = canvas.toDataURL('image/jpeg', quality);
-                    }
-                    resolve(dataUrl);
-                };
-            };
-        });
-    };
-
-    const persistImages = async (newImages) => {
-        if (!recordId) return; // Only auto-save if record already exists
-
-        setSaveStatus('saving');
+    const fetchMedia = async () => {
+        setLoading(true);
         try {
-            const response = await fetch('/api/fichas', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    id: recordId,
-                    fichaType: fichaType,
-                    // Note: We need the full data object or a way to patch. 
-                    // To be safe, the parent handles the full data merge.
-                    updateType: 'imagenes_only',
-                    imagenes: newImages
-                }),
-            });
-
+            // Build query with cedula/recordId and modulo for isolation
+            let query = cedula ? `cedula=${cedula}` : `ficha_id=${recordId}`;
+            if (modulo) {
+                query += `&modulo=${modulo}`;
+            }
+            const response = await fetch(`/api/media?${query}`);
             if (response.ok) {
-                setSaveStatus('success');
-                setTimeout(() => setSaveStatus(null), 2000);
-            } else {
-                setSaveStatus('error');
+                const data = await response.json();
+                setMediaList(data.media || []);
             }
         } catch (error) {
-            setSaveStatus('error');
+            console.error('Error fetching media:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
     const handleFileUpload = async (e) => {
         const files = Array.from(e.target.files);
-        if (files.length === 0) return;
+        if (files.length === 0 || !cedula) return;
+
+        // Differentiated Size limits
+        const validFiles = files.filter(f => {
+            const isVideo = f.type.startsWith('video/');
+            const isPdf = f.type === 'application/pdf';
+            const isImage = f.type.startsWith('image/');
+
+            if (!isVideo && !isPdf && !isImage) return false;
+
+            // Check size only if not an image (images will be compressed)
+            if (!isImage) {
+                const maxSize = isVideo ? 10 * 1024 * 1024 : (isPdf ? 5 * 1024 * 1024 : 1 * 1024 * 1024);
+                const limitDesc = isVideo ? '10MB' : (isPdf ? '5MB' : '1MB');
+
+                if (f.size > maxSize) {
+                    alert(`El archivo ${f.name} supera el límite de ${limitDesc} y será omitido.`);
+                    return false;
+                }
+            }
+            return true;
+        });
+
+        if (validFiles.length === 0) return;
 
         setUploading(true);
-        const compressedImages = await Promise.all(files.map(file => compressImage(file)));
+        setUploadProgress(0);
 
-        const newImages = [...images];
-        const dateIndex = newImages.findIndex(item => item.date === selectedDate);
+        try {
+            const totalFiles = validFiles.length;
+            let completedFiles = 0;
 
-        if (dateIndex > -1) {
-            newImages[dateIndex].data = [...newImages[dateIndex].data, ...compressedImages];
-        } else {
-            newImages.push({ date: selectedDate, data: compressedImages });
+            for (const file of validFiles) {
+                let fileToUpload = file;
+                const isImage = file.type.startsWith('image/');
+
+                // Compress image if applicable
+                if (isImage) {
+                    try {
+                        // Helper to compress image
+                        const compressImage = async (file) => {
+                            return new Promise((resolve, reject) => {
+                                const img = new Image();
+                                img.src = URL.createObjectURL(file);
+                                img.onload = () => {
+                                    const canvas = document.createElement('canvas');
+                                    let width = img.width;
+                                    let height = img.height;
+
+                                    // Resize if larger than 1920px
+                                    const MAX_WIDTH = 1920;
+                                    const MAX_HEIGHT = 1920;
+
+                                    if (width > height) {
+                                        if (width > MAX_WIDTH) {
+                                            height *= MAX_WIDTH / width;
+                                            width = MAX_WIDTH;
+                                        }
+                                    } else {
+                                        if (height > MAX_HEIGHT) {
+                                            width *= MAX_HEIGHT / height;
+                                            height = MAX_HEIGHT;
+                                        }
+                                    }
+
+                                    canvas.width = width;
+                                    canvas.height = height;
+                                    const ctx = canvas.getContext('2d');
+                                    ctx.drawImage(img, 0, 0, width, height);
+
+                                    canvas.toBlob((blob) => {
+                                        if (blob) {
+                                            const newFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".webp", {
+                                                type: 'image/webp',
+                                                lastModified: Date.now(),
+                                            });
+                                            resolve(newFile);
+                                        } else {
+                                            reject(new Error('Compression failed'));
+                                        }
+                                    }, 'image/webp', 0.8); // 0.8 quality
+                                };
+                                img.onerror = reject;
+                            });
+                        };
+
+                        fileToUpload = await compressImage(file);
+                        console.log(`Compresión: ${file.size} -> ${fileToUpload.size} bytes`);
+                    } catch (err) {
+                        console.error("Error comprimiendo imagen, se usará original:", err);
+                    }
+                }
+
+                // Final size check for images after compression
+                if (isImage) {
+                    const maxSize = 1 * 1024 * 1024; // 1MB for images
+                    if (fileToUpload.size > maxSize) {
+                        alert(`La imagen ${file.name} supera 1MB incluso después de comprimir y será omitida.`);
+                        continue;
+                    }
+                }
+
+                const formData = new FormData();
+                formData.append('file', fileToUpload);
+                formData.append('cedula', cedula);
+                formData.append('ficha_id', recordId || '');
+                formData.append('modulo', modulo || 'odontologia');
+                formData.append('categoria', selectedCategory);
+                formData.append('nombre', file.name);
+
+                const response = await axios.post('/api/media', formData, {
+                    onUploadProgress: (progressEvent) => {
+                        const filePercent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                        // Approximate total progress
+                        const overallPercent = Math.round(((completedFiles * 100) + filePercent) / totalFiles);
+                        setUploadProgress(overallPercent);
+                    }
+                });
+
+                // INSTANT UI UPDATE: Add the uploaded media to the list immediately
+                if (response.data && response.data.media) {
+                    setMediaList(prev => [response.data.media, ...prev]);
+                }
+
+                completedFiles++;
+                setUploadProgress(Math.round((completedFiles * 100) / totalFiles));
+            }
+            await fetchMedia();
+            setUploading(false);
+            setUploadProgress(0);
+        } catch (error) {
+            console.error('Error uploading media:', error);
+            alert('Error al subir archivos: ' + (error.response?.data?.error || error.message));
+            setUploading(false);
+            setUploadProgress(0);
         }
-
-        onSave(newImages);
-        persistImages(newImages);
-        setUploading(false);
     };
 
-    const handleDelete = (date, imgIndex) => {
-        if (!confirm('¿Estás seguro de eliminar esta foto? Esta acción no se puede deshacer y se borrará permanentemente de la base de datos.')) return;
+    const handleDelete = async (id) => {
+        if (!confirm('¿Estás seguro de eliminar este archivo permanentemente?')) return;
 
-        const newImages = [...images];
-        const dateIndex = newImages.findIndex(item => item.date === date);
-        if (dateIndex > -1) {
-            newImages[dateIndex].data.splice(imgIndex, 1);
-            if (newImages[dateIndex].data.length === 0) {
-                newImages.splice(dateIndex, 1);
+        try {
+            const response = await fetch(`/api/media?id=${id}`, { method: 'DELETE' });
+            if (response.ok) {
+                setMediaList(mediaList.filter(m => m.id !== id));
             }
-            onSave(newImages);
-            persistImages(newImages);
+        } catch (error) {
+            console.error('Error deleting media:', error);
         }
+    };
+
+    const handleRename = async (id, newName) => {
+        try {
+            const response = await fetch('/api/media', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, nombre: newName, categoria: selectedCategory }),
+            });
+            if (response.ok) {
+                setMediaList(mediaList.map(m => m.id === id ? { ...m, nombre: newName } : m));
+                setEditingMedia(null);
+            }
+        } catch (error) {
+            console.error('Error renaming:', error);
+        }
+    };
+
+    const groupedMedia = mediaList.reduce((acc, curr) => {
+        const cat = curr.categoria || 'Sin Categoría';
+        if (!acc[cat]) acc[cat] = [];
+        acc[cat].push(curr);
+        return acc;
+    }, {});
+
+    const renderMediaIcon = (m) => {
+        if (m.tipo === 'video') return <VideoCameraIcon className="h-10 w-10 text-white/50" />;
+        if (m.tipo === 'pdf') return <DocumentIcon className="h-10 w-10 text-white/50" />;
+        return <PhotoIcon className="h-10 w-10 text-white/50" />;
     };
 
     return (
         <>
             <Transition appear show={isOpen} as={Fragment}>
                 <Dialog as="div" className="relative z-[60]" onClose={onClose}>
-                    <Transition.Child
-                        as={Fragment}
-                        enter="ease-out duration-300"
-                        enterFrom="opacity-0"
-                        enterTo="opacity-100"
-                        leave="ease-in duration-200"
-                        leaveFrom="opacity-100"
-                        leaveTo="opacity-0"
-                    >
+                    <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0">
                         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" />
                     </Transition.Child>
 
                     <div className="fixed inset-0 overflow-y-auto">
                         <div className="flex min-h-full items-center justify-center p-4 text-center">
-                            <Transition.Child
-                                as={Fragment}
-                                enter="ease-out duration-300"
-                                enterFrom="opacity-0 scale-95"
-                                enterTo="opacity-100 scale-100"
-                                leave="ease-in duration-200"
-                                leaveFrom="opacity-100 scale-100"
-                                leaveTo="opacity-0 scale-95"
-                            >
-                                <Dialog.Panel className="w-full max-w-4xl transform overflow-hidden rounded-3xl bg-white shadow-2xl transition-all flex flex-col h-[85vh]">
+                            <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0 scale-95" enterTo="opacity-100 scale-100" leave="ease-in duration-200" leaveFrom="opacity-100 scale-100" leaveTo="opacity-0 scale-95">
+                                <Dialog.Panel className="w-full max-w-5xl transform overflow-hidden rounded-3xl bg-white shadow-2xl transition-all flex flex-col h-[90vh]">
+                                    {/* Header */}
                                     <div className="bg-gradient-to-r from-slate-800 to-slate-900 px-6 py-4 flex items-center justify-between shrink-0">
                                         <div className="flex items-center gap-3">
                                             <div className="p-2 bg-white/10 rounded-lg">
@@ -169,12 +255,9 @@ export default function ModalGalleryFicha({ isOpen, onClose, images = [], histor
                                             </div>
                                             <div>
                                                 <Dialog.Title className="text-xl font-bold text-white uppercase tracking-wider">
-                                                    Galería de Imágenes Clínica
+                                                    Galería Multimedia <span className="text-primary/50 text-sm ml-2">Profesional</span>
                                                 </Dialog.Title>
-                                                {saveStatus === 'saving' && <p className="text-[9px] text-blue-400 font-bold animate-pulse">GUARDANDO CAMBIOS EN NUBE...</p>}
-                                                {saveStatus === 'success' && <p className="text-[9px] text-emerald-400 font-bold uppercase">¡Cambios guardados con éxito!</p>}
-                                                {saveStatus === 'error' && <p className="text-[9px] text-red-400 font-bold uppercase">Error al sincronizar imágenes</p>}
-                                                {!saveStatus && recordId && <p className="text-[9px] text-white/40 uppercase">Sincronización automática activa</p>}
+                                                <p className="text-[9px] text-white/40 uppercase">Archivos optimizados en base de datos dedicada</p>
                                             </div>
                                         </div>
                                         <button onClick={onClose} className="text-white/70 hover:text-white transition-colors">
@@ -182,151 +265,124 @@ export default function ModalGalleryFicha({ isOpen, onClose, images = [], histor
                                         </button>
                                     </div>
 
+                                    {/* Content */}
                                     <div className="flex-1 overflow-y-auto p-6 bg-slate-50 text-left">
 
-                                        {/* HISTORY IMAGES READ-ONLY SECTION */}
-                                        {historyImages.length > 0 && (
-                                            <div className="mb-8">
-                                                <div className="flex items-center gap-2 mb-4">
-                                                    <div className="p-1.5 bg-amber-100 rounded-lg">
-                                                        <CalendarDaysIcon className="h-4 w-4 text-amber-600" />
-                                                    </div>
-                                                    <h3 className="text-sm font-black text-slate-700 uppercase tracking-wide">Historial del Paciente (Otras Fichas)</h3>
-                                                </div>
-                                                <p className="text-[10px] text-slate-400 mb-2 pl-2">Mostrando las 20 imágenes más recientes del historial completo.</p>
-                                                <div className="bg-amber-50/50 p-4 rounded-2xl border border-amber-100">
-                                                    <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
-                                                        {historyImages.map((img, idx) => (
-                                                            <div key={`hist-${idx}`} className="group relative aspect-square rounded-xl overflow-hidden border border-amber-200 shadow-sm bg-white cursor-zoom-in">
-                                                                <img
-                                                                    src={img}
-                                                                    alt="Historial"
-                                                                    className="w-full h-full object-cover"
-                                                                    onClick={() => setPreviewImage(img)}
-                                                                />
-                                                                <div className="absolute inset-x-0 bottom-0 bg-black/50 text-white text-[9px] font-bold text-center py-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                                    HISTÓRICO
-                                                                </div>
-                                                                {/* Selection Overlay */}
-                                                                {onSelectImage && (
-                                                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none group-hover:pointer-events-auto">
-                                                                        <button
-                                                                            onClick={(e) => {
-                                                                                e.stopPropagation();
-                                                                                onSelectImage(img);
-                                                                            }}
-                                                                            className="px-3 py-1.5 bg-emerald-500 text-white rounded-lg font-bold text-[10px] uppercase shadow-lg hover:bg-emerald-600 transition-all transform hover:scale-105 flex items-center gap-1"
-                                                                        >
-                                                                            <CheckCircleIcon className="h-4 w-4" />
-                                                                            Seleccionar
-                                                                        </button>
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        ))}
-                                                    </div>
+
+
+                                        {/* Controls */}
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-bold text-slate-500 uppercase">Categoría de Destino</label>
+                                                <div className="relative">
+                                                    <select
+                                                        value={selectedCategory}
+                                                        onChange={(e) => setSelectedCategory(e.target.value)}
+                                                        className="w-full p-3 bg-white border border-slate-200 rounded-xl appearance-none outline-none focus:ring-2 focus:ring-blue-500 font-bold text-slate-700 text-sm"
+                                                    >
+                                                        {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                                                    </select>
+                                                    <ChevronDownIcon className="absolute right-3 top-3.5 h-4 w-4 text-slate-400 pointer-events-none" />
                                                 </div>
                                             </div>
-                                        )}
 
-                                        {/* Upload Controls */}
-                                        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mb-6">
-                                            <div className="flex flex-col md:flex-row items-end gap-6">
-                                                <div className="flex-1 space-y-2">
-                                                    <label className="text-[10px] font-bold text-slate-500 uppercase flex items-center gap-2">
-                                                        <PhotoIcon className="h-4 w-4" />
-                                                        Imágenes de ESTA Ficha (Nuevas)
-                                                    </label>
-                                                    <input
-                                                        type="date"
-                                                        value={selectedDate}
-                                                        onChange={(e) => setSelectedDate(e.target.value)}
-                                                        className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-bold text-slate-700"
-                                                    />
-                                                </div>
-                                                <div className="flex-1">
-                                                    <label className="relative flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-slate-300 rounded-2xl hover:border-blue-400 hover:bg-blue-50 transition-all cursor-pointer group">
-                                                        <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center">
-                                                            <CloudArrowUpIcon className="h-8 w-8 text-slate-400 group-hover:text-blue-500 mb-1" />
-                                                            <p className="text-[10px] text-slate-500 font-bold uppercase">
-                                                                {uploading ? 'Comprimiendo...' : 'Subir Imágenes'}
-                                                            </p>
+                                            <div className="md:col-span-2 space-y-3">
+                                                <label className="text-[10px] font-bold text-slate-500 uppercase block">Subir Multimedia (Fotos/Docs: 1MB, Video: 10MB)</label>
+                                                <label className={`relative flex items-center justify-center h-14 border-2 border-dashed border-slate-300 rounded-2xl hover:border-blue-400 hover:bg-blue-50 transition-all cursor-pointer group ${uploading ? 'pointer-events-none opacity-50' : ''}`}>
+                                                    <div className="flex items-center gap-3">
+                                                        <CloudArrowUpIcon className="h-6 w-6 text-slate-400 group-hover:text-blue-500" />
+                                                        <span className="text-xs text-slate-500 font-bold uppercase">
+                                                            {uploading ? 'Procesando archivos...' : 'Click para subir archivos multimedia'}
+                                                        </span>
+                                                    </div>
+                                                    <input type="file" multiple accept="image/*,video/*,.pdf" className="hidden" onChange={handleFileUpload} disabled={uploading} />
+                                                </label>
+
+                                                {/* Progress Bar */}
+                                                {uploading && (
+                                                    <div className="space-y-1.5 animate-in fade-in duration-300">
+                                                        <div className="flex justify-between items-center text-[9px] font-black text-blue-600 uppercase tracking-widest">
+                                                            <span>Subiendo...</span>
+                                                            <span>{uploadProgress}%</span>
                                                         </div>
-                                                        <input type="file" multiple accept="image/*" className="hidden" onChange={handleFileUpload} disabled={uploading} />
-                                                    </label>
-                                                </div>
+                                                        <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
+                                                            <div
+                                                                className="h-full bg-blue-600 transition-all duration-300 ease-out rounded-full shadow-[0_0_10px_rgba(37,99,235,0.4)]"
+                                                                style={{ width: `${uploadProgress}%` }}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
 
-                                        {/* Image Grid */}
-                                        <div className="space-y-8">
-                                            {Object.keys(groupedImages).length === 0 ? (
-                                                <div className="flex flex-col items-center justify-center py-10 text-slate-400 bg-white rounded-2xl border-2 border-dashed border-slate-100 mt-4">
-                                                    <PhotoIcon className="h-10 w-10 mb-2 opacity-20" />
-                                                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">No hay imágenes NUEVAS en esta ficha</p>
-                                                    {historyImages.length > 0 && (
-                                                        <p className="text-[9px] text-slate-400 mt-1 italic">Puedes seleccionar las del historial arriba o subir fotos nuevas</p>
-                                                    )}
+                                        {/* Media Grid */}
+                                        <div className="space-y-12">
+                                            {loading ? (
+                                                <div className="flex items-center justify-center py-20">
+                                                    <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                                                </div>
+                                            ) : mediaList.length === 0 ? (
+                                                <div className="text-center py-20 bg-white rounded-3xl border-2 border-dashed border-slate-100">
+                                                    <PhotoIcon className="h-16 w-16 mx-auto text-slate-100 mb-4" />
+                                                    <p className="text-sm font-bold text-slate-300 uppercase tracking-widest">No hay archivos en la galería de este paciente</p>
                                                 </div>
                                             ) : (
-                                                Object.keys(groupedImages).sort((a, b) => new Date(b) - new Date(a)).map(date => (
-                                                    <div key={date} className="space-y-4">
+                                                categories.map(cat => groupedMedia[cat] && (
+                                                    <div key={cat} className="space-y-4">
                                                         <div className="flex items-center gap-4">
-                                                            <div className="h-px flex-1 bg-slate-200"></div>
-                                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-100 px-3 py-1 rounded-full border border-slate-200">
-                                                                {/* Parse date as YYYY, MM, DD to avoid UTC offset */}
-                                                                {(() => {
-                                                                    const [y, m, d] = date.split('-').map(Number);
-                                                                    return new Date(y, m - 1, d).toLocaleDateString('es-ES', {
-                                                                        weekday: 'long',
-                                                                        year: 'numeric',
-                                                                        month: 'long',
-                                                                        day: 'numeric'
-                                                                    });
-                                                                })()}
-                                                            </span>
-                                                            <div className="h-px flex-1 bg-slate-200"></div>
+                                                            <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest bg-white shadow-sm border border-slate-200 px-4 py-1.5 rounded-full flex items-center gap-2">
+                                                                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+                                                                {cat}
+                                                                <span className="text-[10px] text-slate-400 font-normal">({groupedMedia[cat].length})</span>
+                                                            </h3>
+                                                            <div className="h-px flex-1 bg-slate-200" />
                                                         </div>
+
                                                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                                                            {groupedImages[date].map((img, idx) => (
-                                                                <div key={idx} className="group relative aspect-square rounded-2xl overflow-hidden border border-slate-200 shadow-sm bg-white hover:shadow-xl transition-all cursor-zoom-in">
-                                                                    <img
-                                                                        src={img}
-                                                                        alt="Clínica"
-                                                                        className="w-full h-full object-cover"
-                                                                        onClick={() => setPreviewImage(img)}
-                                                                    />
-                                                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 pointer-events-none group-hover:pointer-events-auto">
-                                                                        {onSelectImage ? (
+                                                            {groupedMedia[cat].map(m => (
+                                                                <div key={m.id} className="group relative aspect-square rounded-2xl overflow-hidden border border-slate-200 bg-slate-800 shadow-sm hover:shadow-xl transition-all border-b-4 border-b-blue-500/0 hover:border-b-blue-500">
+                                                                    {m.tipo === 'foto' ? (
+                                                                        <img src={`/api/media/${m.id}`} alt={m.nombre} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                                                                    ) : (
+                                                                        <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center">
+                                                                            {renderMediaIcon(m)}
+                                                                            <p className="mt-2 text-[10px] text-white/70 font-bold uppercase truncate w-full">{m.nombre}</p>
+                                                                        </div>
+                                                                    )}
+
+                                                                    {/* Overlay Actions */}
+                                                                    <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3">
+                                                                        <div className="flex gap-2">
+                                                                            {onSelectImage && m.tipo === 'foto' && (
+                                                                                <button
+                                                                                    onClick={() => onSelectImage(`/api/media/${m.id}`)}
+                                                                                    className="p-2 bg-blue-600 rounded-lg text-white hover:bg-blue-700 transition-all transform hover:scale-110 shadow-lg"
+                                                                                    title="Seleccionar para la ficha"
+                                                                                >
+                                                                                    <CheckCircleIcon className="h-5 w-5" />
+                                                                                </button>
+                                                                            )}
                                                                             <button
-                                                                                onClick={(e) => {
-                                                                                    e.stopPropagation();
-                                                                                    onSelectImage(img);
-                                                                                }}
-                                                                                className="px-3 py-1.5 bg-emerald-500 text-white rounded-lg font-bold text-[10px] uppercase shadow-lg hover:bg-emerald-600 transition-all transform hover:scale-105 flex items-center gap-1"
+                                                                                onClick={() => setPreviewMedia(m)}
+                                                                                className="p-2 bg-white rounded-lg text-slate-900 hover:bg-blue-500 hover:text-white transition-all transform hover:scale-110 shadow-lg"
                                                                             >
-                                                                                <CheckCircleIcon className="h-4 w-4" />
-                                                                                Seleccionar
+                                                                                <PhotoIcon className="h-5 w-5" />
                                                                             </button>
-                                                                        ) : (
-                                                                            <>
-                                                                                <button
-                                                                                    onClick={() => setPreviewImage(img)}
-                                                                                    className="p-2 bg-white rounded-full text-slate-900 hover:bg-blue-500 hover:text-white transition-all transform hover:scale-110"
-                                                                                >
-                                                                                    <PhotoIcon className="h-5 w-5" />
-                                                                                </button>
-                                                                                <button
-                                                                                    onClick={(e) => {
-                                                                                        e.stopPropagation();
-                                                                                        handleDelete(date, idx);
-                                                                                    }}
-                                                                                    className="p-2 bg-white rounded-full text-red-600 hover:bg-red-600 hover:text-white transition-all transform hover:scale-110"
-                                                                                >
-                                                                                    <TrashIcon className="h-5 w-5" />
-                                                                                </button>
-                                                                            </>
-                                                                        )}
+                                                                            <button
+                                                                                onClick={() => setEditingMedia(m)}
+                                                                                className="p-2 bg-white rounded-lg text-slate-900 hover:bg-emerald-500 hover:text-white transition-all transform hover:scale-110 shadow-lg"
+                                                                            >
+                                                                                <PencilSquareIcon className="h-5 w-5" />
+                                                                            </button>
+                                                                            <button
+                                                                                onClick={() => handleDelete(m.id)}
+                                                                                className="p-2 bg-white rounded-lg text-red-600 hover:bg-red-600 hover:text-white transition-all transform hover:scale-110 shadow-lg"
+                                                                            >
+                                                                                <TrashIcon className="h-5 w-5" />
+                                                                            </button>
+                                                                        </div>
+                                                                        <p className="text-[9px] text-white/50 font-mono">{m.nombre.slice(0, 15)}...</p>
                                                                     </div>
                                                                 </div>
                                                             ))}
@@ -337,11 +393,9 @@ export default function ModalGalleryFicha({ isOpen, onClose, images = [], histor
                                         </div>
                                     </div>
 
+                                    {/* Footer */}
                                     <div className="p-4 bg-slate-100 border-t border-slate-200 flex justify-end shrink-0">
-                                        <button
-                                            onClick={onClose}
-                                            className="px-8 py-2.5 bg-slate-800 text-white rounded-xl font-bold hover:bg-slate-700 transition-all active:scale-95 uppercase text-xs"
-                                        >
+                                        <button onClick={onClose} className="px-8 py-2.5 bg-slate-800 text-white rounded-xl font-bold hover:bg-slate-700 transition-all active:scale-95 uppercase text-xs">
                                             Cerrar Galería
                                         </button>
                                     </div>
@@ -352,49 +406,57 @@ export default function ModalGalleryFicha({ isOpen, onClose, images = [], histor
                 </Dialog>
             </Transition>
 
-            {/* PREVIEW LIGHTBOX MODAL */}
-            <Transition appear show={!!previewImage} as={Fragment}>
-                <Dialog as="div" className="relative z-[70]" onClose={() => setPreviewImage(null)}>
-                    <Transition.Child
-                        as={Fragment}
-                        enter="ease-out duration-300"
-                        enterFrom="opacity-0"
-                        enterTo="opacity-100"
-                        leave="ease-in duration-200"
-                        leaveFrom="opacity-100"
-                        leaveTo="opacity-0"
-                    >
+            {/* PREVIEW LIGHTBOX */}
+            <Transition appear show={!!previewMedia} as={Fragment}>
+                <Dialog as="div" className="relative z-[70]" onClose={() => setPreviewMedia(null)}>
+                    <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0">
                         <div className="fixed inset-0 bg-black/90 backdrop-blur-md" />
                     </Transition.Child>
 
                     <div className="fixed inset-0 overflow-y-auto">
                         <div className="flex min-h-full items-center justify-center p-4">
-                            <Transition.Child
-                                as={Fragment}
-                                enter="ease-out duration-300"
-                                enterFrom="opacity-0 scale-95"
-                                enterTo="opacity-100 scale-100"
-                                leave="ease-in duration-200"
-                                leaveFrom="opacity-100 scale-100"
-                                leaveTo="opacity-0 scale-95"
-                            >
+                            <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0 scale-95" enterTo="opacity-100 scale-100" leave="ease-in duration-200" leaveFrom="opacity-100 scale-100" leaveTo="opacity-0 scale-95">
                                 <Dialog.Panel className="relative w-full max-w-5xl h-[90vh] flex flex-col items-center justify-center">
-                                    <button
-                                        onClick={() => setPreviewImage(null)}
-                                        className="absolute top-0 right-0 p-3 text-white bg-white/10 rounded-full hover:bg-white/20 transition-all z-10"
-                                    >
+                                    <button onClick={() => setPreviewMedia(null)} className="absolute top-0 right-0 p-3 text-white bg-white/10 rounded-full hover:bg-white/20 transition-all z-10">
                                         <XMarkIcon className="h-8 w-8" />
                                     </button>
-                                    {previewImage && (
-                                        <img
-                                            src={previewImage}
-                                            alt="Preview"
-                                            className="max-w-full max-h-full object-contain rounded-xl shadow-2xl"
-                                        />
+                                    {previewMedia && (
+                                        <>
+                                            {previewMedia.tipo === 'foto' && <img src={`/api/media/${previewMedia.id}`} alt="Preview" className="max-w-full max-h-full object-contain rounded-xl shadow-2xl" />}
+                                            {previewMedia.tipo === 'video' && <video controls src={`/api/media/${previewMedia.id}`} className="max-w-full max-h-full rounded-xl" />}
+                                            {previewMedia.tipo === 'pdf' && <iframe src={`/api/media/${previewMedia.id}`} className="w-full h-full rounded-xl bg-white" />}
+                                        </>
                                     )}
                                 </Dialog.Panel>
                             </Transition.Child>
                         </div>
+                    </div>
+                </Dialog>
+            </Transition>
+
+            {/* RENAME MODAL */}
+            <Transition appear show={!!editingMedia} as={Fragment}>
+                <Dialog as="div" className="relative z-[80]" onClose={() => setEditingMedia(null)}>
+                    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" />
+                    <div className="fixed inset-0 flex items-center justify-center p-4">
+                        <Dialog.Panel className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl">
+                            <h3 className="text-sm font-black text-slate-800 uppercase mb-4">Renombrar Archivo</h3>
+                            <input
+                                type="text"
+                                defaultValue={editingMedia?.nombre}
+                                id="rename-input"
+                                className="w-full p-3 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+                            />
+                            <div className="flex gap-2">
+                                <button onClick={() => setEditingMedia(null)} className="flex-1 py-2 text-xs font-bold text-slate-400 uppercase">Cancelar</button>
+                                <button
+                                    onClick={() => handleRename(editingMedia.id, document.getElementById('rename-input').value)}
+                                    className="flex-1 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold uppercase shadow-lg shadow-blue-200"
+                                >
+                                    Guardar
+                                </button>
+                            </div>
+                        </Dialog.Panel>
                     </div>
                 </Dialog>
             </Transition>

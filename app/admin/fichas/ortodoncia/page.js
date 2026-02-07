@@ -73,7 +73,7 @@ export default function OrtodonciaFichasPage() {
 
             <div className="mb-8 relative">
                 <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input type="text" placeholder="Buscar paciente..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full pl-12 pr-4 py-4 bg-white border rounded-2xl outline-none" />
+                <input type="text" placeholder="Buscar paciente por nombre o cédula..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full pl-12 pr-4 py-4 bg-white border rounded-2xl outline-none" />
             </div>
 
             {isLoading ? (
@@ -83,12 +83,47 @@ export default function OrtodonciaFichasPage() {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredClients.map(c => (
-                        <div key={c.id} className="bg-white rounded-2xl border p-6 hover:shadow-xl transition-all relative overflow-hidden group">
-                            <button onClick={() => deleteClient(c.id)} className="absolute top-4 right-4 p-2 text-red-500 opacity-0 group-hover:opacity-100"><TrashIcon className="h-4 w-4" /></button>
-                            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center text-white mb-4"><DocumentTextIcon className="h-8 w-8" /></div>
-                            <h3 className="font-bold text-lg uppercase truncate">{c.data.nombre || ''} {c.data.apellido || ''}</h3>
-                            <p className="text-xs text-slate-500 mb-4 tracking-tighter">ID: {c.id.slice(0, 8)}</p>
-                            <button onClick={() => handleEdit(c)} className="w-full py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold uppercase hover:bg-slate-800 transition-colors">Editar Ficha</button>
+                        <div key={c.id} className="group bg-white rounded-2xl border border-gray-200 p-6 hover:shadow-xl hover:border-orange-200 transition-all flex flex-col relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button
+                                    onClick={() => deleteClient(c.id)}
+                                    className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                    title="Eliminar ficha"
+                                >
+                                    <TrashIcon className="h-4 w-4" />
+                                </button>
+                            </div>
+
+                            <div className="flex items-start justify-between mb-4">
+                                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center text-white shadow-lg shadow-orange-100 group-hover:scale-110 transition-transform">
+                                    <DocumentTextIcon className="h-8 w-8" />
+                                </div>
+                                <div className="text-right">
+                                    <span className="text-[10px] font-mono text-gray-400 block tracking-tighter">ID: {c.id.slice(0, 8)}</span>
+                                    <span className="text-[10px] bg-orange-50 text-orange-600 px-2 py-1 rounded-full font-bold uppercase mt-1 inline-block">Ortodoncia</span>
+                                </div>
+                            </div>
+
+                            <h3 className="font-bold text-gray-900 text-lg mb-1 group-hover:text-orange-600 transition-colors uppercase truncate">
+                                {c.data.nombre || ''} {c.data.apellido || ''}
+                            </h3>
+                            <p className="text-xs text-slate-500 mb-4 font-medium flex items-center gap-1">
+                                <span className="w-1 h-1 bg-slate-300 rounded-full" />
+                                Registrado el {new Date(c.timestamp).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })}
+                            </p>
+
+                            <div className="flex gap-2 mt-auto">
+                                <button
+                                    onClick={() => handleEdit(c)}
+                                    className="flex-1 px-4 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition-all flex items-center justify-center gap-2 active:scale-95 uppercase tracking-wide"
+                                >
+                                    <PencilSquareIcon className="h-4 w-4" />
+                                    Editar Ficha
+                                </button>
+                                <button className="p-2.5 border border-slate-200 rounded-xl hover:bg-slate-50 text-slate-600 transition-all hover:border-slate-300">
+                                    <DocumentTextIcon className="h-5 w-5" />
+                                </button>
+                            </div>
                         </div>
                     ))}
                 </div>

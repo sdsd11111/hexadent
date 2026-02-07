@@ -514,7 +514,7 @@ export default function OrtopediaFichasPage() {
                     <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                     <input
                         type="text"
-                        placeholder="Buscar por nombre o ID..."
+                        placeholder="Buscar paciente por nombre o cédula..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
@@ -548,29 +548,46 @@ export default function OrtopediaFichasPage() {
                     {filteredClients.map((client) => (
                         <div
                             key={client.id}
-                            className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all"
+                            className="group bg-white rounded-2xl border border-gray-200 p-6 hover:shadow-xl hover:border-purple-200 transition-all flex flex-col relative overflow-hidden"
                         >
-                            <div className="flex items-start justify-between mb-4">
-                                <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center">
-                                    <ClipboardDocumentCheckIcon className="h-6 w-6 text-purple-600" />
-                                </div>
-                                <span className="text-xs text-gray-500">ID: {client.id.slice(0, 8)}</span>
+                            <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button
+                                    onClick={() => deleteClient(client.id)}
+                                    className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                    title="Eliminar ficha"
+                                >
+                                    <TrashIcon className="h-4 w-4" />
+                                </button>
                             </div>
 
-                            <h3 className="font-bold text-gray-900 mb-1">
+                            <div className="flex items-start justify-between mb-4">
+                                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white shadow-lg shadow-purple-100 group-hover:scale-110 transition-transform">
+                                    <ClipboardDocumentCheckIcon className="h-8 w-8" />
+                                </div>
+                                <div className="text-right">
+                                    <span className="text-[10px] font-mono text-gray-400 block tracking-tighter">ID: {client.id.slice(0, 8)}</span>
+                                    <span className="text-[10px] bg-purple-50 text-purple-600 px-2 py-1 rounded-full font-bold uppercase mt-1 inline-block">Ortopedia</span>
+                                </div>
+                            </div>
+
+                            <h3 className="font-bold text-gray-900 text-lg mb-1 group-hover:text-purple-600 transition-colors uppercase truncate">
                                 {client.data.nombre || 'Sin nombre'}
                             </h3>
-                            <p className="text-sm text-gray-600 mb-4">
-                                {new Date(client.timestamp).toLocaleDateString('es-ES')}
+                            <p className="text-xs text-slate-500 mb-4 font-medium flex items-center gap-1">
+                                <span className="w-1 h-1 bg-slate-300 rounded-full" />
+                                Registrado el {new Date(client.timestamp).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })}
                             </p>
 
-                            <div className="flex gap-2">
+                            <div className="flex gap-2 mt-auto">
                                 <button
                                     onClick={() => editClient(client)}
-                                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+                                    className="flex-1 px-4 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition-all flex items-center justify-center gap-2 active:scale-95 uppercase tracking-wide"
                                 >
                                     <PencilSquareIcon className="h-4 w-4" />
-                                    Ver/Editar
+                                    Editar Ficha
+                                </button>
+                                <button className="p-2.5 border border-slate-200 rounded-xl hover:bg-slate-50 text-slate-600 transition-all hover:border-slate-300">
+                                    <ClipboardDocumentCheckIcon className="h-5 w-5" />
                                 </button>
                             </div>
                         </div>
@@ -2166,6 +2183,8 @@ export default function OrtopediaFichasPage() {
                 historyImages={patientHistoryImages}
                 onSave={(newImages) => setValue('imagenes', newImages, { shouldDirty: true })}
                 recordId={recordId}
+                cedula={watch('cedula')}
+                modulo="ortopedia"
                 fichaType="ortopedia"
             />
         </div>

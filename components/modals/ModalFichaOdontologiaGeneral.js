@@ -205,6 +205,10 @@ export default function ModalFichaOdontologiaGeneral({ isOpen, onClose, onSucces
     const [isCieSelectorOpen, setIsCieSelectorOpen] = useState(false);
     const [activeCieIndex, setActiveCieIndex] = useState(null);
     const [cieSearchTerm, setCieSearchTerm] = useState('');
+    const [customCieCodes, setCustomCieCodes] = useState([]);
+    const [newCieCode, setNewCieCode] = useState('');
+    const [newCieTitle, setNewCieTitle] = useState('');
+    const [isAddingNewCie, setIsAddingNewCie] = useState(false);
 
     const {
         register,
@@ -294,6 +298,11 @@ export default function ModalFichaOdontologiaGeneral({ isOpen, onClose, onSucces
         name: "plan_tratamiento"
     });
 
+    const { fields: diagnosticoFields, append: appendDiagnostico, remove: removeDiagnostico } = useFieldArray({
+        control,
+        name: "diagnostico.items"
+    });
+
     // Calculate total automatically
     useEffect(() => {
         const subscription = watch((value, { name }) => {
@@ -342,6 +351,66 @@ export default function ModalFichaOdontologiaGeneral({ isOpen, onClose, onSucces
         setPdfData(JSON.parse(JSON.stringify(getValues())));
     };
 
+    // Fetch Custom CIE-10 Codes
+    const fetchCustomCie = async () => {
+        try {
+            const response = await fetch('/api/cie10');
+            const data = await response.json();
+            if (data.customCodes) {
+                setCustomCieCodes(data.customCodes);
+            }
+        } catch (error) {
+            console.error('Error fetching custom CIE10:', error);
+        }
+    };
+
+    useEffect(() => {
+        if (isCieSelectorOpen) {
+            fetchCustomCie();
+        }
+    }, [isCieSelectorOpen]);
+
+    const handleSaveCustomCie = async () => {
+        if (!newCieCode || !newCieTitle) return;
+        try {
+            const response = await fetch('/api/cie10', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code: newCieCode, title: newCieTitle }),
+            });
+            if (response.ok) {
+                await fetchCustomCie();
+                setNewCieCode('');
+                setNewCieTitle('');
+                setIsAddingNewCie(false);
+            } else {
+                const errorData = await response.json();
+                alert('Error al guardar: ' + errorData.error);
+            }
+        } catch (error) {
+            console.error('Error saving custom CIE10:', error);
+            alert('Error al conectar con el servidor');
+        }
+    };
+
+    const handleDeleteCustomCie = async (code) => {
+        if (!window.confirm(`¿Está seguro de eliminar el código ${code}?`)) return;
+        try {
+            const response = await fetch(`/api/cie10?code=${code}`, {
+                method: 'DELETE'
+            });
+            if (response.ok) {
+                await fetchCustomCie();
+            } else {
+                const errorData = await response.json();
+                alert('Error al eliminar: ' + errorData.error);
+            }
+        } catch (error) {
+            console.error('Error deleting custom CIE10:', error);
+            alert('Error al conectar con el servidor');
+        }
+    };
+
     // Initialize pdfData when loading edit data or patient data is registered
     useEffect(() => {
         if (isOpen && (editData || recordId)) {
@@ -350,7 +419,16 @@ export default function ModalFichaOdontologiaGeneral({ isOpen, onClose, onSucces
     }, [isOpen, editData, recordId]);
 
     // CIE-10 Selector Logic
-    const filteredCieData = CIE10_DATA.map(group => ({
+    // Combined CIE-10 Data
+    const combinedCieData = [
+        ...CIE10_DATA,
+        ...(customCieCodes.length > 0 ? [{
+            group: "MIS CÓDIGOS PERSONALIZADOS",
+            items: customCieCodes
+        }] : [])
+    ];
+
+    const filteredCieData = combinedCieData.map(group => ({
         ...group,
         items: group.items.filter(item =>
             item.code.toLowerCase().includes(cieSearchTerm.toLowerCase()) ||
@@ -1401,8 +1479,9 @@ export default function ModalFichaOdontologiaGeneral({ isOpen, onClose, onSucces
                                                 isOpen={isGalleryOpen}
                                                 onClose={() => setIsGalleryOpen(false)}
                                                 images={watch('imagenes') || []}
-                                                onSave={(newImages) => setValue('imagenes', newImages, { shouldDirty: true })}
                                                 recordId={recordId}
+                                                cedula={watch('cedula')}
+                                                modulo="odontologia"
                                                 fichaType="odontologia"
                                             />
                                         </div>
@@ -1557,25 +1636,85 @@ export default function ModalFichaOdontologiaGeneral({ isOpen, onClose, onSucces
                                         </div>
                                     </div>
 
-                                    <div className="flex-1 overflow-y-auto p-2 space-y-4 custom-scrollbar">
+                                    <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+                                        {/* Add New Code Section */}
+                                        <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100 mb-4">
+                                            {!isAddingNewCie ? (
+                                                <button
+                                                    onClick={() => setIsAddingNewCie(true)}
+                                                    className="w-full flex items-center justify-center gap-2 py-2 text-xs font-bold text-blue-700 hover:text-blue-800 transition-colors uppercase"
+                                                >
+                                                    <PlusIcon className="h-4 w-4" />
+                                                    ¿No encuentras el código? Agrégalo aquí para siempre
+                                                </button>
+                                            ) : (
+                                                <div className="space-y-3">
+                                                    <h6 className="text-[10px] font-black text-blue-900 uppercase tracking-wider">AGREGAR NUEVO CÓDIGO PERSISTENTE</h6>
+                                                    <div className="grid grid-cols-3 gap-2">
+                                                        <input
+                                                            type="text"
+                                                            placeholder="CÓDIGO (EJ: K136)"
+                                                            value={newCieCode}
+                                                            onChange={(e) => setNewCieCode(e.target.value.toUpperCase())}
+                                                            className="col-span-1 p-2 bg-white border border-blue-200 rounded-lg text-xs font-bold outline-none focus:ring-2 focus:ring-blue-500 uppercase"
+                                                        />
+                                                        <input
+                                                            type="text"
+                                                            placeholder="DESCRIPCIÓN DEL DIAGNÓSTICO"
+                                                            value={newCieTitle}
+                                                            onChange={(e) => setNewCieTitle(e.target.value.toUpperCase())}
+                                                            className="col-span-2 p-2 bg-white border border-blue-200 rounded-lg text-xs font-medium outline-none focus:ring-2 focus:ring-blue-500 uppercase"
+                                                        />
+                                                    </div>
+                                                    <div className="flex justify-end gap-2">
+                                                        <button
+                                                            onClick={() => setIsAddingNewCie(false)}
+                                                            className="px-3 py-1.5 text-[10px] font-bold text-slate-500 hover:text-slate-700 uppercase"
+                                                        >
+                                                            Cancelar
+                                                        </button>
+                                                        <button
+                                                            onClick={handleSaveCustomCie}
+                                                            className="px-4 py-1.5 bg-blue-600 text-white text-[10px] font-bold rounded-lg hover:bg-blue-700 transition-colors uppercase shadow-sm"
+                                                        >
+                                                            Guardar Permanente
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+
                                         {filteredCieData.length > 0 ? (
                                             filteredCieData.map((group, groupIdx) => (
                                                 <div key={groupIdx} className="space-y-1">
                                                     <h5 className="px-3 py-1 text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-100/50 rounded-lg">{group.group}</h5>
                                                     <div className="space-y-0.5">
                                                         {group.items.map((item, itemIdx) => (
-                                                            <button
-                                                                key={itemIdx}
-                                                                onClick={() => handleSelectCie(item)}
-                                                                className="w-full flex items-start gap-3 p-3 hover:bg-blue-50 rounded-xl transition-all text-left border border-transparent hover:border-blue-100 group"
-                                                            >
-                                                                <span className="shrink-0 px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-bold rounded border border-slate-200 group-hover:bg-blue-100 group-hover:text-blue-700 group-hover:border-blue-200 transition-colors uppercase">
-                                                                    {item.code}
-                                                                </span>
-                                                                <span className="text-xs font-semibold text-slate-700 leading-relaxed uppercase">
-                                                                    {item.title}
-                                                                </span>
-                                                            </button>
+                                                            <div key={itemIdx} className="flex items-center gap-2 group">
+                                                                <button
+                                                                    onClick={() => handleSelectCie(item)}
+                                                                    className="flex-1 flex items-start gap-3 p-3 hover:bg-blue-50 rounded-xl transition-all text-left border border-transparent hover:border-blue-100 uppercase"
+                                                                >
+                                                                    <span className="shrink-0 px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-bold rounded border border-slate-200 group-hover:bg-blue-100 group-hover:text-blue-700 group-hover:border-blue-200 transition-colors">
+                                                                        {item.code}
+                                                                    </span>
+                                                                    <span className="text-xs font-semibold text-slate-700 leading-relaxed">
+                                                                        {item.title}
+                                                                    </span>
+                                                                </button>
+                                                                {group.group === "MIS CÓDIGOS PERSONALIZADOS" && (
+                                                                    <button
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            handleDeleteCustomCie(item.code);
+                                                                        }}
+                                                                        className="p-2 text-slate-300 hover:text-red-500 transition-colors"
+                                                                        title="Eliminar código personalizado"
+                                                                    >
+                                                                        <XMarkIcon className="h-4 w-4" />
+                                                                    </button>
+                                                                )}
+                                                            </div>
                                                         ))}
                                                     </div>
                                                 </div>
