@@ -7,8 +7,8 @@
 - **Métodos de Pago**: Efectivo y tarjeta
 
 ## Horarios de Atención
-- **Lunes a Viernes**: Mañana y tarde
-- **Sábados**: Solo en la mañana
+- **Lunes a Viernes**: 09:00 a 13:00 y 15:00 a 18:30
+- **Sábados**: 09:00 a 13:30
 - **Domingos**: Cerrado
 
 ## Servicios y Precios Aproximados

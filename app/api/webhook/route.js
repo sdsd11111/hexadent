@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { processChatbotMessage } from '../../../lib/chatbot/logic';
+import { debounceMessage } from '../../../lib/chatbot/debouncer';
 
 export const dynamic = 'force-dynamic';
 
@@ -73,8 +74,9 @@ export async function POST(request) {
 
         for (const msg of messages) {
             if (msg.from && msg.text) {
-                console.log(`Processing message from ${msg.from} to ${msg.to}: ${msg.text}`);
-                await processChatbotMessage(msg.from, msg.text, msg.to);
+                console.log(`[Webhook] Queuing message from ${msg.from}: ${msg.text}`);
+                // Use debounced processing to group rapid messages
+                await debounceMessage(msg.from, msg.text, msg.to);
             }
         }
 
