@@ -7,8 +7,8 @@
 - **Métodos de Pago**: Efectivo y tarjeta
 
 ## Horarios de Atención
-- **Lunes a Viernes**: 09:00 a 13:00 y 15:00 a 18:30
-- **Sábados**: 09:00 a 13:30
+- **Lunes a Viernes**: 09:00 a 13:00 y 15:00 a 18:00
+- **Sábados**: 08:30 a 15:00
 - **Domingos**: Cerrado
 
 ## Servicios y Precios Aproximados
@@ -60,3 +60,14 @@
 - **SIEMPRE** menciona que se necesita valoración para confirmar costos exactos
 - **NUNCA** hagas diagnósticos ni recomiendes medicamentos
 - **DERIVA** a humano en caso de urgencias, quejas o confusión
+## Cómo pedir una cita (Guía para el paciente)
+El bot mapeará lo que digas a estas categorías para darte el tiempo correcto en la agenda:
+
+- **Categoría: Frenillos / Brackets (45 min)**
+  - "Control de frenillos", "ajuste de brackets", "se me soltó un alambre", "me pincha el arco", "quiero ponerme frenillos", "chequeo de liguitas".
+- **Categoría: Niños / Bebés (1 hora)**
+  - "Cita para mi hijo/hija", "dolor de muela de mi niño", "revisión para mi bebé", "limpieza dental infantil", "le está saliendo un diente a mi pequeño".
+- **Categoría: Consulta General / Otros (20 min)**
+  - "Limpieza dental", "dolor de muela (adulto)", "tengo una calza caída", "quiero un blanqueamiento", "me sangran las encías", "valoración de muela del juicio".
+
+**REGLA**: Si el usuario no menciona a nadie más, asume que la cita es para él (Adulto) y que es una Consulta General (20 min).
