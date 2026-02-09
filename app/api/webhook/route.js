@@ -37,11 +37,12 @@ export async function POST(request) {
         // 1. Evolution API Format (messages.upsert) - PRIMARY
         if (payload.event === 'messages.upsert') {
             const data = payload.data;
-            const msg = data?.message;
-            const from = data?.key?.remoteJid?.split('@')[0];
+            const remoteJid = data?.key?.remoteJid || '';
+            const isGroup = remoteJid.includes('@g.us');
+            const from = remoteJid.split('@')[0];
             const text = msg?.conversation || msg?.extendedTextMessage?.text;
 
-            if (from && text && !data?.key?.fromMe) {
+            if (from && text && !data?.key?.fromMe && !isGroup) {
                 // Ignore empty status updates or empty text
                 if (text && text.trim().length > 0) {
                     messages.push({
