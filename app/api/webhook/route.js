@@ -37,6 +37,7 @@ export async function POST(request) {
         // 1. Evolution API Format (messages.upsert) - PRIMARY
         if (payload.event === 'messages.upsert') {
             const data = payload.data;
+            const msg = data?.message;
             const remoteJid = data?.key?.remoteJid || '';
             const isGroup = remoteJid.includes('@g.us');
             const from = remoteJid.split('@')[0];
