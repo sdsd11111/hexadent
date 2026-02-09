@@ -14,8 +14,7 @@
 ## Servicios y Precios Aproximados
 
 ### Consulta General
-- **Evaluación Clínica**: $15
-- **Promoción**: Consulta gratis durante meses específicos (ej. "Fiesta de Loja")
+- **Promoción**: Consulta gratis solo cuando se anuncie explícitamente en esta guía (Actualmente: Ninguna activa).
 
 ### Ortodoncia (Brackets)
 - **Requisito**: Evaluación clínica previa ($15). El paciente debe tener "cero caries" (o empezar a restaurarlas) antes de la colocación.
