@@ -42,11 +42,14 @@ export async function POST(request) {
             const text = msg?.conversation || msg?.extendedTextMessage?.text;
 
             if (from && text && !data?.key?.fromMe) {
-                messages.push({
-                    from: from,
-                    to: 'evolution_instance',
-                    text: text
-                });
+                // Ignore empty status updates or empty text
+                if (text && text.trim().length > 0) {
+                    messages.push({
+                        from: from,
+                        to: 'evolution_instance',
+                        text: text.trim()
+                    });
+                }
             }
         }
         // 2. Meta/WhatsApp Cloud API Format (Legacy Fallback)
