@@ -6,17 +6,18 @@ export async function GET(request) {
         const { searchParams } = new URL(request.url);
         const date = searchParams.get('date');
 
-        let query = 'SELECT * FROM appointments';
-        let params = [];
+        let rows;
 
         if (date) {
-            query += ' WHERE appointment_date = ?';
-            params.push(date);
+            [rows] = await db.execute(
+                'SELECT id, patient_name, patient_phone, patient_cedula, patient_age, appointment_date, appointment_time, duration_minutes, status FROM appointments WHERE appointment_date = ? ORDER BY appointment_time ASC',
+                [date]
+            );
+        } else {
+            [rows] = await db.execute(
+                'SELECT id, patient_name, patient_phone, patient_cedula, patient_age, appointment_date, appointment_time, duration_minutes, status FROM appointments ORDER BY appointment_date DESC, appointment_time ASC LIMIT 100'
+            );
         }
-
-        query += ' ORDER BY appointment_date DESC, appointment_time ASC';
-
-        const [rows] = await db.execute(query, params);
         return NextResponse.json(rows, { status: 200 });
     } catch (error) {
         console.error('Admin Calendar Appointments GET Error:', error);

@@ -194,7 +194,21 @@ export default function Calendar({ isAdmin = false }) {
                                     {isSunday && d.currentMonth && (
                                         <div className="w-full bg-gray-100 text-gray-400 text-[8px] font-bold px-1 rounded">Cerrado</div>
                                     )}
+                                    {isAdmin && d.currentMonth && !isSunday && !isPast && (
+                                        <>
+                                            {(() => {
+                                                const count = appointments.filter(a => a.appointment_date.split('T')[0] === dateStr).length;
+                                                return count > 0 ? (
+                                                    <div className="w-full bg-blue-100 text-blue-700 text-[9px] font-black px-1.5 py-0.5 rounded-lg flex items-center justify-between">
+                                                        <span>Citas:</span>
+                                                        <span className="bg-blue-600 text-white w-3.5 h-3.5 flex items-center justify-center rounded-full text-[8px]">{count}</span>
+                                                    </div>
+                                                ) : null;
+                                            })()}
+                                        </>
+                                    )}
                                 </div>
+
 
                                 {isAdmin && d.currentMonth && !isSunday && !isPast && (
                                     <button
@@ -247,12 +261,22 @@ export default function Calendar({ isAdmin = false }) {
                                                     {app.status === 'scheduled' ? 'Confirmada' : app.status}
                                                 </span>
                                             </div>
-                                            <p className="text-sm font-bold text-secondary flex items-center gap-2">
-                                                <UserIcon className="h-3 w-3" /> {app.patient_name}
-                                            </p>
-                                            <p className="text-[10px] text-gray-500 flex items-center gap-2 mt-1">
-                                                <PhoneIcon className="h-3 w-3" /> {app.patient_phone}
-                                            </p>
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <UserIcon className="h-4 w-4 text-secondary" />
+                                                <p className="text-sm font-bold text-secondary">{app.patient_name}</p>
+                                                <span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-black">
+                                                    {app.patient_age} años
+                                                </span>
+                                            </div>
+                                            <div className="space-y-1 ml-6">
+                                                <p className="text-[10px] text-gray-500 flex items-center gap-2">
+                                                    <PhoneIcon className="h-3 w-3" /> {app.patient_phone}
+                                                </p>
+                                                <p className="text-[10px] text-gray-500 font-medium flex items-center gap-2">
+                                                    <span className="font-black text-gray-300">ID:</span> {app.patient_cedula}
+                                                </p>
+                                            </div>
+
                                         </div>
                                     ))}
                                 </div>
