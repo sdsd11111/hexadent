@@ -197,7 +197,9 @@ export default function Calendar({ isAdmin = false }) {
                                     {isAdmin && d.currentMonth && !isSunday && !isPast && (
                                         <>
                                             {(() => {
-                                                const count = appointments.filter(a => a.appointment_date.split('T')[0] === dateStr).length;
+                                                const count = appointments
+                                                    .filter(a => a.appointment_date.split('T')[0] === dateStr && a.status !== 'cancelled')
+                                                    .length;
                                                 return count > 0 ? (
                                                     <div className="w-full bg-blue-100 text-blue-700 text-[9px] font-black px-1.5 py-0.5 rounded-lg flex items-center justify-between">
                                                         <span>Citas:</span>
