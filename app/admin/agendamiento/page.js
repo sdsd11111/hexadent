@@ -47,9 +47,12 @@ export default function AgendamientoPage() {
 
     const handleAddIgnored = async () => {
         if (!newIgnoredNumber) return;
+        const cleanPhone = newIgnoredNumber.replace(/\D/g, '');
+        if (!cleanPhone) return;
+
         await fetch('/api/admin/ignored-numbers', {
             method: 'POST',
-            body: JSON.stringify({ phone: newIgnoredNumber, action: 'add' })
+            body: JSON.stringify({ phone: cleanPhone, action: 'add' })
         });
         setNewIgnoredNumber('');
         fetchIgnoredNumbers();

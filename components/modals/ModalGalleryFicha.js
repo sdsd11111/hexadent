@@ -57,7 +57,7 @@ export default function ModalGalleryFicha({ isOpen, onClose, images = [], record
         const files = Array.from(e.target.files);
         if (files.length === 0 || !cedula) return;
 
-        // Differentiated Size limits
+        // Differentiated Size limits for Vercel (Max 4MB to be safe)
         const validFiles = files.filter(f => {
             const isVideo = f.type.startsWith('video/');
             const isPdf = f.type === 'application/pdf';
@@ -65,15 +65,13 @@ export default function ModalGalleryFicha({ isOpen, onClose, images = [], record
 
             if (!isVideo && !isPdf && !isImage) return false;
 
-            // Check size only if not an image (images will be compressed)
-            if (!isImage) {
-                const maxSize = isVideo ? 10 * 1024 * 1024 : (isPdf ? 5 * 1024 * 1024 : 1 * 1024 * 1024);
-                const limitDesc = isVideo ? '10MB' : (isPdf ? '5MB' : '1MB');
+            // Check size: Vercel hard limit is 4.5MB for the entire request
+            const maxSize = 4 * 1024 * 1024; // 4MB safe limit
+            const limitDesc = '4MB';
 
-                if (f.size > maxSize) {
-                    alert(`El archivo ${f.name} supera el límite de ${limitDesc} y será omitido.`);
-                    return false;
-                }
+            if (f.size > maxSize && !isImage) {
+                alert(`El archivo ${f.name} supera el límite de ${limitDesc} permitido por el servidor y será omitido.`);
+                return false;
             }
             return true;
         });
@@ -94,7 +92,6 @@ export default function ModalGalleryFicha({ isOpen, onClose, images = [], record
                 // Compress image if applicable
                 if (isImage) {
                     try {
-                        // Helper to compress image
                         const compressImage = async (file) => {
                             return new Promise((resolve, reject) => {
                                 const img = new Image();
@@ -104,9 +101,9 @@ export default function ModalGalleryFicha({ isOpen, onClose, images = [], record
                                     let width = img.width;
                                     let height = img.height;
 
-                                    // Resize if larger than 1920px
-                                    const MAX_WIDTH = 1920;
-                                    const MAX_HEIGHT = 1920;
+                                    // Optimized resize for web (1600px is plenty for clinical photos)
+                                    const MAX_WIDTH = 1600;
+                                    const MAX_HEIGHT = 1600;
 
                                     if (width > height) {
                                         if (width > MAX_WIDTH) {
@@ -135,26 +132,23 @@ export default function ModalGalleryFicha({ isOpen, onClose, images = [], record
                                         } else {
                                             reject(new Error('Compression failed'));
                                         }
-                                    }, 'image/webp', 0.8); // 0.8 quality
+                                    }, 'image/webp', 0.7); // 0.7 quality is excellent for clinical use and saves more space
                                 };
                                 img.onerror = reject;
                             });
                         };
 
                         fileToUpload = await compressImage(file);
-                        console.log(`Compresión: ${file.size} -> ${fileToUpload.size} bytes`);
                     } catch (err) {
-                        console.error("Error comprimiendo imagen, se usará original:", err);
+                        console.error("Error comprimiendo imagen:", err);
                     }
                 }
 
-                // Final size check for images after compression
-                if (isImage) {
-                    const maxSize = 1 * 1024 * 1024; // 1MB for images
-                    if (fileToUpload.size > maxSize) {
-                        alert(`La imagen ${file.name} supera 1MB incluso después de comprimir y será omitida.`);
-                        continue;
-                    }
+                // Final size check for all files (especially after compression)
+                const maxSize = 4 * 1024 * 1024; // 4MB
+                if (fileToUpload.size > maxSize) {
+                    alert(`El archivo ${file.name} es demasiado grande (${(fileToUpload.size / (1024 * 1024)).toFixed(2)}MB). El máximo es 4MB.`);
+                    continue;
                 }
 
                 const formData = new FormData();
@@ -287,7 +281,7 @@ export default function ModalGalleryFicha({ isOpen, onClose, images = [], record
                                             </div>
 
                                             <div className="md:col-span-2 space-y-3">
-                                                <label className="text-[10px] font-bold text-slate-500 uppercase block">Subir Multimedia (Fotos/Docs: 1MB, Video: 10MB)</label>
+                                                <label className="text-[10px] font-bold text-slate-500 uppercase block">Subir Multimedia (Máx 4MB)</label>
                                                 <label className={`relative flex items-center justify-center h-14 border-2 border-dashed border-slate-300 rounded-2xl hover:border-blue-400 hover:bg-blue-50 transition-all cursor-pointer group ${uploading ? 'pointer-events-none opacity-50' : ''}`}>
                                                     <div className="flex items-center gap-3">
                                                         <CloudArrowUpIcon className="h-6 w-6 text-slate-400 group-hover:text-blue-500" />

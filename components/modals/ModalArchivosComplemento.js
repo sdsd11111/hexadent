@@ -131,7 +131,6 @@ export default function ModalArchivosComplemento({ isOpen, onClose }) {
                 let fileToUpload = file;
                 if (isImage) {
                     try {
-                        // Helper to compress image
                         const compressImage = async (file) => {
                             return new Promise((resolve, reject) => {
                                 const img = new Image();
@@ -141,9 +140,9 @@ export default function ModalArchivosComplemento({ isOpen, onClose }) {
                                     let width = img.width;
                                     let height = img.height;
 
-                                    // Resize if larger than 1920px
-                                    const MAX_WIDTH = 1920;
-                                    const MAX_HEIGHT = 1920;
+                                    // Optimized resize for web
+                                    const MAX_WIDTH = 1600;
+                                    const MAX_HEIGHT = 1600;
 
                                     if (width > height) {
                                         if (width > MAX_WIDTH) {
@@ -172,28 +171,24 @@ export default function ModalArchivosComplemento({ isOpen, onClose }) {
                                         } else {
                                             reject(new Error('Compression failed'));
                                         }
-                                    }, 'image/webp', 0.8); // 0.8 quality
+                                    }, 'image/webp', 0.7); // 0.7 quality saves more space
                                 };
                                 img.onerror = reject;
                             });
                         };
 
                         fileToUpload = await compressImage(file);
-                        console.log(`Compresión: ${file.size} -> ${fileToUpload.size} bytes`);
                     } catch (err) {
-                        console.error("Error comprimiendo imagen, se usará original:", err);
+                        console.error("Error comprimiendo imagen:", err);
                     }
                 }
 
-                // Validate file size (1MB for images, 10MB for videos, 5MB for PDFs)
-                // Note: Image size check applies AFTER compression
-                let maxSize = 1 * 1024 * 1024; // 1MB default (images)
-                if (isVideo) maxSize = 10 * 1024 * 1024; // 10MB for videos
-                if (isPdf) maxSize = 5 * 1024 * 1024; // 5MB for PDFs
+                // Strictly enforce Vercel payload limit (4.5MB total request)
+                // We limit to 4MB for safety
+                const maxSize = 4 * 1024 * 1024;
 
                 if (fileToUpload.size > maxSize) {
-                    const sizeMB = Math.round(maxSize / (1024 * 1024));
-                    alert(`${file.name} excede el tamaño máximo permitido (${sizeMB}MB)`);
+                    alert(`${file.name} es demasiado grande (${(fileToUpload.size / (1024 * 1024)).toFixed(2)}MB). El máximo es 4MB debido a límites de infraestructura.`);
                     continue;
                 }
 
@@ -731,7 +726,7 @@ export default function ModalArchivosComplemento({ isOpen, onClose }) {
                                                                             </div>
                                                                         )}
                                                                         <p className="text-[9px] text-slate-500 mt-2">
-                                                                            📁 Imágenes y PDFs hasta 5MB | 🎥 Videos hasta 10MB
+                                                                            📁 Fotos y PDFs | 🎥 Videos | Máx 4MB por archivo
                                                                         </p>
                                                                     </div>
 

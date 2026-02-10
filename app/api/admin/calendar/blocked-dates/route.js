@@ -1,8 +1,16 @@
-import { NextResponse } from 'next/server';
-import db from '../../../../../lib/db.js';
+async function ensureBlockedDatesTable() {
+    await db.execute(`
+        CREATE TABLE IF NOT EXISTS blocked_dates (
+            blocked_date DATE PRIMARY KEY,
+            reason VARCHAR(255),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    `);
+}
 
 export async function GET() {
     try {
+        await ensureBlockedDatesTable();
         const [rows] = await db.execute('SELECT * FROM blocked_dates ORDER BY blocked_date ASC');
         return NextResponse.json(rows, { status: 200 });
     } catch (error) {
@@ -13,6 +21,7 @@ export async function GET() {
 
 export async function POST(request) {
     try {
+        await ensureBlockedDatesTable();
         const body = await request.json();
         const { date, reason } = body;
 
