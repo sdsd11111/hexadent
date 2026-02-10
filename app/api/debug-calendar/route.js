@@ -19,31 +19,33 @@ export async function GET() {
             calendar_list_attempt: null
         };
 
-        // 1. Auth
+        // 1. Auth check
         let auth;
-        try {
-            if (SERVICE_ACCOUNT) {
+        if (SERVICE_ACCOUNT) {
+            try {
                 const credentials = JSON.parse(SERVICE_ACCOUNT);
                 auth = new google.auth.GoogleAuth({
                     credentials,
                     scopes: ['https://www.googleapis.com/auth/calendar'],
                 });
                 debugInfo.auth_attempt = "SUCCESS (Service Account)";
-            } else {
-                throw new Error("No Service Account Key found");
+            } catch (e) {
+                debugInfo.auth_attempt = `FAILED PARSE: ${e.message}`;
+                return NextResponse.json(debugInfo, { status: 500 });
             }
-        } catch (e) {
-            debugInfo.auth_attempt = `FAILED: ${e.message}`;
+        } else {
+            debugInfo.auth_attempt = "FAILED: No Service Account Key";
             return NextResponse.json(debugInfo, { status: 500 });
         }
 
-        // 2. Calendar List
+        // 2. Calendar List & Simulation
         try {
             const calendar = google.calendar('v3');
 
             // TARGET DATE: Miércoles 11 de Febrero (Mañana real)
             const targetDate = new Date('2026-02-11T09:00:00-05:00');
             const endDate = new Date('2026-02-11T18:00:00-05:00');
+            const dateStr = targetDate.toISOString().split('T')[0];
 
             debugInfo.target_date_check = targetDate.toISOString();
 
@@ -57,33 +59,14 @@ export async function GET() {
                 orderBy: 'startTime',
             });
 
-            debugInfo.calendar_list_attempt = {
-                status: "SUCCESS",
-                items_found: response.data.items ? response.data.items.length : 0,
-                events: response.data.items.map(i => ({
-                    summary: i.summary,
-                    start: i.start.dateTime || i.start.date,
-                    end: i.end.dateTime || i.end.date
-                }))
-            };
-
-        } catch (e) {
-            debugInfo.calendar_list_attempt = `FAILED: ${e.message}`;
-            if (e.response) {
-                debugInfo.api_error_details = e.response.data;
-            }
-            // 3. GENERATE SLOTS (SIMULATION)
-            // Copying logic from calendar_helper.js with extra logs
-
             const busySlots = (response.data.items || []).map(e => ({
                 start: new Date(e.start.dateTime || e.start.date),
                 end: new Date(e.end.dateTime || e.end.date)
             }));
 
+            // --- SIMULATION LOGIC ---
             const available = [];
             const logs = [];
-
-            // Wednesday check
             const dayOfWeek = targetDate.getDay();
 
             // Define Hours (Logic from Helper)
@@ -144,9 +127,28 @@ export async function GET() {
                 current = new Date(current.getTime() + incrementMs);
             }
 
+            // Return success with simulation data
             return NextResponse.json({
                 target_date: dateStr,
                 events_found: busySlots.length,
                 generated_slots: available,
-                slot_logs: logs
+                slot_logs: logs,
+                events: response.data.items ? response.data.items.map(i => ({
+                    summary: i.summary,
+                    start: i.start.dateTime || i.start.date,
+                    end: i.end.dateTime || i.end.date
+                })) : []
             });
+
+        } catch (e) {
+            debugInfo.calendar_list_attempt = `FAILED: ${e.message}`;
+            if (e.response) {
+                debugInfo.api_error_details = e.response.data;
+            }
+            return NextResponse.json(debugInfo, { status: 500 });
+        }
+
+    } catch (error) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+}
