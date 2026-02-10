@@ -72,11 +72,81 @@ export async function GET() {
             if (e.response) {
                 debugInfo.api_error_details = e.response.data;
             }
-        }
+            // 3. GENERATE SLOTS (SIMULATION)
+            // Copying logic from calendar_helper.js with extra logs
 
-        return NextResponse.json(debugInfo);
+            const busySlots = (response.data.items || []).map(e => ({
+                start: new Date(e.start.dateTime || e.start.date),
+                end: new Date(e.end.dateTime || e.end.date)
+            }));
 
-    } catch (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-}
+            const available = [];
+            const logs = [];
+
+            // Wednesday check
+            const dayOfWeek = targetDate.getDay();
+
+            // Define Hours (Logic from Helper)
+            let startHour, endHour, lunchStart, lunchEnd;
+            if (dayOfWeek === 6) {
+                startHour = 8.5; endHour = 15; lunchStart = null; lunchEnd = null;
+            } else {
+                startHour = 9; endHour = 18; lunchStart = 13; lunchEnd = 15;
+            }
+
+            const startDay = new Date(`${dateStr}T${dayOfWeek === 6 ? '08:30' : '09:00'}:00-05:00`);
+            const limitDate = new Date(`${dateStr}T${dayOfWeek === 6 ? '15:00' : '18:00'}:00-05:00`);
+
+            logs.push(`Config: Day=${dayOfWeek}, Start=${startDay.toISOString()}, End=${limitDate.toISOString()}`);
+
+            let current = new Date(startDay);
+            const durationMin = 20;
+            const requestedDurationMs = durationMin * 60 * 1000;
+            const incrementMs = 15 * 60 * 1000;
+
+            let iterations = 0;
+            while (current.getTime() + requestedDurationMs <= limitDate.getTime() && iterations < 50) {
+                iterations++;
+                const next = new Date(current.getTime() + requestedDurationMs);
+
+                // Decimal calculation
+                const dayStartForHour = new Date(`${dateStr}T00:00:00-05:00`).getTime();
+                const elapsedMs = current.getTime() - dayStartForHour;
+                const decimalHour = elapsedMs / (60 * 60 * 1000);
+
+                // Lunch check
+                let inLunch = false;
+                const endDecimalHour = (current.getTime() + requestedDurationMs - dayStartForHour) / (1000 * 60 * 60);
+
+                if (lunchStart && decimalHour < lunchEnd && endDecimalHour > lunchStart) {
+                    inLunch = true;
+                }
+
+                // Busy check
+                const isBusy = busySlots.some(busy => (current < busy.end && next > busy.start));
+
+                const timeStr = current.toLocaleTimeString('es-EC', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/Guayaquil' });
+
+                let status = "OK";
+                if (inLunch) status = "LUNCH";
+                if (isBusy) status = "BUSY";
+
+                logs.push(`Slot ${timeStr}: Decimal=${decimalHour.toFixed(2)} -> ${status}`);
+
+                if (!inLunch && !isBusy) {
+                    available.push(timeStr);
+                }
+
+                if (inLunch) {
+                    // Skip logic simulation
+                }
+                // Always increment
+                current = new Date(current.getTime() + incrementMs);
+            }
+
+            return NextResponse.json({
+                target_date: dateStr,
+                events_found: busySlots.length,
+                generated_slots: available,
+                slot_logs: logs
+            });
