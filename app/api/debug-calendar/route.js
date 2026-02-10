@@ -40,16 +40,19 @@ export async function GET() {
         // 2. Calendar List
         try {
             const calendar = google.calendar('v3');
-            const now = new Date();
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
+
+            // TARGET DATE: Miércoles 11 de Febrero (Mañana real)
+            const targetDate = new Date('2026-02-11T09:00:00-05:00');
+            const endDate = new Date('2026-02-11T18:00:00-05:00');
+
+            debugInfo.target_date_check = targetDate.toISOString();
 
             const response = await calendar.events.list({
                 auth: auth,
                 calendarId: CALENDAR_ID,
-                timeMin: now.toISOString(),
-                timeMax: tomorrow.toISOString(),
-                maxResults: 5,
+                timeMin: targetDate.toISOString(),
+                timeMax: endDate.toISOString(),
+                maxResults: 10,
                 singleEvents: true,
                 orderBy: 'startTime',
             });
