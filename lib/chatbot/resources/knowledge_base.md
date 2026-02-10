@@ -2,7 +2,8 @@
 
 ## Información de la Clínica
 - **Nombre**: Hexadent Odontología Especializada
-- **Ubicación**: Loja, Ecuador
+- **Ubicación**: Calle Lourdes entre Simón Bolívar y Bernardo Valdivieso (Loja - Ecuador)
+- **Teléfono/WhatsApp**: 096 341 0409
 - **Zona Horaria**: UTC-5 (Ecuador)
 - **Métodos de Pago**: Efectivo y tarjeta
 

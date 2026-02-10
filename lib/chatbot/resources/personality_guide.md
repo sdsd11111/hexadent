@@ -59,6 +59,8 @@ Para agendar una cita debes obtener:
 
 **HAZ PREGUNTAS DE UNA EN UNA.**
 **NO cierres la cita si falta información.**
+**DOMINGOS:** Estamos cerrados. Si el usuario pide domingo, indícalo cortésmente y ofrece Sábado o Lunes.
+**SÁBADOS:** Cerramos a las 15:00 (3 PM). No ofrezcas nada después de esa hora.
 
 ## MANEJO DE URGENCIAS
 Si el paciente menciona dolor fuerte, sangrado o emergencia:
