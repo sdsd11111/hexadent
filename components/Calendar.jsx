@@ -249,41 +249,65 @@ export default function Calendar({ isAdmin = false }) {
                             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                         </div>
                     ) : isAdmin ? (
-                        <div className="space-y-4">
-                            <h4 className="text-xs font-black uppercase text-gray-400 tracking-widest px-2">Citas Agendadas</h4>
-                            {appointments.filter(a => a.appointment_date.split('T')[0] === selectedDate).length === 0 ? (
-                                <p className="text-sm text-gray-400 italic px-2">No hay citas para este día.</p>
-                            ) : (
-                                <div className="space-y-3">
-                                    {appointments.filter(a => a.appointment_date.split('T')[0] === selectedDate).map(app => (
-                                        <div key={app.id} className="p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:shadow-md transition-all">
-                                            <div className="flex justify-between items-start mb-2">
-                                                <span className="text-xs font-black text-primary bg-blue-100 px-2 py-1 rounded-full">{app.appointment_time.substring(0, 5)}</span>
-                                                <span className={`text-[9px] font-black uppercase px-2 py-1 rounded-full ${app.status === 'scheduled' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                                                    {app.status === 'scheduled' ? 'Confirmada' : app.status}
-                                                </span>
+                        <div className="space-y-6">
+                            {/* ACTIVE APPOINTMENTS */}
+                            <div className="space-y-4">
+                                <h4 className="text-xs font-black uppercase text-gray-400 tracking-widest px-2">Citas Agendadas</h4>
+                                {appointments.filter(a => a.appointment_date.split('T')[0] === selectedDate && a.status !== 'cancelled').length === 0 ? (
+                                    <p className="text-sm text-gray-400 italic px-2">No hay citas activas para este día.</p>
+                                ) : (
+                                    <div className="space-y-3">
+                                        {appointments.filter(a => a.appointment_date.split('T')[0] === selectedDate && a.status !== 'cancelled').map(app => (
+                                            <div key={app.id} className="p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:shadow-md transition-all">
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <span className="text-xs font-black text-primary bg-blue-100 px-2 py-1 rounded-full">{app.appointment_time.substring(0, 5)}</span>
+                                                    <span className={`text-[9px] font-black uppercase px-2 py-1 rounded-full bg-green-100 text-green-700`}>
+                                                        Confirmada
+                                                    </span>
+                                                </div>
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <UserIcon className="h-4 w-4 text-secondary" />
+                                                    <p className="text-sm font-bold text-secondary">{app.patient_name}</p>
+                                                    <span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-black">
+                                                        {app.patient_age} años
+                                                    </span>
+                                                </div>
+                                                <div className="space-y-1 ml-6">
+                                                    <p className="text-[10px] text-gray-500 flex items-center gap-2">
+                                                        <PhoneIcon className="h-3 w-3" /> {app.patient_phone}
+                                                    </p>
+                                                    <p className="text-[10px] text-gray-500 font-medium flex items-center gap-2">
+                                                        <span className="font-black text-gray-300">ID:</span> {app.patient_cedula}
+                                                    </p>
+                                                </div>
                                             </div>
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <UserIcon className="h-4 w-4 text-secondary" />
-                                                <p className="text-sm font-bold text-secondary">{app.patient_name}</p>
-                                                <span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-black">
-                                                    {app.patient_age} años
-                                                </span>
-                                            </div>
-                                            <div className="space-y-1 ml-6">
-                                                <p className="text-[10px] text-gray-500 flex items-center gap-2">
-                                                    <PhoneIcon className="h-3 w-3" /> {app.patient_phone}
-                                                </p>
-                                                <p className="text-[10px] text-gray-500 font-medium flex items-center gap-2">
-                                                    <span className="font-black text-gray-300">ID:</span> {app.patient_cedula}
-                                                </p>
-                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
 
-                                        </div>
-                                    ))}
+                            {/* CANCELLED APPOINTMENTS */}
+                            {appointments.filter(a => a.appointment_date.split('T')[0] === selectedDate && a.status === 'cancelled').length > 0 && (
+                                <div className="space-y-4 pt-4 border-t border-dashed border-gray-100">
+                                    <h4 className="text-xs font-black uppercase text-red-300 tracking-widest px-2">Historial / Canceladas</h4>
+                                    <div className="space-y-2 opacity-60">
+                                        {appointments.filter(a => a.appointment_date.split('T')[0] === selectedDate && a.status === 'cancelled').map(app => (
+                                            <div key={app.id} className="p-3 bg-red-50/30 rounded-xl border border-red-50 flex items-center justify-between gap-4 grayscale">
+                                                <div className="flex items-center gap-3">
+                                                    <span className="text-[9px] font-black text-red-400 bg-red-100/50 px-2 py-0.5 rounded-full line-through">{app.appointment_time.substring(0, 5)}</span>
+                                                    <div>
+                                                        <p className="text-xs font-bold text-gray-400 line-through">{app.patient_name}</p>
+                                                        <p className="text-[9px] text-gray-300">Cédula: {app.patient_cedula}</p>
+                                                    </div>
+                                                </div>
+                                                <span className="text-[8px] font-black uppercase text-red-300">Cancelada</span>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             )}
                         </div>
+
                     ) : (
                         <div className="space-y-4">
                             <h4 className="text-xs font-black uppercase text-gray-400 tracking-widest px-2">Horarios Disponibles</h4>
