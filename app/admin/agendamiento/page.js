@@ -6,6 +6,7 @@ import {
     ArrowPathIcon,
     CheckCircleIcon
 } from '@heroicons/react/24/outline';
+import Calendar from '@/components/Calendar';
 
 export default function AgendamientoPage() {
     const [isLoading, setIsLoading] = useState(true);
@@ -76,29 +77,9 @@ export default function AgendamientoPage() {
                 </div>
             </div>
 
-            {/* Calendar Integration */}
-            <div className="bg-white rounded-3xl shadow-xl border border-gray-200 overflow-hidden mb-12">
-                <div className="px-8 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-                    <h2 className="font-bold text-gray-800 flex items-center gap-3 text-lg">
-                        <ClockIcon className="h-6 w-6 text-blue-600" />
-                        Agenda de Citas y Disponibilidad
-                    </h2>
-                    <div className="flex items-center gap-2">
-                        <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
-                        <span className="text-[10px] bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-black uppercase tracking-widest">
-                            Sincronizado con Google
-                        </span>
-                    </div>
-                </div>
-                <div className="w-full" style={{ height: '700px' }}>
-                    <iframe
-                        src="https://calendar.google.com/calendar/embed?src=cristhopheryeah113%40gmail.com&ctz=America%2FGuayaquil"
-                        style={{ border: 0 }}
-                        className="w-full h-full"
-                        frameBorder="0"
-                        scrolling="no"
-                    ></iframe>
-                </div>
+            {/* Internal Calendar Integration */}
+            <div className="mb-12">
+                <Calendar isAdmin={true} />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
