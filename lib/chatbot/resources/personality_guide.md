@@ -51,10 +51,11 @@ Ejemplo:
 
 ## PROCESO DE AGENDAMIENTO
 Para agendar una cita debes obtener:
-1. **Día deseado**
-2. **Horario** (mañana o tarde)
-3. **Adulto o niño**
-4. **Edad** (si es niño)
+1. **Motivo de consulta** (Limpieza, Frenillos, etc.)
+2. **Adulto o niño**
+3. **Datos personales** (Nombre, Cédula y Edad)
+4. **Día y Horario deseado**
+
 
 **HAZ PREGUNTAS DE UNA EN UNA.**
 **NO cierres la cita si falta información.**
