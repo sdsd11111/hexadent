@@ -57,7 +57,11 @@ export async function GET() {
             debugInfo.calendar_list_attempt = {
                 status: "SUCCESS",
                 items_found: response.data.items ? response.data.items.length : 0,
-                first_item_summary: response.data.items && response.data.items.length > 0 ? response.data.items[0].summary : "N/A"
+                events: response.data.items.map(i => ({
+                    summary: i.summary,
+                    start: i.start.dateTime || i.start.date,
+                    end: i.end.dateTime || i.end.date
+                }))
             };
 
         } catch (e) {
