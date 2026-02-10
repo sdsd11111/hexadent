@@ -1,6 +1,6 @@
-
 import { NextResponse } from 'next/server';
-import { getAvailableSlots, checkAvailability } from '../../../lib/chatbot/scripts/calendar_helper';
+import { getAvailableSlots } from '../../../lib/chatbot/scripts/calendar_helper';
+import mysql from 'mysql2/promise';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,6 +8,31 @@ export async function GET(request) {
     try {
         const { searchParams } = new URL(request.url);
         const debugMsg = searchParams.get('msg') || "Hola quiero cita mañana a las 10am";
+        const showLogs = searchParams.get('logs');
+
+        if (showLogs) {
+            const connection = await mysql.createConnection({
+                host: process.env.MYSQL_HOST,
+                user: process.env.MYSQL_USER,
+                password: process.env.MYSQL_PASSWORD,
+                database: process.env.MYSQL_DATABASE,
+                port: parseInt(process.env.MYSQL_PORT)
+            });
+
+            const [rows] = await connection.execute('SELECT * FROM chatbot_logs ORDER BY id DESC LIMIT 5');
+            await connection.end();
+
+            return NextResponse.json({
+                recent_logs: rows.map(r => ({
+                    timestamp: r.timestamp,
+                    user_msg: r.user_msg,
+                    bot_resp: r.bot_resp,
+                    // We need to see if we stored the prompt or context. 
+                    // Usually we don't store the full prompt in logs, just msg/resp.
+                    // But we can infer from the response.
+                }))
+            });
+        }
 
         // --- REPLICATE LOGIC.JS (Condensed) ---
         const now = new Date();
