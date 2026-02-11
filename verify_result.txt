@@ -1,0 +1,17 @@
+Reading file: ./lib/chatbot/scripts/calendar_helper.js
+--- CONTENT START ---
+import db from '../../db.js';
+
+console.log(">>> [LOAD] Loading lib/chatbot/scripts/calendar_helper.js");
+
+/**
+ * Get all available slots for a specific day.
+ * Assumes working hours 09:00 - 13:00 and 15:00 - 18:00 (UTC-5)
+ * Saturdays 08:30 - 15:00
+ */
+export async function getAvailableSlotsDebug(dateStr, durationMin = 20, excludePhone = null) {
+    throw new Error("I AM HERE - VERIFYING EXECUTION");
+    try {
+        console.log(`[DEBUG] getAvailableSlots called for ${dateStr}, Dura
+--- CONTENT END ---
+✅ SUCCESS: The file contains the verification error string.
