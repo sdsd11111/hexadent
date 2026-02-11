@@ -59,6 +59,9 @@ export async function POST(request) {
         const formData = await request.formData();
         const file = formData.get('file');
         const cedula = formData.get('cedula');
+
+        console.log(`[Media Upload] Starting upload for cedula: ${cedula}, file: ${file?.name}, size: ${file?.size}`);
+
         const modulo = formData.get('modulo') || 'odontologia';
         const categoria = formData.get('categoria') || 'Diagnóstico';
         const nombre = formData.get('nombre') || file?.name;
@@ -87,11 +90,13 @@ export async function POST(request) {
         const tipo = isVideo ? 'video' : (isImage ? 'foto' : (file.type === 'application/pdf' ? 'pdf' : 'archivo'));
 
         try {
+            console.log(`[Media Upload] Inserting into DB...`);
             await mediaDb.execute(
                 `INSERT INTO galerias_pacientes (id, cedula_paciente, ficha_id, modulo, nombre, tipo, categoria, data, mime_type, size) 
                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                 [id, cedula, fichaId || null, modulo, nombre, tipo, categoria, buffer, file.type, file.size]
             );
+            console.log(`[Media Upload] DB Insert Success for ID: ${id}`);
 
             const record = {
                 id,

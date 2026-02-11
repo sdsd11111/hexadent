@@ -57,39 +57,34 @@ export default function ModalGalleryFicha({ isOpen, onClose, images = [], record
         const files = Array.from(e.target.files);
         if (files.length === 0 || !cedula) return;
 
-        // Differentiated Size limits for Vercel (Max 4MB to be safe)
-        const validFiles = files.filter(f => {
-            const isVideo = f.type.startsWith('video/');
-            const isPdf = f.type === 'application/pdf';
-            const isImage = f.type.startsWith('image/');
-
-            if (!isVideo && !isPdf && !isImage) return false;
-
-            // Check size: Vercel hard limit is 4.5MB for the entire request
-            const maxSize = 4 * 1024 * 1024; // 4MB safe limit
-            const limitDesc = '4MB';
-
-            if (f.size > maxSize && !isImage) {
-                alert(`El archivo ${f.name} supera el límite de ${limitDesc} permitido por el servidor y será omitido.`);
-                return false;
-            }
-            return true;
-        });
-
-        if (validFiles.length === 0) return;
-
         setUploading(true);
         setUploadProgress(0);
 
         try {
-            const totalFiles = validFiles.length;
-            let completedFiles = 0;
+            const totalFiles = files.length;
+            let currentFileIndex = 0;
 
-            for (const file of validFiles) {
-                let fileToUpload = file;
+            for (const file of files) {
                 const isImage = file.type.startsWith('image/');
+                const isVideo = file.type.startsWith('video/');
+                const isPdf = file.type === 'application/pdf';
 
-                // Compress image if applicable
+                // LIMITS ENFORCEMENT
+                if (isImage && file.size > 1 * 1024 * 1024) {
+                    alert(`La imagen "${file.name}" supera el límite de 1MB.`);
+                    continue;
+                }
+                if (isVideo && file.size > 10 * 1024 * 1024) {
+                    alert(`El video "${file.name}" supera el límite de 10MB.`);
+                    continue;
+                }
+                if (isPdf && file.size > 5 * 1024 * 1024) {
+                    alert(`El PDF "${file.name}" supera el límite de 5MB.`);
+                    continue;
+                }
+
+                let fileToUpload = file;
+                // 1. Process Images (Compression)
                 if (isImage) {
                     try {
                         const compressImage = async (file) => {
@@ -100,20 +95,17 @@ export default function ModalGalleryFicha({ isOpen, onClose, images = [], record
                                     const canvas = document.createElement('canvas');
                                     let width = img.width;
                                     let height = img.height;
-
-                                    // Optimized resize for web (1600px is plenty for clinical photos)
-                                    const MAX_WIDTH = 1600;
-                                    const MAX_HEIGHT = 1600;
+                                    const MAX_SIZE = 1600;
 
                                     if (width > height) {
-                                        if (width > MAX_WIDTH) {
-                                            height *= MAX_WIDTH / width;
-                                            width = MAX_WIDTH;
+                                        if (width > MAX_SIZE) {
+                                            height *= MAX_SIZE / width;
+                                            width = MAX_SIZE;
                                         }
                                     } else {
-                                        if (height > MAX_HEIGHT) {
-                                            width *= MAX_HEIGHT / height;
-                                            height = MAX_HEIGHT;
+                                        if (height > MAX_SIZE) {
+                                            width *= MAX_SIZE / height;
+                                            height = MAX_SIZE;
                                         }
                                     }
 
@@ -121,7 +113,6 @@ export default function ModalGalleryFicha({ isOpen, onClose, images = [], record
                                     canvas.height = height;
                                     const ctx = canvas.getContext('2d');
                                     ctx.drawImage(img, 0, 0, width, height);
-
                                     canvas.toBlob((blob) => {
                                         if (blob) {
                                             const newFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".webp", {
@@ -132,51 +123,84 @@ export default function ModalGalleryFicha({ isOpen, onClose, images = [], record
                                         } else {
                                             reject(new Error('Compression failed'));
                                         }
-                                    }, 'image/webp', 0.7); // 0.7 quality is excellent for clinical use and saves more space
+                                    }, 'image/webp', 0.8);
                                 };
                                 img.onerror = reject;
                             });
                         };
-
                         fileToUpload = await compressImage(file);
                     } catch (err) {
-                        console.error("Error comprimiendo imagen:", err);
+                        console.warn("Compression failed, using original:", err);
                     }
                 }
 
-                // Final size check for all files (especially after compression)
-                const maxSize = 4 * 1024 * 1024; // 4MB
-                if (fileToUpload.size > maxSize) {
-                    alert(`El archivo ${file.name} es demasiado grande (${(fileToUpload.size / (1024 * 1024)).toFixed(2)}MB). El máximo es 4MB.`);
-                    continue;
-                }
+                // 2. Determine if Chunking is needed (Files > 3.5MB)
+                const CHUNK_SIZE = 3.5 * 1024 * 1024; // 3.5MB chunks for safety
+                if (fileToUpload.size > CHUNK_SIZE) {
+                    console.log(`[Chunking] Starting for file: ${fileToUpload.name} (${(fileToUpload.size / (1024 * 1024)).toFixed(2)}MB)`);
+                    const uploadId = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2) + Date.now();
+                    const totalChunks = Math.ceil(fileToUpload.size / CHUNK_SIZE);
 
-                const formData = new FormData();
-                formData.append('file', fileToUpload);
-                formData.append('cedula', cedula);
-                formData.append('ficha_id', recordId || '');
-                formData.append('modulo', modulo || 'odontologia');
-                formData.append('categoria', selectedCategory);
-                formData.append('nombre', file.name);
+                    for (let i = 0; i < totalChunks; i++) {
+                        const start = i * CHUNK_SIZE;
+                        const end = Math.min(fileToUpload.size, start + CHUNK_SIZE);
+                        const chunk = fileToUpload.slice(start, end);
 
-                const response = await axios.post('/api/media', formData, {
-                    onUploadProgress: (progressEvent) => {
-                        const filePercent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                        // Approximate total progress
-                        const overallPercent = Math.round(((completedFiles * 100) + filePercent) / totalFiles);
-                        setUploadProgress(overallPercent);
+                        const chunkFormData = new FormData();
+                        chunkFormData.append('upload_id', uploadId);
+                        chunkFormData.append('chunk_index', i);
+                        chunkFormData.append('file', chunk);
+
+                        await axios.post('/api/media/chunk', chunkFormData);
+
+                        // Update progress per file
+                        const chunkProgress = Math.round(((i + 1) / totalChunks) * 100);
+                        const overallProgress = Math.round(((currentFileIndex * 100) + (chunkProgress / totalFiles)));
+                        setUploadProgress(overallProgress);
                     }
-                });
 
-                // INSTANT UI UPDATE: Add the uploaded media to the list immediately
-                if (response.data && response.data.media) {
-                    setMediaList(prev => [response.data.media, ...prev]);
+                    // Finalize
+                    const finalizeRes = await axios.post('/api/media/finalize', {
+                        uploadId,
+                        cedula,
+                        modulo: modulo || 'odontologia',
+                        categoria: selectedCategory,
+                        nombre: file.name,
+                        mime_type: fileToUpload.type,
+                        size: fileToUpload.size,
+                        ficha_id: recordId || null
+                    });
+
+                    if (finalizeRes.data?.media) {
+                        setMediaList(prev => [finalizeRes.data.media, ...prev]);
+                    }
+                } else {
+                    // 3. Normal Upload (Small files)
+                    const formData = new FormData();
+                    formData.append('file', fileToUpload);
+                    formData.append('cedula', cedula);
+                    formData.append('ficha_id', recordId || '');
+                    formData.append('modulo', modulo || 'odontologia');
+                    formData.append('categoria', selectedCategory);
+                    formData.append('nombre', file.name);
+
+                    const response = await axios.post('/api/media', formData, {
+                        onUploadProgress: (p) => {
+                            const filePercent = Math.round((p.loaded * 100) / p.total);
+                            const overallPercent = Math.round(((currentFileIndex * 100) + filePercent) / totalFiles);
+                            setUploadProgress(overallPercent);
+                        }
+                    });
+
+                    if (response.data?.media) {
+                        setMediaList(prev => [response.data.media, ...prev]);
+                    }
                 }
 
-                completedFiles++;
-                setUploadProgress(Math.round((completedFiles * 100) / totalFiles));
+                currentFileIndex++;
+                setUploadProgress(Math.round((currentFileIndex * 100) / totalFiles));
             }
-            await fetchMedia();
+
             setUploading(false);
             setUploadProgress(0);
         } catch (error) {
@@ -248,7 +272,7 @@ export default function ModalGalleryFicha({ isOpen, onClose, images = [], record
                                                 <PhotoIcon className="h-6 w-6 text-white" />
                                             </div>
                                             <div>
-                                                <Dialog.Title className="text-xl font-bold text-white uppercase tracking-wider">
+                                                <Dialog.Title as="h3" className="text-xl font-bold text-white uppercase tracking-wider">
                                                     Galería Multimedia <span className="text-primary/50 text-sm ml-2">Profesional</span>
                                                 </Dialog.Title>
                                                 <p className="text-[9px] text-white/40 uppercase">Archivos optimizados en base de datos dedicada</p>

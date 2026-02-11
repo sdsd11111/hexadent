@@ -114,7 +114,7 @@ export default function ModalArchivosComplemento({ isOpen, onClose }) {
 
         try {
             const totalFiles = selectedFiles.length;
-            let completedFiles = 0;
+            let currentFileIndex = 0;
 
             for (const file of selectedFiles) {
                 // Validate file type
@@ -127,7 +127,20 @@ export default function ModalArchivosComplemento({ isOpen, onClose }) {
                     continue;
                 }
 
-                // Compress image if applicable
+                // LIMITS ENFORCEMENT
+                if (isImage && file.size > 1 * 1024 * 1024) {
+                    alert(`La imagen "${file.name}" supera el límite de 1MB.`);
+                    continue;
+                }
+                if (isVideo && file.size > 10 * 1024 * 1024) {
+                    alert(`El video "${file.name}" supera el límite de 10MB.`);
+                    continue;
+                }
+                if (isPdf && file.size > 5 * 1024 * 1024) {
+                    alert(`El PDF "${file.name}" supera el límite de 5MB.`);
+                    continue;
+                }
+
                 let fileToUpload = file;
                 if (isImage) {
                     try {
@@ -137,77 +150,71 @@ export default function ModalArchivosComplemento({ isOpen, onClose }) {
                                 img.src = URL.createObjectURL(file);
                                 img.onload = () => {
                                     const canvas = document.createElement('canvas');
-                                    let width = img.width;
-                                    let height = img.height;
-
-                                    // Optimized resize for web
-                                    const MAX_WIDTH = 1600;
-                                    const MAX_HEIGHT = 1600;
-
-                                    if (width > height) {
-                                        if (width > MAX_WIDTH) {
-                                            height *= MAX_WIDTH / width;
-                                            width = MAX_WIDTH;
-                                        }
-                                    } else {
-                                        if (height > MAX_HEIGHT) {
-                                            width *= MAX_HEIGHT / height;
-                                            height = MAX_HEIGHT;
-                                        }
-                                    }
-
-                                    canvas.width = width;
-                                    canvas.height = height;
+                                    let width = img.width; height = img.height;
+                                    const MAX = 1600;
+                                    if (width > height) { if (width > MAX) { height *= MAX / width; width = MAX; } }
+                                    else { if (height > MAX) { width *= MAX / height; height = MAX; } }
+                                    canvas.width = width; canvas.height = height;
                                     const ctx = canvas.getContext('2d');
                                     ctx.drawImage(img, 0, 0, width, height);
-
                                     canvas.toBlob((blob) => {
-                                        if (blob) {
-                                            const newFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".webp", {
-                                                type: 'image/webp',
-                                                lastModified: Date.now(),
-                                            });
-                                            resolve(newFile);
-                                        } else {
-                                            reject(new Error('Compression failed'));
-                                        }
-                                    }, 'image/webp', 0.7); // 0.7 quality saves more space
+                                        if (blob) resolve(new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".webp", { type: 'image/webp' }));
+                                        else reject(new Error('failed'));
+                                    }, 'image/webp', 0.8);
                                 };
                                 img.onerror = reject;
                             });
                         };
-
                         fileToUpload = await compressImage(file);
-                    } catch (err) {
-                        console.error("Error comprimiendo imagen:", err);
+                    } catch (err) { console.warn("Image compression failed:", err); }
+                }
+
+                const CHUNK_SIZE = 3.5 * 1024 * 1024;
+                if (fileToUpload.size > CHUNK_SIZE) {
+                    const uploadId = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2) + Date.now();
+                    const totalChunks = Math.ceil(fileToUpload.size / CHUNK_SIZE);
+
+                    for (let i = 0; i < totalChunks; i++) {
+                        const start = i * CHUNK_SIZE;
+                        const end = Math.min(fileToUpload.size, start + CHUNK_SIZE);
+                        const chunk = fileToUpload.slice(start, end);
+                        const formData = new FormData();
+                        formData.append('upload_id', uploadId);
+                        formData.append('chunk_index', i);
+                        formData.append('file', chunk);
+
+                        await fetch('/api/media/chunk', { method: 'POST', body: formData });
+
+                        const chunkProgress = Math.round(((i + 1) / totalChunks) * 100);
+                        setUploadProgress(Math.round(((currentFileIndex * 100) + (chunkProgress / totalFiles))));
                     }
+
+                    await fetch('/api/media/finalize', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            uploadId,
+                            cedula: 'GENERAL',
+                            modulo: 'complemento',
+                            categoria: 'General',
+                            nombre: file.name,
+                            mime_type: fileToUpload.type,
+                            size: fileToUpload.size
+                        })
+                    });
+                } else {
+                    const formData = new FormData();
+                    formData.append('file', fileToUpload);
+                    formData.append('cedula', 'GENERAL');
+                    formData.append('modulo', 'complemento');
+                    formData.append('categoria', 'General');
+                    formData.append('nombre', file.name);
+
+                    await fetch('/api/media', { method: 'POST', body: formData });
                 }
 
-                // Strictly enforce Vercel payload limit (4.5MB total request)
-                // We limit to 4MB for safety
-                const maxSize = 4 * 1024 * 1024;
-
-                if (fileToUpload.size > maxSize) {
-                    alert(`${file.name} es demasiado grande (${(fileToUpload.size / (1024 * 1024)).toFixed(2)}MB). El máximo es 4MB debido a límites de infraestructura.`);
-                    continue;
-                }
-
-                const formData = new FormData();
-                formData.append('file', fileToUpload);
-                formData.append('cedula', 'GENERAL');
-                formData.append('modulo', 'complemento');
-                formData.append('categoria', 'General'); // Default category
-                formData.append('nombre', file.name);
-
-                const response = await fetch('/api/media', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (response.ok) {
-                    completedFiles++;
-                    setUploadProgress(Math.round((completedFiles * 100) / totalFiles));
-                }
+                currentFileIndex++;
+                setUploadProgress(Math.round((currentFileIndex * 100) / totalFiles));
             }
 
             await fetchMediaGallery();
