@@ -41,7 +41,34 @@ export async function POST(request) {
             const remoteJid = data?.key?.remoteJid || '';
             const isGroup = remoteJid.includes('@g.us');
             const from = remoteJid.split('@')[0];
-            const text = msg?.conversation || msg?.extendedTextMessage?.text;
+
+            // Detect text in various spots
+            let text = msg?.conversation || msg?.extendedTextMessage?.text;
+
+            // DETECT AUDIO
+            if (!text && (msg?.audioMessage || data?.messageType === 'audio')) {
+                console.log(`[Webhook] Audio detected from ${from}. Attempting transcription...`);
+                try {
+                    // Import dynamically to avoid overhead on text-only messages
+                    const { transcribeAudio } = await import('../../../lib/chatbot/transcription');
+
+                    // Evolution API usually sends base64 in data.base64 or we might need to fetch it
+                    // If instances are configured with base64: true, it comes in payload.data.base64
+                    const base64 = data?.base64;
+
+                    if (base64) {
+                        const buffer = Buffer.from(base64, 'base64');
+                        text = await transcribeAudio(buffer);
+                        console.log(`[Webhook] Audio transcribed for ${from}: "${text}"`);
+                    } else {
+                        console.warn(`[Webhook] Audio message received but no base64 found. Ensure Evolution API has media base64 enabled.`);
+                        text = "(Mensaje de voz no procesado: faltan datos de audio)";
+                    }
+                } catch (e) {
+                    console.error(`[Webhook] Transcription FAILED:`, e.message);
+                    text = "(Error al procesar mensaje de voz)";
+                }
+            }
 
             if (from && text && !data?.key?.fromMe && !isGroup) {
                 // Ignore empty status updates or empty text
