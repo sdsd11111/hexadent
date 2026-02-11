@@ -2,30 +2,34 @@ import db from './lib/db.js';
 
 async function clearMemory() {
     try {
-        console.log('Clearing all chatbot memory components...');
+        console.log('--- RESETTING CHATBOT MEMORY ---');
 
-        // 1. Logs
-        await db.execute('DELETE FROM chatbot_logs');
-        console.log('- Logs cleared.');
+        const tables = [
+            'chatbot_logs',
+            'chatbot_sessions',
+            'chatbot_buffer',
+            'chatbot_locks',
+            'chatbot_locked_slots',
+            'handoff_sessions'
+        ];
 
-        // 2. Sessions (Name/Cedula)
-        await db.execute('DELETE FROM chatbot_sessions');
-        console.log('- Sessions cleared.');
+        for (const table of tables) {
+            try {
+                await db.execute(`DELETE FROM ${table}`);
+                console.log(`✅ Table ${table} cleared.`);
+            } catch (err) {
+                if (err.code === 'ER_NO_SUCH_TABLE') {
+                    console.log(`ℹ️ Table ${table} does not exist, skipping.`);
+                } else {
+                    console.error(`❌ Error clearing ${table}:`, err.message);
+                }
+            }
+        }
 
-        // 3. Buffer and Locks
-        await db.execute('DELETE FROM chatbot_buffer');
-        await db.execute('DELETE FROM chatbot_locks');
-        console.log('- Concurrency tables cleared.');
-
-        // 4. Handoff Sessions (Human override)
-        // Check if table exists first (just in case)
-        await db.execute('DELETE FROM handoff_sessions');
-        console.log('- Handoff sessions (silence) cleared.');
-
-        console.log('Memory reset successful.');
+        console.log('\n✨ All memory has been wiped clean.');
         process.exit(0);
     } catch (error) {
-        console.error('Error clearing memory:', error.message);
+        console.error('FATAL Error clearing memory:', error.message);
         process.exit(1);
     }
 }
