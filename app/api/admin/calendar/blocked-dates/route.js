@@ -1,3 +1,6 @@
+import { NextResponse } from 'next/server';
+import db from '../../../../../lib/db.js';
+
 async function ensureBlockedDatesTable() {
     await db.execute(`
         CREATE TABLE IF NOT EXISTS blocked_dates (
