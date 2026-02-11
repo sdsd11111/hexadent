@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { processChatbotMessage } from '../../../lib/chatbot/logic';
-import { debounceMessage } from '../../../lib/chatbot/debouncer';
+import { processChatbotMessage } from '../../../lib/chatbot/logic.js';
+import { debounceMessage } from '../../../lib/chatbot/debouncer.js';
 
 export const dynamic = 'force-dynamic';
 
@@ -57,8 +57,7 @@ export async function POST(request) {
                     const base64 = data?.base64;
 
                     if (base64) {
-                        const buffer = Buffer.from(base64, 'base64');
-                        text = await transcribeAudio(buffer);
+                        text = await transcribeAudio(base64);
                         console.log(`[Webhook] Audio transcribed for ${from}: "${text}"`);
                     } else {
                         console.warn(`[Webhook] Audio message received but no base64 found. Ensure Evolution API has media base64 enabled.`);
@@ -68,6 +67,12 @@ export async function POST(request) {
                     console.error(`[Webhook] Transcription FAILED:`, e.message);
                     text = "(Error al procesar mensaje de voz)";
                 }
+            }
+
+            // DETECT OTHER MEDIA (IMAGE, VIDEO, STICKER)
+            if (!text && (msg?.imageMessage || msg?.videoMessage || msg?.stickerMessage || msg?.documentMessage)) {
+                console.log(`[Webhook] Non-audio media detected from ${from}.`);
+                text = "(El usuario envió un archivo multimedia: foto, video, sticker o documento que no puedes visualizar. Pídele amablemente que te lo explique en texto)";
             }
 
             if (from && text && !data?.key?.fromMe && !isGroup) {

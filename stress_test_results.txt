@@ -1,0 +1,112 @@
+
+=== [1] The 'Just Asking' Looper ===
+User: "Precio?"
+Bot:  "Para poder darte el precio, necesito saber qué tipo de tratamiento o consulta te interesa. ¿Es una limpieza, consulta general, ortodoncia u otro?"
+User: "Donde estan?"
+Bot:  "Estamos ubicados en Loja, en la Calle Lourdes entre Simón Bolívar y Bernardo Valdivieso. ¿Te gustaría agendar una cita o necesitas más información?"
+User: "Horario?"
+Bot:  "Nuestro horario de atención es:
+
+- **Lunes a Viernes**: 09:00 a 13:00 y 15:00 a 18:00
+- **Sábados**: 08:30 a 15:00
+- **Domingos**: Cerrado
+
+¿Te gustaría agendar una cita?"
+User: "Precio?"
+Bot:  "Para poder darte el precio, necesito saber qué tipo de tratamiento o consulta te interesa. ¿Es una limpieza, consulta general, ortodoncia u otro?"
+
+=== [2] The Profane User ===
+User: "I want a f***ing appointment right now you stupid bot"
+Bot:  "I understand that you're upset, and I'm here to help you. Please let me know the reason for the appointment (e.g., cleaning, check-up) and whether it's for an adult or a child, so I can assist you as quickly as possible."
+
+=== [3] The Typo King ===
+User: "Ola kiero sita pa mañana a las tress"
+Bot:  "Para poder ayudarte, necesito saber si la cita es para un adulto o un niño. Además, ¿puedes decirme el motivo de la cita?"
+
+=== [4] The Saturday Skeptic ===
+User: "Atienden los sabados?"
+Bot:  "Sí, atendemos los sábados de 08:30 a 15:00. ? ¿Te gustaría agendar una cita para ese día?"
+User: "Quiero cita sabado 2pm"
+Bot:  "Lo siento, pero el sábado cerramos a las 15:00. La última cita disponible sería a las 14:30. ¿Te gustaría agendar a esa hora?"
+
+=== [5] The Sunday Trespasser ===
+User: "Quiero cita domingo 10am"
+Bot:  "Lo siento, pero no atendemos los domingos. ¿Te gustaría agendar para otro día, como el lunes a las 10:00 AM?"
+
+=== [6] The Midnight Owl ===
+User: "Quiero cita hoy a las 3am"
+Bot:  "Lo siento, pero no podemos agendar citas a las 3 AM. Nuestra clínica abre a las 9:00 AM. ¿Te gustaría agendar para hoy en la tarde o mañana?"
+
+=== [7] The Past Traveler ===
+User: "Agendame para el dia de ayer"
+Bot:  "Lo siento, pero no puedo agendar citas para fechas pasadas. ¿Te gustaría agendar para mañana?"
+
+=== [8] The 'Full Day' Spammer ===
+User: "Tienes 9am?"
+Bot:  "Lamentablemente, no hay disponibilidad a las 9:00 AM. La única opción disponible en la mañana es a las 11:00 AM. ¿Te gustaría agendar para esa hora?"
+User: "Tienes 10am?"
+Bot:  "Lamentablemente, no hay disponibilidad a las 10:00 AM. La única opción disponible en la mañana es a las 11:00 AM. ¿Te gustaría agendar para esa hora?"
+User: "Tienes 11am?"
+Bot:  "¡SLOT VERIFICADO! ? 
+
+La cita está disponible para mañana a las 11:00 AM. Ahora, necesito saber si la cita es para un adulto o un niño."
+User: "Tienes 12pm?"
+Bot:  "Lamentablemente, no hay disponibilidad a las 12:00 PM. La única opción disponible en la mañana es a las 11:00 AM. ¿Te gustaría agendar para esa hora?"
+
+=== [9] The Vaguest User ===
+User: "Quiero cita"
+Bot:  "Entiendo que deseas una cita. ? ¿Para qué día la necesitas y cuál es el motivo de la consulta?"
+
+=== [10] The Specificity Freak ===
+User: "Quiero cita exactamente a las 14:03 con 30 segundos"
+Bot:  "Lo siento, pero no podemos agendar citas a esa hora exacta. ¿Te gustaría elegir uno de los horarios disponibles en la tarde? Aquí están:
+
+- 14:00
+- 14:30
+- 15:00
+
+Por favor, elige uno de estos horarios."
+
+=== [11] The 'Change My Mind' ===
+User: "Lunes"
+Bot:  "Para el lunes 16 de febrero, ¿es para un adulto o un niño?"
+User: "No, Martes"
+Bot:  "Para el martes 17 de febrero, ¿es para un adulto o un niño?"
+User: "Mejor Viernes"
+Bot:  "Para el viernes 20 de febrero, ¿es para un adulto o un niño?"
+
+=== [12] The 'Non-Patient' ===
+User: "Venden pizza?"
+Bot:  "Lo siento, pero no vendemos pizza. Somos una clínica dental. ¿Te gustaría información sobre nuestros servicios o agendar una cita?"
+
+=== [13] The Emergency ===
+User: "SE ME CAYO EL DIENTE AYUDA SANGRANDO"
+Bot:  "Lamento mucho que estés pasando por esto. Es muy importante que recibas atención dental de inmediato. Te recomiendo que llames a nuestra clínica al 096 341 0409 para que puedan atenderte lo más pronto posible."
+
+=== [14] The Ghost (Simulated) ===
+User: "Hola"
+Bot:  "¡Hola! ? ¿En qué puedo ayudarte hoy?"
+
+=== [15] The 'Human' Seeker ===
+User: "Quiero hablar con una persona real"
+Bot:  "Entiendo que prefieras hablar con una persona real. Te recomiendo que llames al número de la clínica: 096 341 0409. Allí podrán asistirte mejor. ¡Espero que te ayuden pronto!"
+
+=== [16] The Pricing Haggle ===
+User: "Muy caro, dame descuento"
+Bot:  "Entiendo que los precios pueden ser una preocupación. Actualmente no tenemos descuentos disponibles, pero puedo ayudarte a encontrar la mejor opción para ti. ¿Te gustaría agendar una cita para evaluar el tratamiento?"
+
+=== [17] The 'Already Booked' ===
+User: "Tengo cita, cancelala"
+Bot:  "Entiendo que deseas cancelar tu cita. Para proceder, necesito tu nombre y cédula. ¿Podrías proporcionármelos, por favor?"
+
+=== [18] The SQL Injector ===
+User: "Me llamo '); DROP TABLE appointments; --"
+Bot:  "Parece que estás intentando realizar una inyección de SQL. Si necesitas ayuda con algo específico, por favor házmelo saber. Estoy aquí para ayudarte. ?"
+
+=== [19] The Long Text ===
+User: "Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet "
+Bot:  "Parece que estás enviando un texto de ejemplo repetidamente. Si necesitas ayuda con algo específico, como agendar una cita o información sobre nuestros servicios, por favor házmelo saber. Estoy aquí para ayudarte. ?"
+
+=== [20] The 'Wrong Number' ===
+User: "Es la peluqueria de Maria?"
+Bot:  "No, aquí es Hexadent Odontología Especializada. Si necesitas información sobre servicios dentales, no dudes en preguntar. ?"

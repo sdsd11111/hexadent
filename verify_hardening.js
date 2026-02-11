@@ -1,73 +1,69 @@
-const mysql = require('mysql2/promise');
 const fs = require('fs');
+const mysql = require('mysql2/promise');
 
-// Mock calendar_helper import logic (since it's an ES module, we'll test the logic concepts here or try to import if possible)
-// To keep it simple and robust, we will TEST THE DB CONSTRAINT directly.
+if (fs.existsSync('.env')) {
+    const lines = fs.readFileSync('.env', 'utf8').split('\n');
+    lines.forEach(line => {
+        const [key, ...vals] = line.split('=');
+        if (key && vals && !key.trim().startsWith('#')) {
+            process.env[key.trim()] = vals.join('=').trim().replace(/^"|"$/g, '');
+        }
+    });
+}
 
-async function run() {
-    let env = {};
-    if (fs.existsSync('.env')) {
-        fs.readFileSync('.env', 'utf8').split('\n').filter(Boolean).forEach(l => {
-            const [k, v] = l.split('=');
-            if (k && v && !k.startsWith('#')) env[k.trim()] = v.trim();
-        });
-    }
-
-    const config = {
-        host: env.MYSQL_HOST,
-        port: env.MYSQL_PORT,
-        user: env.MYSQL_USER,
-        password: env.MYSQL_PASSWORD,
-        database: env.MYSQL_DATABASE,
-    };
-
-    const connection = await mysql.createConnection(config);
-    console.log('--- VERIFYING HARDENING ---');
+async function runTests() {
+    let results = "--- HARDENING VERIFICATION RESULTS ---\n";
+    console.log("Starting tests...");
 
     try {
-        // 1. VERIFY TIMEZONE LOGIC
-        const ecuadorTime = new Date().toLocaleString("en-US", { timeZone: "America/Guayaquil" });
-        const nowEcu = new Date(ecuadorTime);
-        console.log(`✅ TIMEZONE CHECK: Server says it is ${new Date().toISOString()}`);
-        console.log(`✅ ECUADOR TIME detected as: ${nowEcu.toISOString()}`);
+        const { processChatbotMessage } = await import('./lib/chatbot/logic.js');
+        const { validateCedula } = await import('./lib/chatbot/utils/validation.js');
 
-        // 2. VERIFY DUPLICATE CONSTRAINT
-        const testDate = '2099-12-31';
-        const testTime = '23:55:00';
+        // 1. Cédula Validation
+        results += "\n🔹 Cédula Validation:\n";
+        [
+            { id: "1111111111", expect: false },
+            { id: "1710034065", expect: true }, // Known valid
+            { id: "1724018371", expect: false },
+            { id: "0999999999", expect: false }
+        ].forEach(t => {
+            const ok = validateCedula(t.id);
+            results += `   ID ${t.id} -> ${ok ? 'VALID' : 'INVALID'} (Expected: ${t.expect ? 'VALID' : 'INVALID'})\n`;
+        });
 
-        console.log(`\n--- TESTING RACE CONDITION ---`);
-        console.log(`Attempting to insert test slot ${testDate} ${testTime}...`);
+        // 2. Database Checks
+        const dbConfig = {
+            host: process.env.MYSQL_HOST,
+            user: process.env.MYSQL_USER,
+            password: process.env.MYSQL_PASSWORD,
+            database: process.env.MYSQL_DATABASE,
+        };
+        const c = await mysql.createConnection(dbConfig);
 
-        // Insert 1
-        await connection.execute(
-            'INSERT IGNORE INTO appointments (patient_name, patient_phone, appointment_date, appointment_time, duration_minutes, status) VALUES (?, ?, ?, ?, ?, ?)',
-            ['Tester 1', '0000000000', testDate, testTime, 20, 'scheduled']
-        );
-        console.log('Insert 1: SUCCESS (or ignored if existed)');
+        // 3. Slot Locking
+        results += "\n🔹 Slot Locking:\n";
+        const testPhone = "998877665";
+        await c.execute("DELETE FROM chatbot_locked_slots WHERE locked_by = ?", [testPhone]);
 
-        // Insert 2 (Should Fail)
-        try {
-            await connection.execute(
-                'INSERT INTO appointments (patient_name, patient_phone, appointment_date, appointment_time, duration_minutes, status) VALUES (?, ?, ?, ?, ?, ?)',
-                ['Tester 2', '0000000001', testDate, testTime, 20, 'scheduled']
-            );
-            console.log('❌ FAIL: Duplicate insert SUCCEEDED (Constraint missing!)');
-        } catch (e) {
-            if (e.code === 'ER_DUP_ENTRY') {
-                console.log('✅ SUCCESS: Duplicate insert FAILED with ER_DUP_ENTRY (Reference: "Slot taken" logic works).');
-            } else {
-                console.log(`❌ FAIL: Unexpected error: ${e.message}`);
-            }
-        }
+        await processChatbotMessage(testPhone, "Cita para limpieza mañana a las 09:00");
+        const [locks] = await c.execute("SELECT * FROM chatbot_locked_slots WHERE locked_by = ?", [testPhone]);
+        results += locks.length > 0 ? `   ✅ Slot Locked: ${locks[0].date} ${locks[0].time}\n` : "   ❌ Slot Lock FAILED\n";
 
-        // Cleanup
-        await connection.execute('DELETE FROM appointments WHERE appointment_date = ? AND appointment_time = ?', [testDate, testTime]);
-        console.log('Cleanup done.');
+        // 4. Flow Validation
+        results += "\n🔹 Flow Validation (Invalid Cédula):\n";
+        await processChatbotMessage(testPhone, "Mi cédula es 1111111111 y tengo 25 años");
+        const [logs] = await c.execute("SELECT bot_resp FROM chatbot_logs WHERE phone = ? ORDER BY id DESC LIMIT 1", [testPhone]);
+        results += logs[0].bot_resp.includes("no es válida") ? "   ✅ Bot Rejected Invalid ID\n" : `   ❌ Rejection FAILED. Response: ${logs[0].bot_resp}\n`;
 
-    } catch (err) {
-        console.error('FATAL:', err);
-    } finally {
-        await connection.end();
+        await c.end();
+
+    } catch (e) {
+        results += `\nFATAL ERROR: ${e.message}\n`;
     }
+
+    fs.writeFileSync('hardening_test_results.txt', results);
+    console.log("Results written to hardening_test_results.txt");
+    process.exit(0);
 }
-run();
+
+runTests();
