@@ -150,7 +150,8 @@ export default function ModalArchivosComplemento({ isOpen, onClose }) {
                                 img.src = URL.createObjectURL(file);
                                 img.onload = () => {
                                     const canvas = document.createElement('canvas');
-                                    let width = img.width; height = img.height;
+                                    let width = img.width;
+                                    let height = img.height;
                                     const MAX = 1600;
                                     if (width > height) { if (width > MAX) { height *= MAX / width; width = MAX; } }
                                     else { if (height > MAX) { width *= MAX / height; height = MAX; } }
