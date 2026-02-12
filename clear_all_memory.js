@@ -10,15 +10,17 @@ async function clearMemory() {
             'chatbot_buffer',
             'chatbot_locks',
             'chatbot_locked_slots',
-            'handoff_sessions'
+            'handoff_sessions',
+            'chatbot_failed_metadata'
         ];
 
         for (const table of tables) {
             try {
+                // Use TRUNCATE if possible or DELETE
                 await db.execute(`DELETE FROM ${table}`);
                 console.log(`✅ Table ${table} cleared.`);
             } catch (err) {
-                if (err.code === 'ER_NO_SUCH_TABLE') {
+                if (err.code === 'ER_NO_SUCH_TABLE' || err.message.includes("doesn't exist")) {
                     console.log(`ℹ️ Table ${table} does not exist, skipping.`);
                 } else {
                     console.error(`❌ Error clearing ${table}:`, err.message);
