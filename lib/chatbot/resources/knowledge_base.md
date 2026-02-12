@@ -9,7 +9,7 @@
 
 ## Horarios de Atención
 - **Lunes a Viernes**: 09:00 a 13:00 y 15:00 a 18:00
-- **Sábados**: 08:30 a 15:00
+- **Sábados**: 08:30 a 15:00 (Atención continua, sin cierre al mediodía)
 - **Domingos**: Cerrado
 
 ## Servicios y Precios Aproximados
