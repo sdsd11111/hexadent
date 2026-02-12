@@ -61,11 +61,12 @@ export async function POST(request) {
                         console.log(`[Webhook] Audio transcribed for ${from}: "${text}"`);
                     } else {
                         console.warn(`[Webhook] Audio message received but no base64 found. Ensure Evolution API has media base64 enabled.`);
-                        text = "(Mensaje de voz no procesado: faltan datos de audio)";
+                        // STILL send a message to the bot so it can respond to the user
+                        text = "El usuario envió un mensaje de voz que no pudo ser transcrito. Pídele amablemente que lo escriba en texto.";
                     }
                 } catch (e) {
                     console.error(`[Webhook] Transcription FAILED:`, e.message);
-                    text = "(Error al procesar mensaje de voz)";
+                    text = "El usuario envió un mensaje de voz pero hubo un error al procesarlo. Pídele amablemente que lo escriba en texto.";
                 }
             }
 
