@@ -1,12 +1,17 @@
 import { getAvailableSlots } from './lib/chatbot/scripts/calendar_helper.js';
 
 async function test() {
-    const slots = await getAvailableSlots('2026-07-25', 20);
-    console.log('Slots for 2026-07-25 (Saturday):');
-    console.log(JSON.stringify(slots, null, 2));
+    const date = '2026-02-14';
+    console.log('--- DEBUG: Slots for', date, '---');
+    const slots = await getAvailableSlots(date, 20);
+    console.log('Slots:', slots.join(', '));
 
-    const isFivePMAvailable = slots.includes('17:00');
-    console.log(`Is 17:00 in slots? ${isFivePMAvailable}`);
+    if (slots.includes('08:30')) {
+        console.log('✅ 08:30 is PRESENT in the engine output.');
+    } else {
+        console.log('❌ 08:30 is MISSING from the engine output.');
+    }
+    process.exit(0);
 }
 
-test().catch(console.error);
+test();
