@@ -18,6 +18,8 @@ async function clear() {
         await c.execute('DELETE FROM handoff_sessions');
         await c.execute('DELETE FROM chatbot_buffer');
         await c.execute('DELETE FROM chatbot_locks');
+        await c.execute('DELETE FROM chatbot_locked_slots'); // Added this too
+        await c.execute('DELETE FROM appointments'); // CRITICAL: Clear appointments for testing
         await c.execute('DELETE FROM ignored_numbers');
         console.log('CLEANED');
         await c.end();
