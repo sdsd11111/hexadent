@@ -25,7 +25,12 @@
 - **Costos**: Todos los valores (entrada y cuotas) se determinan **únicamente** tras la evaluación clínica ($15) y la planificación con radiografías.
 
 ### Odontología General
-- **Calce, Restauraciones, Limpiezas, Cirugías**: Todos los procedimientos requieren una evaluación previa ($15) para determinar el presupuesto exacto según el caso clínico.
+- **Calce, Restauraciones, Limpiezas**: Requieren evaluación previa ($15).
+
+### Cirugía (Terceras Molares / Muelas del Juicio)
+- **Requisito**: Para dar un costo aproximado o planificar la cirugía, **es ideal** que el paciente comparta una imagen de su radiografía panorámica.
+- **Alternativa**: Si no tiene radiografía, se debe agendar una evaluación clínica ($15) para emitir la orden.
+- **Nota**: Si el paciente pregunta precios de cirugía, SUGIERA enviar la foto de la radiografía o agendar evaluación.
 
 ### Prótesis Dental
 - **Requisito**: Evaluación clínica exhaustiva ($15) para determinar el tipo de prótesis ideal (Removible, Flexible, Fija o sobre Implantes).
@@ -66,6 +71,9 @@ El bot mapeará lo que digas a estas categorías para darte el tiempo correcto e
 - **Categoría: Prótesis Dental (45 min)**
   - "Necesito una placa", "me falta un diente", "quiero una prótesis", "puente dental", "coronas de porcelana", "reparar mi dentadura".
   - **REGLA**: Para prótesis, asuma siempre que el paciente es un **ADULTO**.
+- **Categoría: Cirugía / Terceras Molares (45 min)**
+  - "Me duele la muela del juicio", "quiero sacarme una muela", "cirugía de tercer molar", "extracción dental".
+  - **REGLA**: Si preguntan precio, sugiere enviar foto de radiografía o agendar evaluación.
 - **Categoría: Niños / Bebés (1 hora)**
   - "Cita para mi hijo/hija", "dolor de muela de mi niño", "revisión para mi bebé", "limpieza dental infantil", "le está saliendo un diente a mi pequeño".
 - **Categoría: Consulta General / Otros (20 min)**
