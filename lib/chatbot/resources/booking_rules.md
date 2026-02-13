@@ -11,6 +11,7 @@
 Se prohibe dar horarios sin saber el motivo.
 - Limpieza/Calza: 20m
 - Ortodoncia Control: 45m
+- Prótesis Dental: 45m (Asumir ADULTO siempre)
 - Niños: 60m
 
 ## 3. REGLA DE 24 HORAS

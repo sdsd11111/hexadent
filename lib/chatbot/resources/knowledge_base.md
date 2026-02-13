@@ -36,6 +36,15 @@
 - **Limpieza Dental / Tratamiento de Gingivitis**: $20
 - **Cirugía de Tercera Molar**: $150
 
+### Prótesis Dental
+- **Requisito**: Evaluación clínica exhaustiva para determinar el tipo de prótesis ideal.
+- **Alternativas y Costos (Aproximados)**:
+  - **Prótesis Removible (Básica)**: Desde $150 (depende del número de dientes).
+  - **Prótesis Flexible (Deflex)**: Desde $250. Estética y cómoda.
+  - **Prótesis Fija (Puentes/Coronas)**: Requiere valoración para determinar material (Porcelana, Zirconio, etc.).
+  - **Prótesis sobre Implantes**: Opción de alta gama. Requiere tomografía y planificación quirúrgica.
+- **Nota**: El costo final se entrega únicamente después de la valoración clínica.
+
 ## Proceso de Agendamiento
 1. Preguntar día deseado
 2. Preguntar horario (mañana o tarde)
@@ -65,6 +74,9 @@ El bot mapeará lo que digas a estas categorías para darte el tiempo correcto e
 
 - **Categoría: Frenillos / Brackets (45 min)**
   - "Control de frenillos", "ajuste de brackets", "se me soltó un alambre", "me pincha el arco", "quiero ponerme frenillos", "chequeo de liguitas".
+- **Categoría: Prótesis Dental (45 min)**
+  - "Necesito una placa", "me falta un diente", "quiero una prótesis", "puente dental", "coronas de porcelana", "reparar mi dentadura".
+  - **REGLA**: Para prótesis, asuma siempre que el paciente es un **ADULTO**.
 - **Categoría: Niños / Bebés (1 hora)**
   - "Cita para mi hijo/hija", "dolor de muela de mi niño", "revisión para mi bebé", "limpieza dental infantil", "le está saliendo un diente a mi pequeño".
 - **Categoría: Consulta General / Otros (20 min)**
