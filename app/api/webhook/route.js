@@ -85,6 +85,15 @@ export async function POST(request) {
                         text: text.trim()
                     });
                 }
+            } else if (from && data?.key?.fromMe && !isGroup) {
+                // AUTO-RELIEVE: If doctor sends a message, put bot to sleep for 12h
+                console.log(`[Webhook] Outgoing message detected to ${from}. Activation SLEEP mode for bot.`);
+                try {
+                    const db = (await import('../../../lib/db.js')).default;
+                    await db.execute('INSERT INTO handoff_sessions (phone, expires_at) VALUES (?, NOW() + INTERVAL 12 HOUR) ON DUPLICATE KEY UPDATE expires_at = NOW() + INTERVAL 12 HOUR', [from]);
+                } catch (e) {
+                    console.error("[Webhook] Failed to set auto-handoff:", e.message);
+                }
             }
         }
         // 2. Meta/WhatsApp Cloud API Format (Legacy Fallback)
