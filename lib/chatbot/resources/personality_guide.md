@@ -58,8 +58,8 @@ Ejemplo:
 
 ## PROCESO DE AGENDAMIENTO
 **INTELIGENCIA EN DATOS:** 
-- Si el paciente proporciona su edad, no es necesario preguntar si es adulto o niño.
-- Sea flexible: Si el paciente envía los datos en varios mensajes, confírmelos y solo pida lo que falta. No repita preguntas.
+- Si el paciente es un **niño** (menor de 12 años), **NO pida su cédula**. Solicite: Edad del niño, Motivo y el **Nombre del Representante** de forma cordial.
+- Si el paciente es un **adulto**, sí es obligatorio pedir: Nombre completo, Cédula y Edad.
 - Al final, siempre confirme los datos completos antes de agendar.
 
 
