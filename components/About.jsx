@@ -16,8 +16,8 @@ export default function About() {
             <div className="container-custom relative z-10">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
-                    {/* Columna Izquierda: Contenido y Narrativa */}
-                    <div className="space-y-8 fade-in-up">
+                    {/* Columna Izquierda: Contenido y Narrativa - Order 2 on mobile, 1 on LG */}
+                    <div className="space-y-8 fade-in-up order-2 lg:order-1">
                         <div className="space-y-4">
                             <h2 className="text-3xl lg:text-4xl font-light text-secondary leading-tight">
                                 Referente en <span className="text-primary font-medium">Ortodoncia y Salud Dental</span> en Loja
@@ -72,12 +72,25 @@ export default function About() {
                         </div>
                     </div>
 
-                    {/* Columna Derecha: Imagen de la Doctora */}
-                    <div className="relative flex justify-center lg:justify-end fade-in-up delay-200">
+                    {/* Columna Derecha: Imagen de la Doctora - Order 1 on mobile, 2 on LG */}
+                    <div className="relative flex justify-center lg:justify-end fade-in-up delay-200 order-1 lg:order-2 mb-36 lg:mb-0">
                         {/* Elemento decorativo detrás de la imagen */}
                         <div className="absolute top-1/2 left-1/2 w-[110%] h-[110%] bg-primary/20 hexagon transform -translate-x-1/2 -translate-y-1/2 rotate-6 z-0"></div>
 
                         <div className="relative w-full max-w-md aspect-square z-10">
+                            {/* Badge Rusia - Colores oficiales y tamaño mejorado - Movido un poco más arriba en móvil */}
+                            <div className="absolute -top-10 -right-2 md:top-8 md:-right-8 z-30 flex items-center gap-3 px-4 py-2.5 bg-white shadow-2xl border-r-4 border-primary">
+                                <div className="flex flex-col w-12 h-8 border border-gray-100 overflow-hidden shadow-sm">
+                                    <div className="h-1/3 bg-white"></div>
+                                    <div className="h-1/3" style={{ backgroundColor: '#0039A6' }}></div>
+                                    <div className="h-1/3" style={{ backgroundColor: '#D52B1E' }}></div>
+                                </div>
+                                <div className="flex flex-col text-left">
+                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">Especializada en</span>
+                                    <span className="text-sm font-black text-secondary uppercase leading-none tracking-wide">RUSIA</span>
+                                </div>
+                            </div>
+
                             <div className="w-full h-full hexagon overflow-hidden relative shadow-2xl bg-white">
                                 <Image
                                     src="/doctor.png"
@@ -87,40 +100,13 @@ export default function About() {
                                     sizes="(max-width: 768px) 100vw, 50vw"
                                 />
 
-                                {/* Overlay gradiente inferior para texto - Elevado para evitar solapamiento */}
-                                <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/95 via-black/40 to-transparent flex items-end justify-center pb-16">
-                                    <div className="text-center text-white p-4 flex flex-col items-center">
-                                        {/* Icono del logo en blanco */}
-                                        <svg width="45" height="50" viewBox="0 0 80 90" fill="none" xmlns="http://www.w3.org/2000/svg" className="mb-3 opacity-90 drop-shadow-md">
-                                            <g stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
-                                                <path d="M15 28 V85" strokeLinecap="butt" />
-                                                <path d="M25 15 V85" strokeLinecap="butt" />
-                                                <path d="M25 15 C65 15 75 30 75 50 C75 70 65 85 25 85" fill="none" />
-                                                <path d="M15 28 H52" strokeLinecap="butt" />
-                                                <path d="M52 28 C68 28 68 56 52 56" fill="none" />
-                                                <path d="M52 56 H15" strokeLinecap="butt" />
-                                                <path d="M35 56 L48 78" />
-                                            </g>
-                                        </svg>
-                                        {/* Especialización - Adaptada para fondo oscuro */}
-                                        <div className="flex items-center gap-3 px-5 py-2.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-md">
-                                            <div className="flex flex-col w-8 h-5 border border-white/30 overflow-hidden shadow-md">
-                                                <div className="h-1/3 bg-white"></div>
-                                                <div className="h-1/3 bg-blue-600"></div>
-                                                <div className="h-1/3 bg-red-600"></div>
-                                            </div>
-                                            <div className="flex flex-col text-left">
-                                                <span className="text-[11px] font-bold text-white/80 uppercase tracking-widest leading-none mb-1">Especializada en</span>
-                                                <span className="text-base font-black text-white uppercase leading-none tracking-wide">RUSIA</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                {/* Overlay gradiente inferior para profundidad */}
+                                <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/20 to-transparent"></div>
                             </div>
                         </div>
 
                         {/* Floating Badge -Visible on both mobile and desktop- */}
-                        <div className="absolute -bottom-10 md:-bottom-6 left-1/2 -translate-x-1/2 md:left-auto md:translate-x-0 md:-left-6 bg-white p-5 shadow-2xl border-l-4 border-primary z-20 w-full max-w-[260px] md:max-w-[300px]">
+                        <div className="absolute -bottom-20 md:-bottom-6 left-1/2 -translate-x-1/2 md:left-auto md:translate-x-0 md:-left-6 bg-white p-5 shadow-2xl border-l-4 border-primary z-20 w-full max-w-[280px] md:max-w-[300px]">
                             {/* Logo en la tarjeta */}
                             <div className="mb-4 pb-4 border-b border-gray-100">
                                 <svg width="200" height="75" viewBox="0 0 240 90" fill="none" xmlns="http://www.w3.org/2000/svg" className="mx-auto md:mx-0">
