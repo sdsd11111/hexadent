@@ -35,9 +35,10 @@ export default function Header() {
                             <span className="text-2xl font-light text-secondary tracking-tight leading-none mb-0.5">
                                 HEXA<span className="text-primary font-medium">DENT</span>
                             </span>
-                            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">
-                                Cuidamos tu Sonrisa
-                            </span>
+                            <div className="font-script text-xl md:text-2xl mt-[-4px]">
+                                <span className="text-secondary">Cuidamos de tu </span>
+                                <span className="text-primary">Sonrisa...!</span>
+                            </div>
                         </div>
                     </Link>
 
@@ -70,24 +71,29 @@ export default function Header() {
                         </li>
                     </ul>
 
-                    {/* Botón Reservar Cita Desktop */}
-                    <button
-                        onClick={handleReservarCita}
-                        className="hidden md:block btn btn-secondary"
-                    >
-                        RESERVAR CITA
-                    </button>
+                    {/* Botón Reservar Cita y Menú Móvil */}
+                    <div className="flex items-center gap-2 md:gap-8">
+                        {/* Botón Reservar Cita */}
+                        <button
+                            onClick={handleReservarCita}
+                            className="bg-secondary text-white font-bold px-3 py-2 text-[10px] sm:text-xs md:px-8 md:py-4 md:text-sm hover:bg-primary transition-colors whitespace-nowrap tracking-widest uppercase md:btn-secondary md:bg-secondary md:hover:bg-primary md:hover:translate-y-[-2px] md:hover:shadow-[0_4px_8px_rgba(0,151,151,0.3)] md:border-none"
+                            style={{ clipPath: 'none', WebkitClipPath: 'none' }} // Para la version móvil
+                        >
+                            <span className="md:hidden">RESERVAR</span>
+                            <span className="hidden md:inline">RESERVAR CITA</span>
+                        </button>
 
-                    {/* Botón Menú Móvil */}
-                    <button
-                        onClick={toggleMenu}
-                        className="md:hidden flex flex-col gap-1.5 w-8 h-8 justify-center items-center"
-                        aria-label="Toggle menu"
-                    >
-                        <span className={`w-full h-0.5 bg-secondary transition-transform ${isMenuOpen ? 'rotate-45 translate-y-2' : ''}`}></span>
-                        <span className={`w-full h-0.5 bg-secondary transition-opacity ${isMenuOpen ? 'opacity-0' : ''}`}></span>
-                        <span className={`w-full h-0.5 bg-secondary transition-transform ${isMenuOpen ? '-rotate-45 -translate-y-2' : ''}`}></span>
-                    </button>
+                        {/* Botón Menú Móvil */}
+                        <button
+                            onClick={toggleMenu}
+                            className="md:hidden flex flex-col gap-1.5 w-8 h-8 justify-center items-center shrink-0"
+                            aria-label="Toggle menu"
+                        >
+                            <span className={`w-full h-0.5 bg-secondary transition-transform ${isMenuOpen ? 'rotate-45 translate-y-2' : ''}`}></span>
+                            <span className={`w-full h-0.5 bg-secondary transition-opacity ${isMenuOpen ? 'opacity-0' : ''}`}></span>
+                            <span className={`w-full h-0.5 bg-secondary transition-transform ${isMenuOpen ? '-rotate-45 -translate-y-2' : ''}`}></span>
+                        </button>
+                    </div>
                 </nav>
 
                 {/* Menú Móvil */}
@@ -141,7 +147,7 @@ export default function Header() {
                                 Contacto
                             </Link>
                         </li>
-                        <li className="pt-4">
+                        <li className="pt-4 hidden md:block">
                             <button
                                 onClick={handleReservarCita}
                                 className="btn btn-secondary w-full"

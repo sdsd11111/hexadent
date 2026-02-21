@@ -12,7 +12,8 @@ module.exports = {
         secondary: '#58595b', // Gris carbono
       },
       fontFamily: {
-        sans: ['Montserrat', 'sans-serif'],
+        sans: ['var(--font-outfit)', 'sans-serif'],
+        script: ['var(--font-script)', 'cursive'],
       },
       fontWeight: {
         normal: '400',

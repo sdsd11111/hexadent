@@ -202,6 +202,37 @@ export default function Contact() {
                     </div>
 
                 </div>
+
+                {/* --- MÉTODOS DE PAGO --- */}
+                <div className="mt-20 pt-10 border-t border-gray-100 flex flex-col items-center justify-center fade-in-up">
+                    <h3 className="text-xl md:text-2xl font-medium text-[#8ca3ba] mb-6 text-center">
+                        Aceptamos todas las tarjetas de crédito
+                    </h3>
+
+                    {/* Contenedor de Logos - 3 arriba y 2 abajo en móvil */}
+                    <div className="grid grid-cols-6 md:flex md:flex-wrap items-center justify-center gap-y-10 gap-x-2 md:gap-14 opacity-95 saturate-150 max-w-4xl mx-auto">
+
+                        <div className="col-span-2 flex justify-center items-center" aria-label="MasterCard">
+                            <Image src="/images/mastercard.webp" alt="MasterCard" width={120} height={80} className="h-12 md:h-16 w-auto object-contain hover:scale-110 transition-transform" />
+                        </div>
+
+                        <div className="col-span-2 flex justify-center items-center" aria-label="Visa">
+                            <Image src="/images/Visa.webp" alt="Visa" width={120} height={50} className="h-10 md:h-12 w-auto object-contain hover:scale-110 transition-transform" />
+                        </div>
+
+                        <div className="col-span-2 flex justify-center items-center" aria-label="Diners Club">
+                            <Image src="/images/Diners club.webp" alt="Diners Club" width={180} height={80} className="h-12 md:h-16 w-auto object-contain hover:scale-110 transition-transform" />
+                        </div>
+
+                        <div className="col-start-2 col-span-2 flex justify-center items-center" aria-label="Banco Pichincha">
+                            <Image src="/images/Banco de pichincha.webp" alt="Banco Pichincha" width={200} height={80} className="h-12 md:h-18 w-auto object-contain hover:scale-110 transition-transform" />
+                        </div>
+
+                        <div className="col-start-4 col-span-2 flex justify-center items-center" aria-label="Banco de Loja">
+                            <Image src="/images/banco de loja.webp" alt="Banco de Loja" width={180} height={60} className="h-12 md:h-16 w-auto object-contain hover:scale-110 transition-transform" />
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
     )

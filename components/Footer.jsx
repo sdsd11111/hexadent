@@ -18,7 +18,7 @@ export default function Footer() {
             <div className="container-custom section-padding">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
                     {/* Columna 1: Marca y Descripción */}
-                    <div className="space-y-4">
+                    <div className="space-y-4 flex flex-col items-center md:items-start text-center md:text-left">
                         <div className="flex items-center gap-3">
                             <Image
                                 src="/logo.jpg"
@@ -27,11 +27,11 @@ export default function Footer() {
                                 height={50}
                                 className="w-12 h-12"
                             />
-                            <span className="text-2xl font-light">
+                            <span className="text-2xl font-light text-white">
                                 HEXA<span className="text-primary font-medium">DENT</span>
                             </span>
                         </div>
-                        <p className="text-gray-300 text-sm leading-relaxed">
+                        <p className="text-gray-300 text-sm leading-relaxed max-w-xs md:max-w-none">
                             Centro Odontológico especializado en Ortodoncia avanzada en el centro de Loja.
                         </p>
                         <div className="pt-2">
@@ -42,40 +42,35 @@ export default function Footer() {
                     </div>
 
                     {/* Columna 2: Información de Contacto (NAP) */}
-                    <div className="space-y-4">
+                    <div className="space-y-4 flex flex-col items-center md:items-start text-center md:text-left">
                         <h3 className="text-lg font-medium text-primary uppercase tracking-wide">
                             Contacto
                         </h3>
-                        <div className="space-y-3 text-sm">
+                        <div className="space-y-3 text-sm flex flex-col items-center md:items-start">
                             {/* Nombre */}
                             <div>
-                                <p className="font-bold text-white">Centro Odontológico HEXA DENT</p>
+                                <p className="font-bold text-white text-center md:text-left">Centro Odontológico HEXA DENT</p>
                             </div>
 
                             {/* Dirección */}
-                            <div className="flex gap-3">
-                                <svg className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <div className="flex flex-col md:flex-row items-center md:items-start gap-2 md:gap-3">
+                                <svg className="w-5 h-5 text-primary flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                                 </svg>
-                                <div>
-                                    <p className="text-gray-300">
-                                        Calles Lourdes 156-46<br />
-                                        entre Bolívar y Sucre<br />
-                                        <strong>San Sebastián, Loja</strong>
-                                    </p>
-                                </div>
+                                <p className="text-gray-300">
+                                    Calles Lourdes 156-46 entre Bolívar y Sucre<br />
+                                    <strong>San Sebastián, Loja</strong>
+                                </p>
                             </div>
 
                             {/* Teléfono */}
-                            <div className="flex gap-3">
+                            <div className="flex items-center md:items-start gap-3">
                                 <svg className="w-5 h-5 text-primary flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
                                 </svg>
-                                <div>
-                                    <a href="tel:0967885039" className="text-gray-300 hover:text-primary transition-sharp">
-                                        0967885039
-                                    </a>
-                                </div>
+                                <a href="tel:0967885039" className="text-gray-300 hover:text-primary transition-sharp">
+                                    0967885039
+                                </a>
                             </div>
 
                             {/* WhatsApp */}
@@ -94,12 +89,12 @@ export default function Footer() {
                     </div>
 
                     {/* Columna 3: Horarios de Atención */}
-                    <div className="space-y-4">
+                    <div className="space-y-4 flex flex-col items-center md:items-start text-center md:text-left">
                         <h3 className="text-lg font-medium text-primary uppercase tracking-wide">
                             Horarios
                         </h3>
-                        <div className="space-y-3 text-sm">
-                            <div className="flex justify-between items-center border-b border-gray-600 pb-2">
+                        <div className="space-y-3 text-sm flex flex-col items-center md:items-start w-full">
+                            <div className="flex justify-between items-center border-b border-gray-600 pb-2 w-full max-w-[200px] md:max-w-none justify-center md:justify-between">
                                 <span className="font-bold text-white">Lunes - Viernes</span>
                             </div>
                             <div className="space-y-1 text-gray-300">
@@ -107,7 +102,7 @@ export default function Footer() {
                                 <p>• 15:00 - 18:30</p>
                             </div>
 
-                            <div className="flex justify-between items-center border-b border-gray-600 pb-2 pt-2">
+                            <div className="flex justify-between items-center border-b border-gray-600 pb-2 pt-2 w-full max-w-[200px] md:max-w-none justify-center md:justify-between">
                                 <span className="font-bold text-white">Sábados</span>
                             </div>
                             <div className="text-gray-300">
@@ -123,27 +118,27 @@ export default function Footer() {
                     </div>
 
                     {/* Columna 4: Sección de Autoridad y Links */}
-                    <div className="space-y-4">
+                    <div className="space-y-4 flex flex-col items-center md:items-start text-center md:text-left">
                         <h3 className="text-lg font-medium text-primary uppercase tracking-wide">
                             Certificaciones
                         </h3>
-                        <div className="space-y-3 text-sm text-gray-300">
-                            <div className="flex items-start gap-2">
-                                <svg className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <div className="space-y-3 text-sm text-gray-300 flex flex-col items-center md:items-start">
+                            <div className="flex items-center md:items-start gap-2">
+                                <svg className="w-5 h-5 text-primary flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                 </svg>
                                 <p>Registro SENESCYT - Odontología Especializada</p>
                             </div>
 
-                            <div className="flex items-start gap-2">
-                                <svg className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <div className="flex items-center md:items-start gap-2">
+                                <svg className="w-5 h-5 text-primary flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                 </svg>
                                 <p>Dra. Diana Rodríguez - Especialista en Ortodoncia</p>
                             </div>
 
-                            <div className="flex items-start gap-2">
-                                <svg className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <div className="flex items-center md:items-start gap-2">
+                                <svg className="w-5 h-5 text-primary flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                 </svg>
                                 <p>Tecnología de Última Generación</p>
@@ -151,9 +146,9 @@ export default function Footer() {
                         </div>
 
                         {/* Redes Sociales */}
-                        <div className="pt-4">
+                        <div className="pt-4 flex flex-col items-center md:items-start">
                             <h4 className="text-sm font-bold text-white mb-3">Síguenos</h4>
-                            <div className="flex gap-3">
+                            <div className="flex gap-4">
                                 <a
                                     href="https://www.facebook.com/OdontologiaHexadent?locale=es_LA"
                                     target="_blank"

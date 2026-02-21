@@ -221,12 +221,13 @@ export default function Gallery() {
                         <div className="border-8 border-secondary relative">
                             <div className="absolute top-0 right-0 w-16 h-16 border-t-8 border-r-8 border-primary z-20"></div>
 
-                            <div className="relative aspect-video w-full h-full bg-black">
+                            <div className="relative aspect-square md:aspect-video w-full h-full bg-black">
                                 <Image
                                     src={selectedImage.src}
                                     alt={selectedImage.alt}
                                     fill
                                     className="object-contain"
+                                    sizes="100vw"
                                 />
                             </div>
                         </div>
