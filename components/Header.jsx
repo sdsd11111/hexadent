@@ -31,13 +31,18 @@ export default function Header() {
                             className="w-12 h-12"
                             priority
                         />
-                        <span className="text-2xl font-black text-secondary tracking-tight">
-                            HEXA<span className="text-primary">DENT</span>
-                        </span>
+                        <div className="flex flex-col justify-center">
+                            <span className="text-2xl font-light text-secondary tracking-tight leading-none mb-0.5">
+                                HEXA<span className="text-primary font-medium">DENT</span>
+                            </span>
+                            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">
+                                Cuidamos tu Sonrisa
+                            </span>
+                        </div>
                     </Link>
 
                     {/* Navegación Desktop */}
-                    <ul className="hidden md:flex items-center gap-8 font-bold text-secondary">
+                    <ul className="hidden md:flex items-center gap-8 font-medium text-secondary">
                         <li>
                             <Link href="#inicio" className="hover:text-primary transition-sharp">
                                 Inicio
@@ -49,8 +54,13 @@ export default function Header() {
                             </Link>
                         </li>
                         <li>
-                            <Link href="#servicios" className="hover:text-primary transition-sharp">
-                                Servicios
+                            <Link href="#especialidades" className="hover:text-primary transition-sharp">
+                                Especialidades
+                            </Link>
+                        </li>
+                        <li>
+                            <Link href="#galeria" className="hover:text-primary transition-sharp">
+                                Casos Clínicos
                             </Link>
                         </li>
                         <li>
@@ -85,7 +95,7 @@ export default function Header() {
                     className={`md:hidden overflow-hidden transition-all duration-300 ${isMenuOpen ? 'max-h-96' : 'max-h-0'
                         }`}
                 >
-                    <ul className="flex flex-col gap-4 py-6 font-bold text-secondary">
+                    <ul className="flex flex-col gap-4 py-6 font-medium text-secondary">
                         <li>
                             <Link
                                 href="#inicio"
@@ -106,11 +116,20 @@ export default function Header() {
                         </li>
                         <li>
                             <Link
-                                href="#servicios"
+                                href="#especialidades"
                                 onClick={() => setIsMenuOpen(false)}
                                 className="block hover:text-primary transition-sharp"
                             >
-                                Servicios
+                                Especialidades
+                            </Link>
+                        </li>
+                        <li>
+                            <Link
+                                href="#galeria"
+                                onClick={() => setIsMenuOpen(false)}
+                                className="block hover:text-primary transition-sharp"
+                            >
+                                Casos Clínicos
                             </Link>
                         </li>
                         <li>

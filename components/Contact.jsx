@@ -1,9 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import dynamic from 'next/dynamic'
-
-const LeafletMap = dynamic(() => import('./LeafletMap'), { ssr: false })
+import Image from 'next/image'
 
 
 export default function Contact() {
@@ -23,9 +21,25 @@ export default function Contact() {
     const handleSubmit = (e) => {
         e.preventDefault()
         setStatus('submitting')
+
+        // WhatsApp redirection logic
+        const phoneNumber = '593967885039'
+        const message = `¡Hola! Me gustaría agendar una valoración.
+        
+*Nombre:* ${formData.name}
+*WhatsApp:* ${formData.phone}
+*Motivo:* ${formData.service}
+*Mensaje:* ${formData.message || 'Sin mensaje adicional'}`
+
+        const encodedMessage = encodeURIComponent(message)
+        const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`
+
+        // Open WhatsApp in a new tab
+        window.open(whatsappUrl, '_blank')
+
         setTimeout(() => {
             setStatus('success')
-        }, 1500)
+        }, 1000)
     }
 
     return (
@@ -40,8 +54,8 @@ export default function Contact() {
                     <div className="lg:col-span-7 bg-white">
                         {/* Header */}
                         <div className="mb-10">
-                            <h2 className="text-3xl lg:text-4xl font-black text-secondary uppercase tracking-tight mb-4">
-                                Agenda tu <span className="text-primary">Valoración</span>
+                            <h2 className="text-3xl lg:text-4xl font-light text-secondary uppercase tracking-tight mb-4">
+                                Agenda tu <span className="text-primary font-medium">Valoración</span>
                             </h2>
                             <div className="w-20 h-1 bg-primary mb-4"></div>
                             <p className="text-gray-500 text-lg">
@@ -56,7 +70,7 @@ export default function Contact() {
                                         <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="3" d="M5 13l4 4L19 7" />
                                     </svg>
                                 </div>
-                                <h3 className="text-2xl font-black text-secondary uppercase mb-2">¡Solicitud Enviada!</h3>
+                                <h3 className="text-2xl font-light text-secondary uppercase mb-2">¡Solicitud Enviada!</h3>
                                 <p className="text-gray-600 mb-6">
                                     Hemos recibido tus datos correctamente. El equipo de Hexadent te contactará vía WhatsApp en los próximos minutos.
                                 </p>
@@ -72,7 +86,7 @@ export default function Contact() {
 
                                 {/* Nombre */}
                                 <div className="md:col-span-2">
-                                    <label className="block text-xs font-black text-secondary uppercase tracking-widest mb-2">Nombre Completo</label>
+                                    <label className="block text-xs font-medium text-secondary uppercase tracking-widest mb-2">Nombre Completo</label>
                                     <input
                                         type="text"
                                         name="name"
@@ -86,7 +100,7 @@ export default function Contact() {
 
                                 {/* Teléfono */}
                                 <div className="md:col-span-1">
-                                    <label className="block text-xs font-black text-secondary uppercase tracking-widest mb-2">WhatsApp</label>
+                                    <label className="block text-xs font-medium text-secondary uppercase tracking-widest mb-2">WhatsApp</label>
                                     <input
                                         type="tel"
                                         name="phone"
@@ -100,7 +114,7 @@ export default function Contact() {
 
                                 {/* Motivo */}
                                 <div className="md:col-span-1">
-                                    <label className="block text-xs font-black text-secondary uppercase tracking-widest mb-2">Motivo de Consulta</label>
+                                    <label className="block text-xs font-medium text-secondary uppercase tracking-widest mb-2">Motivo de Consulta</label>
                                     <div className="relative">
                                         <select
                                             name="service"
@@ -125,7 +139,7 @@ export default function Contact() {
 
                                 {/* Mensaje */}
                                 <div className="md:col-span-2">
-                                    <label className="block text-xs font-black text-secondary uppercase tracking-widest mb-2">Mensaje / Horario</label>
+                                    <label className="block text-xs font-medium text-secondary uppercase tracking-widest mb-2">Mensaje / Horario</label>
                                     <textarea
                                         name="message"
                                         rows="3"
@@ -141,11 +155,11 @@ export default function Contact() {
                                     <button
                                         type="submit"
                                         disabled={status === 'submitting'}
-                                        className="w-full bg-primary hover:bg-secondary text-white font-black uppercase py-5 px-8 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed tracking-widest text-sm relative overflow-hidden shadow-lg hover:shadow-xl hover:-translate-y-1"
+                                        className="w-full bg-primary hover:bg-secondary text-white font-medium uppercase py-5 px-8 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed tracking-widest text-sm relative overflow-hidden shadow-lg hover:shadow-xl hover:-translate-y-1"
                                         style={{ clipPath: 'polygon(0 0, 100% 0, 98% 100%, 0 100%)' }} // Corte sutil
                                     >
                                         <span className="flex items-center justify-center gap-3">
-                                            {status === 'submitting' ? 'PROCESANDO...' : 'SOLICITAR MI VALORACIÓN'}
+                                            {status === 'submitting' ? 'PROCESANDO...' : 'AGENDAR MI VALORACIÓN'}
                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="3" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                             </svg>
@@ -163,8 +177,27 @@ export default function Contact() {
                     <div className="lg:col-span-5 h-full min-h-[500px] relative">
                         <div className="absolute inset-0 bg-gray-100 shadow-2xl overflow-hidden"
                             style={{ clipPath: 'polygon(0 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%)' }}> {/* Marco Hexa-Tech */}
+                            <Image
+                                src="/images/ubicacion.webp"
+                                alt="Ubicación de Hexadent en San Sebastián, Loja"
+                                fill
+                                className="object-cover transition-transform duration-700 hover:scale-105"
+                            />
 
-                            <LeafletMap />
+                            {/* Overlay y Botón Google Maps */}
+                            <div className="absolute inset-0 bg-secondary/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
+                                <a
+                                    href="https://maps.app.goo.gl/6NcHF86TzWDoBDZ69"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="bg-white text-secondary font-bold px-6 py-3 rounded-full shadow-xl hover:scale-105 hover:text-primary transition-all duration-300 flex items-center gap-2"
+                                >
+                                    <svg className="w-5 h-5 text-[#EA4335]" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                                    </svg>
+                                    VER EN GOOGLE MAPS
+                                </a>
+                            </div>
                         </div>
                     </div>
 

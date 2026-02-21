@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 
 const reviews = [
     {
@@ -51,6 +51,28 @@ export default function Testimonials() {
         return () => clearInterval(timer)
     }, [nextSlide])
 
+    // Intersection Observer for Stars Animation
+    const [starsVisible, setStarsVisible] = useState(false)
+    const badgeRef = useRef(null)
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setStarsVisible(true)
+                    observer.disconnect() // Only animate once
+                }
+            },
+            { threshold: 0.5 }
+        )
+
+        if (badgeRef.current) {
+            observer.observe(badgeRef.current)
+        }
+
+        return () => observer.disconnect()
+    }, [])
+
     return (
         <section id="testimonios" className="py-20 bg-gray-50 relative overflow-hidden">
             {/* Patrón de líneas diagonales en esquinas */}
@@ -64,14 +86,20 @@ export default function Testimonials() {
                 {/* Header + Badge Google */}
                 <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6 fade-in-up">
                     <div className="max-w-2xl">
-                        <h2 className="text-3xl lg:text-4xl font-black text-secondary leading-tight mb-2">
-                            Confianza Real: <span className="text-primary">Lo que dicen nuestros pacientes</span> en Loja
+                        <h2 className="text-3xl lg:text-4xl font-light text-secondary leading-tight mb-2">
+                            Confianza Real: <span className="text-primary font-medium">Lo que dicen nuestros pacientes</span> en Loja
                         </h2>
                         <div className="w-20 h-1 bg-primary"></div>
                     </div>
 
                     {/* Badge Google 5.0 */}
-                    <div className="bg-white border-2 border-gray-200 p-4 min-w-[200px] flex items-center gap-4 shadow-sm hover:shadow-md transition-sharp cursor-pointer">
+                    <a
+                        href="https://share.google/w4cvXdbAqyA4iq96o"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        ref={badgeRef}
+                        className="bg-white border-2 border-gray-200 p-4 min-w-[200px] flex items-center gap-4 shadow-sm hover:shadow-md transition-sharp cursor-pointer group"
+                    >
                         <div className="w-12 h-12 relative">
                             <svg viewBox="0 0 48 48" className="w-full h-full">
                                 <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
@@ -81,11 +109,21 @@ export default function Testimonials() {
                             </svg>
                         </div>
                         <div>
-                            <p className="font-black text-secondary text-xl leading-none">5.0</p>
-                            <div className="flex text-[#FBBC05] text-xs">★★★★★</div>
+                            <p className="font-medium text-secondary text-xl leading-none">5.0</p>
+                            <div className="flex text-[#FBBC05] text-xs">
+                                {[0, 1, 2, 3, 4].map((index) => (
+                                    <span
+                                        key={index}
+                                        className={`transition-all duration-700 ease-out transform ${starsVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-2 scale-50'}`}
+                                        style={{ transitionDelay: `${index * 150}ms` }}
+                                    >
+                                        ★
+                                    </span>
+                                ))}
+                            </div>
                             <p className="text-xs text-gray-500 font-bold uppercase mt-1">Google Rating</p>
                         </div>
-                    </div>
+                    </a>
                 </div>
 
                 {/* Slider Geométrico */}

@@ -6,6 +6,8 @@ import Image from 'next/image'
 export default function Gallery() {
     const [activeFilter, setActiveFilter] = useState('all')
     const [selectedImage, setSelectedImage] = useState(null)
+    const [page, setPage] = useState(0)
+    const imagesPerPage = 5
 
     const categories = [
         { id: 'all', label: 'Ver Todo' },
@@ -15,53 +17,104 @@ export default function Gallery() {
     ]
 
     const galleryItems = [
+        // --- Categoría: Nuestra Clínica ---
         {
             id: 1,
             category: 'clinic',
-            src: '/gallery-clinic.jpg',
-            alt: 'Clínica Hexadent en San Sebastián, Loja - Exterior',
-            size: 'large' // ocupa 2 columnas o filas
+            src: '/images/clinica 1.webp',
+            alt: 'Instalaciones de Clínica Hexadent - Loja',
+            size: 'large' // Destacada
         },
         {
             id: 2,
-            category: 'cases',
-            src: '/doctor.png',
-            alt: 'Resultado de Ortodoncia Invisible - Antes y Después',
+            category: 'clinic',
+            src: '/images/clinica 2.webp',
+            alt: 'Recepción y sala de espera Hexadent',
             size: 'normal'
         },
         {
             id: 3,
-            category: 'tech',
-            src: '/video-poster.jpg',
-            alt: 'Tecnología de Vanguardia - Brackets Biocompatibles',
+            category: 'clinic',
+            src: '/images/clinica 3.webp',
+            alt: 'Consultorio odontológico equipado',
             size: 'normal'
         },
         {
             id: 4,
-            category: 'tech',
-            src: '/hero-bg.jpg',
-            alt: 'Equipos dentales de última generación en Loja',
-            size: 'wide' // ancho completo
+            category: 'clinic',
+            src: '/images/clinica 4.webp',
+            alt: 'Detalles visuales de la clínica Hexadent',
+            size: 'wide' // Ancho completo en grid
         },
+
+        // --- Categoría: Casos de Éxito (Clientes) ---
         {
             id: 5,
-            category: 'clinic',
-            src: '/gallery-clinic.jpg', // Reusing for layout demo
-            alt: 'Sala de espera confortable en Hexadent',
+            category: 'cases',
+            src: '/images/cliente 1.webp',
+            alt: 'Resultado exitoso de Ortodoncia',
             size: 'normal'
         },
         {
             id: 6,
             category: 'cases',
-            src: '/doctor.png', // Reusing
-            alt: 'Diseño de Sonrisa Digital en Loja',
+            src: '/images/cliente 2.webp',
+            alt: 'Paciente feliz con su nueva sonrisa',
+            size: 'large' // Destacada
+        },
+        {
+            id: 7,
+            category: 'cases',
+            src: '/images/cliente 3.webp',
+            alt: 'Transformación dental en Hexadent',
+            size: 'normal'
+        },
+        {
+            id: 8,
+            category: 'cases',
+            src: '/images/cliente 4.webp',
+            alt: 'Sonrisa de alta estética dental',
+            size: 'normal'
+        },
+
+        // --- Categoría: Tecnología ---
+        {
+            id: 9,
+            category: 'tech',
+            src: '/images/tecnologia 1.webp',
+            alt: 'Equipos dentales de última generación',
+            size: 'wide'
+        },
+        {
+            id: 10,
+            category: 'tech',
+            src: '/images/tecnologia 2.webp',
+            alt: 'Tecnología de escaneo y diagnóstico digital',
+            size: 'normal'
+        },
+        {
+            id: 11,
+            category: 'tech',
+            src: '/images/tecnologia 3.webp',
+            alt: 'Instrumental biocompatible y seguro',
+            size: 'large'
+        },
+        {
+            id: 12,
+            category: 'tech',
+            src: '/images/tecnologia 4.webp',
+            alt: 'Esterilización y cuidados de primer nivel',
             size: 'normal'
         }
     ]
 
-    const filteredItems = activeFilter === 'all'
+    const baseItems = activeFilter === 'all'
         ? galleryItems
         : galleryItems.filter(item => item.category === activeFilter)
+
+    const totalPages = Math.ceil(baseItems.length / imagesPerPage)
+    const startIndex = page * imagesPerPage
+    const filteredItems = baseItems.slice(startIndex, startIndex + imagesPerPage)
 
     return (
         <section id="galeria" className="py-20 bg-white relative">
@@ -69,8 +122,8 @@ export default function Gallery() {
 
                 {/* Header de Sección */}
                 <div className="text-center mb-12 fade-in-up">
-                    <h2 className="text-3xl lg:text-4xl font-black text-secondary mb-4 leading-tight">
-                        Excelencia Clínica en el <span className="text-primary">Corazón de San Sebastián</span>
+                    <h2 className="text-3xl lg:text-4xl font-light text-secondary mb-4 leading-tight">
+                        Casos Clínicos de <span className="text-primary font-medium">Éxito en Loja</span>
                     </h2>
                     <p className="text-gray-500 max-w-2xl mx-auto">
                         Conoce nuestras instalaciones y los resultados reales que transforman vidas en Loja.
@@ -82,7 +135,10 @@ export default function Gallery() {
                     {categories.map(cat => (
                         <button
                             key={cat.id}
-                            onClick={() => setActiveFilter(cat.id)}
+                            onClick={() => {
+                                setActiveFilter(cat.id)
+                                setPage(0)
+                            }}
                             className={`px-6 py-2 text-sm font-bold uppercase tracking-wider transition-all duration-300 border-2
                 ${activeFilter === cat.id
                                     ? 'bg-secondary text-white border-secondary'
@@ -128,6 +184,19 @@ export default function Gallery() {
                         </div>
                     ))}
                 </div>
+
+                {/* Controles de Paginación */}
+                {totalPages > 1 && (
+                    <div className="mt-12 flex justify-center fade-in-up">
+                        <button
+                            onClick={() => setPage(page < totalPages - 1 ? page + 1 : 0)}
+                            className="bg-primary text-white font-bold py-3 px-8 uppercase tracking-widest text-sm hover:bg-secondary transition-colors duration-300"
+                            style={{ clipPath: 'polygon(10% 0, 100% 0, 100% 100%, 0 100%, 0 25%)' }}
+                        >
+                            {page < totalPages - 1 ? 'Ver Más' : 'Volver al Inicio'}
+                        </button>
+                    </div>
+                )}
 
                 {/* Pie de Galería SEO */}
                 <div className="mt-8 text-center">

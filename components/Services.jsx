@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 
-export default function Services() {
-    const services = [
+export default function Especialidades() {
+    const especialidades = [
         {
             id: 1,
             title: 'Ortodoncia Invisible',
@@ -57,7 +57,7 @@ export default function Services() {
     }
 
     return (
-        <section id="servicios" className="py-20 lg:py-32 bg-gray-50 relative overflow-hidden">
+        <section id="especialidades" className="py-20 lg:py-32 bg-gray-50 relative overflow-hidden">
             {/* Elementos decorativos */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 hexagon translate-x-1/2 -translate-y-1/2"></div>
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-secondary/5 hexagon -translate-x-1/2 translate-y-1/2"></div>
@@ -66,16 +66,16 @@ export default function Services() {
 
                 {/* Encabezado de Sección */}
                 <div className="text-center max-w-3xl mx-auto mb-16 fade-in-up">
-                    <h2 className="text-3xl lg:text-5xl font-black text-secondary mb-4 leading-tight">
-                        Servicios de Ortodoncia en Loja: <br />
-                        <span className="text-primary">Innovación que Transforma</span>
+                    <h2 className="text-3xl lg:text-5xl font-light text-secondary mb-4 leading-tight">
+                        Especialidades en Ortodoncia en Loja: <br />
+                        <span className="text-primary font-script text-4xl lg:text-5xl block mt-2 normal-case">Innovación que Transforma</span>
                     </h2>
                     <div className="w-24 h-1 bg-secondary mx-auto"></div>
                 </div>
 
-                {/* Grid de Servicios */}
+                {/* Grid de Especialidades */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {services.map((service, index) => (
+                    {especialidades.map((service, index) => (
                         <div
                             key={service.id}
                             className="group relative bg-white p-1 hover:-translate-y-2 transition-transform duration-300"
@@ -93,7 +93,7 @@ export default function Services() {
                                     {service.icon}
                                 </div>
 
-                                <h3 className="text-xl font-black text-secondary mb-2 uppercase tracking-tight group-hover:text-primary transition-colors">
+                                <h3 className="text-xl font-medium text-secondary mb-2 uppercase tracking-tight group-hover:text-primary transition-colors">
                                     {service.title}
                                 </h3>
                                 <p className="text-xs font-bold text-primary mb-4 uppercase tracking-widest">

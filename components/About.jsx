@@ -19,10 +19,13 @@ export default function About() {
                     {/* Columna Izquierda: Contenido y Narrativa */}
                     <div className="space-y-8 fade-in-up">
                         <div className="space-y-4">
-                            <h2 className="text-3xl lg:text-4xl font-black text-secondary leading-tight">
-                                Liderando la <span className="text-primary">Ortodoncia de Vanguardia</span> en el Corazón de Loja
+                            <h2 className="text-3xl lg:text-4xl font-light text-secondary leading-tight">
+                                Referente en <span className="text-primary font-medium">Ortodoncia y Salud Dental</span> en Loja
                             </h2>
                             <div className="w-20 h-1.5 bg-primary"></div>
+
+                            {/* Eliminado badge de Especialización de esta zona según solicitud */}
+                            <div className="pt-4 pb-2 border-b border-transparent"></div>
                         </div>
 
                         <div className="space-y-6 text-gray-600 text-lg leading-relaxed">
@@ -52,8 +55,8 @@ export default function About() {
 
                         {/* Gatillo de Confianza + CTA */}
                         <div className="pt-6 flex flex-col sm:flex-row gap-6 items-center">
-                            <Link href="#trayectoria" className="btn btn-secondary text-sm px-8 py-4 w-full sm:w-auto">
-                                CONOCE NUESTRA TRAYECTORIA
+                            <Link href="#contacto" className="btn btn-secondary text-sm px-8 py-4 w-full sm:w-auto">
+                                AGENDA TU CITA AHORA
                             </Link>
 
                             {/* Badge SEO Local */}
@@ -84,20 +87,60 @@ export default function About() {
                                     sizes="(max-width: 768px) 100vw, 50vw"
                                 />
 
-                                {/* Overlay gradiente inferior para texto */}
-                                <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent flex items-end justify-center pb-6">
-                                    <div className="text-center text-white p-4">
-                                        <p className="font-bold text-xl tracking-wide">Dra. Diana Rodríguez</p>
-                                        <p className="text-xs uppercase tracking-widest text-primary font-bold">Registro SENESCYT</p>
+                                {/* Overlay gradiente inferior para texto - Elevado para evitar solapamiento */}
+                                <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/95 via-black/40 to-transparent flex items-end justify-center pb-16">
+                                    <div className="text-center text-white p-4 flex flex-col items-center">
+                                        {/* Icono del logo en blanco */}
+                                        <svg width="45" height="50" viewBox="0 0 80 90" fill="none" xmlns="http://www.w3.org/2000/svg" className="mb-3 opacity-90 drop-shadow-md">
+                                            <g stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+                                                <path d="M15 28 V85" strokeLinecap="butt" />
+                                                <path d="M25 15 V85" strokeLinecap="butt" />
+                                                <path d="M25 15 C65 15 75 30 75 50 C75 70 65 85 25 85" fill="none" />
+                                                <path d="M15 28 H52" strokeLinecap="butt" />
+                                                <path d="M52 28 C68 28 68 56 52 56" fill="none" />
+                                                <path d="M52 56 H15" strokeLinecap="butt" />
+                                                <path d="M35 56 L48 78" />
+                                            </g>
+                                        </svg>
+                                        {/* Especialización - Adaptada para fondo oscuro */}
+                                        <div className="flex items-center gap-3 px-5 py-2.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-md">
+                                            <div className="flex flex-col w-8 h-5 border border-white/30 overflow-hidden shadow-md">
+                                                <div className="h-1/3 bg-white"></div>
+                                                <div className="h-1/3 bg-blue-600"></div>
+                                                <div className="h-1/3 bg-red-600"></div>
+                                            </div>
+                                            <div className="flex flex-col text-left">
+                                                <span className="text-[11px] font-bold text-white/80 uppercase tracking-widest leading-none mb-1">Especializada en</span>
+                                                <span className="text-base font-black text-white uppercase leading-none tracking-wide">RUSIA</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         {/* Floating Badge */}
-                        <div className="absolute -bottom-6 -left-6 bg-white p-4 shadow-xl border-l-4 border-primary z-20 hidden md:block max-w-xs">
+                        <div className="absolute -bottom-6 -left-6 bg-white p-5 shadow-2xl border-l-4 border-primary z-20 hidden md:block max-w-[300px]">
+                            {/* Logo en la tarjeta */}
+                            <div className="mb-4 pb-4 border-b border-gray-100">
+                                <svg width="200" height="75" viewBox="0 0 240 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <g stroke="#009797" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M15 28 V85" strokeLinecap="butt" />
+                                        <path d="M25 15 V85" strokeLinecap="butt" />
+                                        <path d="M25 15 C65 15 75 30 75 50 C75 70 65 85 25 85" fill="none" />
+                                        <path d="M15 28 H52" strokeLinecap="butt" />
+                                        <path d="M52 28 C68 28 68 56 52 56" fill="none" />
+                                        <path d="M52 56 H15" strokeLinecap="butt" />
+                                        <path d="M35 56 L48 78" />
+                                    </g>
+                                    <text x="85" y="38" fill="#2a2b2e" fontSize="24" fontWeight="500" className="font-sans tracking-tight">DIANA</text>
+                                    <text x="85" y="65" fill="#2a2b2e" fontSize="24" fontWeight="500" className="font-sans tracking-tight">RODRÍGUEZ</text>
+                                    <rect x="85" y="72" width="145" height="1" fill="#f3f4f6" />
+                                    <text x="85" y="85" fill="#58595b" fontSize="10" fontWeight="400" letterSpacing="5" className="font-sans uppercase">Ortodoncista</text>
+                                </svg>
+                            </div>
                             <p className="text-xs font-bold text-gray-400 uppercase mb-1">Especialista en</p>
-                            <p className="text-lg font-black text-secondary leading-none">ORTODONCIA Y ODONTOPEDIATRÍA</p>
+                            <p className="text-lg font-medium text-secondary leading-tight">ORTODONCIA Y ODONTOPEDIATRÍA</p>
                         </div>
                     </div>
                 </div>

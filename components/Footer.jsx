@@ -27,12 +27,12 @@ export default function Footer() {
                                 height={50}
                                 className="w-12 h-12"
                             />
-                            <span className="text-2xl font-black">
-                                HEXA<span className="text-primary">DENT</span>
+                            <span className="text-2xl font-light">
+                                HEXA<span className="text-primary font-medium">DENT</span>
                             </span>
                         </div>
                         <p className="text-gray-300 text-sm leading-relaxed">
-                            Centro Odontológico especializado en Ortodoncia de vanguardia en el corazón de Loja.
+                            Centro Odontológico especializado en Ortodoncia avanzada en el centro de Loja.
                         </p>
                         <div className="pt-2">
                             <span className="inline-block px-3 py-1 bg-primary text-white text-xs font-bold">
@@ -43,7 +43,7 @@ export default function Footer() {
 
                     {/* Columna 2: Información de Contacto (NAP) */}
                     <div className="space-y-4">
-                        <h3 className="text-lg font-black text-primary uppercase tracking-wide">
+                        <h3 className="text-lg font-medium text-primary uppercase tracking-wide">
                             Contacto
                         </h3>
                         <div className="space-y-3 text-sm">
@@ -95,7 +95,7 @@ export default function Footer() {
 
                     {/* Columna 3: Horarios de Atención */}
                     <div className="space-y-4">
-                        <h3 className="text-lg font-black text-primary uppercase tracking-wide">
+                        <h3 className="text-lg font-medium text-primary uppercase tracking-wide">
                             Horarios
                         </h3>
                         <div className="space-y-3 text-sm">
@@ -124,7 +124,7 @@ export default function Footer() {
 
                     {/* Columna 4: Sección de Autoridad y Links */}
                     <div className="space-y-4">
-                        <h3 className="text-lg font-black text-primary uppercase tracking-wide">
+                        <h3 className="text-lg font-medium text-primary uppercase tracking-wide">
                             Certificaciones
                         </h3>
                         <div className="space-y-3 text-sm text-gray-300">
@@ -155,7 +155,9 @@ export default function Footer() {
                             <h4 className="text-sm font-bold text-white mb-3">Síguenos</h4>
                             <div className="flex gap-3">
                                 <a
-                                    href="#"
+                                    href="https://www.facebook.com/OdontologiaHexadent?locale=es_LA"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
                                     className="w-10 h-10 bg-primary hover:bg-white hover:text-primary transition-sharp flex items-center justify-center"
                                     aria-label="Facebook"
                                 >
@@ -164,7 +166,9 @@ export default function Footer() {
                                     </svg>
                                 </a>
                                 <a
-                                    href="#"
+                                    href="https://www.instagram.com/hexadent.ortodoncia/"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
                                     className="w-10 h-10 bg-primary hover:bg-white hover:text-primary transition-sharp flex items-center justify-center"
                                     aria-label="Instagram"
                                 >

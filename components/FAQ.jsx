@@ -53,8 +53,8 @@ export default function FAQ() {
 
                 {/* Header de Sección */}
                 <div className="text-center mb-16 fade-in-up">
-                    <h2 className="text-3xl lg:text-4xl font-black text-secondary leading-tight mb-4">
-                        Preguntas <span className="text-primary">Frecuentes</span>
+                    <h2 className="text-3xl lg:text-4xl font-light text-secondary leading-tight mb-4">
+                        Preguntas <span className="text-primary font-medium">Frecuentes</span>
                     </h2>
                     <div className="w-20 h-1 bg-secondary mx-auto"></div>
                 </div>

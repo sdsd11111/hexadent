@@ -22,16 +22,16 @@ export default function VideoSection() {
 
                     {/* Header del Video */}
                     <div className="text-center space-y-4 fade-in-up">
-                        <h2 className="text-3xl lg:text-4xl font-black leading-tight">
-                            Tecnología y Calidez: <span className="text-primary">El Corazón de Hexadent</span>
+                        <h2 className="text-3xl lg:text-4xl font-light leading-tight">
+                            Tecnología y Calidez: <span className="text-primary font-medium">El Corazón de Hexadent</span>
                         </h2>
                         <p className="text-lg text-gray-300 max-w-2xl mx-auto">
-                            Descubre nuestra experiencia de bienestar. Reducimos el estrés dental integrando tecnología de vanguardia y materiales biocompatibles en San Sebastián.
+                            Descubre nuestra experiencia de bienestar. Reducimos el estrés dental integrando tecnología avanzada y materiales biocompatibles en San Sebastián.
                         </p>
                     </div>
 
-                    {/* Contenedor del Video Geométrico */}
-                    <div className="relative w-full aspect-video group fade-in-up delay-100">
+                    {/* Contenedor del Video Geométrico (Formato Reel Vertical) */}
+                    <div className="relative w-full max-w-[320px] sm:max-w-[400px] aspect-[9/16] mx-auto group fade-in-up delay-100">
                         {/* Marco/Borde Geométrico activado en Hover - Usando pseudo-elementos o div absoluto */}
                         <div className="absolute -inset-1 bg-primary transform scale-[0.99] group-hover:scale-[1.01] transition-transform duration-300 z-0"
                             style={{ clipPath: 'polygon(5% 0, 100% 0, 100% 90%, 95% 100%, 0 100%, 0 10%)' }}>
@@ -45,7 +45,7 @@ export default function VideoSection() {
                                 <>
                                     {/* Thumbnail con Filtro */}
                                     <Image
-                                        src="/video-poster.jpg"
+                                        src="/images/clinica 1.webp"
                                         alt="Ortodoncia Invisible en Loja - Dra. Diana Rodríguez"
                                         fill
                                         className="object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-500"
@@ -80,18 +80,18 @@ export default function VideoSection() {
                                     {/* Etiqueta de Autoridad */}
                                     <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 z-20">
                                         <p className="text-primary font-bold tracking-widest uppercase text-xs mb-1">Dra. Diana Rodríguez</p>
-                                        <p className="text-white font-bold text-xl md:text-2xl">Innovación en Loja</p>
+                                        <p className="text-white font-medium text-xl md:text-2xl">Innovación en Loja</p>
                                     </div>
                                 </>
                             ) : (
-                                <iframe
-                                    className="w-full h-full"
-                                    src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=0"
-                                    title="Tecnología Hexadent Loja"
-                                    frameBorder="0"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                    allowFullScreen
-                                ></iframe>
+                                <video
+                                    className="w-full h-full object-cover"
+                                    src="/video/video.mp4"
+                                    autoPlay
+                                    controls
+                                >
+                                    Tu navegador no soporta videos HTML5.
+                                </video>
                             )}
                         </div>
                     </div>

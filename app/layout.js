@@ -1,10 +1,18 @@
-import { Montserrat } from 'next/font/google'
+import { Outfit, Dancing_Script } from 'next/font/google'
 import './globals.css'
 
-const montserrat = Montserrat({
+const outfit = Outfit({
     subsets: ['latin'],
-    weight: ['400', '700', '900'],
+    weight: ['300', '400', '500', '600', '700', '900'],
     display: 'swap',
+    variable: '--font-outfit',
+})
+
+const dancingScript = Dancing_Script({
+    subsets: ['latin'],
+    weight: ['400', '700'],
+    display: 'swap',
+    variable: '--font-script',
 })
 
 export const metadata = {
@@ -72,7 +80,7 @@ export default function RootLayout({ children }) {
                 <meta name="geo.position" content="-3.9933;-79.2042" />
                 <meta name="ICBM" content="-3.9933, -79.2042" />
             </head>
-            <body className={montserrat.className}>
+            <body className={`${outfit.variable} ${dancingScript.variable} font-sans`}>
                 {children}
             </body>
         </html>

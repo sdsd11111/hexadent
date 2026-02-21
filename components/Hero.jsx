@@ -9,10 +9,10 @@ export default function Hero() {
         window.open(`https://wa.me/${phone}?text=${message}`, '_blank')
     }
 
-    const scrollToServicios = () => {
-        const servicios = document.getElementById('servicios')
-        if (servicios) {
-            servicios.scrollIntoView({ behavior: 'smooth' })
+    const scrollToEspecialidades = () => {
+        const especialidades = document.getElementById('especialidades')
+        if (especialidades) {
+            especialidades.scrollIntoView({ behavior: 'smooth' })
         }
     }
 
@@ -41,18 +41,18 @@ export default function Hero() {
             <div className="container-custom relative z-10 py-20 lg:py-32">
                 <div className="max-w-4xl mx-auto text-center text-white fade-in-up">
                     {/* H1 Optimizado para SEO */}
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-tight">
+                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-light mb-6 leading-tight tracking-tight">
                         Ortodoncia en Loja: <br className="hidden sm:block" />
-                        <span className="text-primary">Transforma tu Sonrisa</span> con Hexadent
+                        <span className="text-primary font-medium">Transforma tu Sonrisa</span> con Hexadent
                     </h1>
 
                     {/* Subtítulo con mención a la Dra. Diana Rodríguez */}
-                    <p className="text-lg md:text-xl lg:text-2xl mb-4 font-normal leading-relaxed">
-                        Dra. <strong>Diana Rodríguez</strong> - Especialista en Ortodoncia de Vanguardia
+                    <p className="text-2xl md:text-3xl lg:text-4xl mb-6 font-script text-primary">
+                        Dra. <strong>Diana Rodríguez</strong> - Cuidamos de tu Sonrisa
                     </p>
 
                     <p className="text-base md:text-lg mb-8 opacity-90">
-                        En el corazón de <strong>San Sebastián, Loja</strong> - Tecnología de punta y atención personalizada
+                        En <strong>San Sebastián, Loja</strong> - Tecnología de punta y atención personalizada
                     </p>
 
                     {/* Divisor Visual */}
@@ -78,10 +78,10 @@ export default function Hero() {
 
                         {/* CTA Secundario: Ver Tratamientos */}
                         <button
-                            onClick={scrollToServicios}
+                            onClick={scrollToEspecialidades}
                             className="btn btn-outline w-full sm:w-auto"
                         >
-                            VER TRATAMIENTOS
+                            VER ESPECIALIDADES
                         </button>
                     </div>
 
