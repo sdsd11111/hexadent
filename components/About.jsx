@@ -30,7 +30,7 @@ export default function About() {
 
                         <div className="space-y-6 text-gray-600 text-lg leading-relaxed">
                             <p>
-                                En <strong>Centro Odontológico Hexadent</strong>, redefinimos la experiencia dental en el tradicional barrio de <strong>San Sebastián</strong>. Bajo el liderazgo de la <strong>Odontóloga Diana Rodríguez</strong>, fusionamos la calidez humana de la &quot;odontología de proximidad&quot; con los más altos estándares científicos.
+                                En <strong>Centro Odontológico Hexadent</strong>, redefinimos la experiencia dental en el tradicional barrio de <strong>San Sebastián</strong>. Bajo el liderazgo de la <strong>Odontóloga Diana Rodríguez</strong>, fusionamos la calidez humana de una <strong>atención dental cercana y de confianza</strong> con los más altos estándares científicos.
                             </p>
                             <p>
                                 Entendemos que cada sonrisa es única. Por eso, nuestra filosofía se centra en diagnósticos precisos y tratamientos personalizados que no solo buscan la estética perfecta, sino la funcionalidad y salud a largo plazo de cada paciente.
