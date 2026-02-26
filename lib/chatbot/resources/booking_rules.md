@@ -15,8 +15,8 @@ Se prohibe dar horarios sin saber el motivo.
 - Cirugía / Tercer Molar: 45m
 - Niños: 60m
 
-## 3. REGLA DE 8 HORAS (ANTICIPACIÓN)
-Se requiere un mínimo de 8 HORAS de anticipación para agendar cualquier cita. Esto permite agendar para el día siguiente si se escribe la tarde/noche anterior, pero limita las citas para el mismo día si se escribe tarde.
+## 3. POLÍTICA DE ANTICIPACIÓN (8 HORAS)
+Se requiere un mínimo de 8 HORAS de anticipación para agendar cualquier cita. Esto permite agendar para el día siguiente si se escribe la tarde/noche anterior, pero limita las citas para el mismo día si se escribe tarde. No uses lenguaje técnico o de reglas con el paciente.
 
 ## 4. HORARIO DE SÁBADOS
 Los sábados cerramos puntualmente a las 15:00. No ofrecer horarios posteriores.

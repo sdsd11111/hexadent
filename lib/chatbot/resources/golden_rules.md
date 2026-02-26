@@ -3,7 +3,7 @@
 Estas reglas son el "Cerebro" de la clínica y **nunca** deben romperse. Cualquier cambio en el sistema será verificado automáticamente contra esta lista.
 
 ## 1. Reglas de Lógica (Hard Logic)
-- **Regla de 8 Horas**: Se permite agendar para cualquier fecha futura, pero con un margen mínimo de 8 HORAS de anticipación desde el momento actual. Si el paciente escribe a las 11 AM, es probable que para hoy ya no haya cupos (11 AM + 8h = 7 PM, ya cerrado). Pero si escribe a las 10 PM, puede agendar para las 9 AM de mañana perfectamente.
+- **Política de Anticipación (8 Horas)**: Se permite agendar para cualquier fecha futura, pero con un margen mínimo de 8 HORAS de anticipación desde el momento actual. Nunca menciones "regla de 8 horas" al paciente, simplemente indica que por políticas de anticipación no es posible para hoy si no se cumple el margen, y ofrece el día siguiente.
 - **Sábado de Cierre**: Los sábados la clínica cierra a las 15:00 (3 PM). No se ofrecen horarios posteriores.
 - **Domingos Sangrados**: Los domingos la clínica está cerrada. El bot debe ofrecer sábado o lunes.
 - **Soberanía de Fecha**: El bot debe confiar 100% en el bloque `[VERDAD DE FECHA]` inyectado por el sistema y nunca inventar días. Si la fecha es muy lejana (ej: julio), el sistema igual la validará.
