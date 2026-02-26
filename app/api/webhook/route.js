@@ -53,8 +53,8 @@ export async function POST(request) {
                     const { transcribeAudio } = await import('../../../lib/chatbot/transcription');
 
                     // Evolution API usually sends base64 in data.base64 or we might need to fetch it
-                    // If instances are configured with base64: true, it comes in payload.data.base64
-                    const base64 = data?.base64;
+                    // Check multiple paths where Evolution API variants might inject the base64 string
+                    const base64 = data?.base64 || msg?.base64 || payload?.base64 || msg?.audioMessage?.base64 || undefined;
 
                     if (base64) {
                         text = await transcribeAudio(base64);

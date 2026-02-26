@@ -10,12 +10,12 @@ export async function GET(request) {
 
         if (date) {
             [rows] = await db.execute(
-                'SELECT id, patient_name, patient_phone, patient_cedula, patient_age, appointment_date, appointment_time, duration_minutes, status FROM appointments WHERE appointment_date = ? ORDER BY appointment_time ASC',
+                'SELECT id, patient_name, patient_phone, patient_cedula, patient_age, appointment_date, appointment_time, duration_minutes, status, motive FROM appointments WHERE appointment_date = ? ORDER BY appointment_time ASC',
                 [date]
             );
         } else {
             [rows] = await db.execute(
-                'SELECT id, patient_name, patient_phone, patient_cedula, patient_age, appointment_date, appointment_time, duration_minutes, status FROM appointments ORDER BY appointment_date DESC, appointment_time ASC LIMIT 100'
+                'SELECT id, patient_name, patient_phone, patient_cedula, patient_age, appointment_date, appointment_time, duration_minutes, status, motive FROM appointments ORDER BY appointment_date DESC, appointment_time ASC LIMIT 100'
             );
         }
         return NextResponse.json(rows, { status: 200 });

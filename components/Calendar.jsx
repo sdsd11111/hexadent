@@ -9,7 +9,8 @@ import {
     LockOpenIcon,
     UserIcon,
     ClockIcon,
-    PhoneIcon
+    PhoneIcon,
+    ChatBubbleBottomCenterTextIcon
 } from '@heroicons/react/24/outline';
 
 const DAYS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
@@ -272,13 +273,21 @@ export default function Calendar({ isAdmin = false }) {
                                                         {app.patient_age} años
                                                     </span>
                                                 </div>
-                                                <div className="space-y-1 ml-6">
+                                                <div className="space-y-1 ml-6 mt-2">
                                                     <p className="text-[10px] text-gray-500 flex items-center gap-2">
                                                         <PhoneIcon className="h-3 w-3" /> {app.patient_phone}
                                                     </p>
                                                     <p className="text-[10px] text-gray-500 font-medium flex items-center gap-2">
                                                         <span className="font-black text-gray-300">ID:</span> {app.patient_cedula}
                                                     </p>
+                                                    {app.motive && (
+                                                        <div className="pt-1 mt-1 border-t border-gray-100 flex items-start gap-1">
+                                                            <ChatBubbleBottomCenterTextIcon className="h-3 w-3 text-blue-400 mt-0.5" />
+                                                            <p className="text-[10px] text-blue-600/90 italic font-medium break-words pr-2">
+                                                                {app.motive}
+                                                            </p>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         ))}
