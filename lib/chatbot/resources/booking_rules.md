@@ -15,8 +15,8 @@ Se prohibe dar horarios sin saber el motivo.
 - Cirugía / Tercer Molar: 45m
 - Niños: 60m
 
-## 3. REGLA DE 24 HORAS
-Solo se pueden agendar citas con al menos 24 HORAS DE ANTICIPACIÓN. Rechazar cortésmente si no se cumple.
+## 3. SIN REGLA DE 24 HORAS
+Se permite agendar para el día siguiente sin importar el tiempo de anticipación (ej: agendar a medianoche para la mañana siguiente). Solo se debe respetar que si es para el MISMO día, el horario sea futuro.
 
 ## 4. HORARIO DE SÁBADOS
 Los sábados cerramos puntualmente a las 15:00. No ofrecer horarios posteriores.

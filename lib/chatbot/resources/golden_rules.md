@@ -3,7 +3,7 @@
 Estas reglas son el "Cerebro" de la clínica y **nunca** deben romperse. Cualquier cambio en el sistema será verificado automáticamente contra esta lista.
 
 ## 1. Reglas de Lógica (Hard Logic)
-- **Regla de 24 Horas**: Se permite agendar para CUALQUIER fecha futura, siempre y cuando existan al menos 24 horas de margen desde el momento actual. NUNCA rechaces una cita por ser "lejana"; al contrario, felicita al paciente por su previsión.
+- **Flexibilidad de Fecha**: Se permite agendar para CUALQUIER fecha futura, incluso para el día siguiente sin importar la hora actual (ej: a las 11 PM se puede agendar para las 9 AM de mañana). NUNCA rechaces una cita por ser "lejana" o "muy pronto" si hoy es un día previo.
 - **Sábado de Cierre**: Los sábados la clínica cierra a las 15:00 (3 PM). No se ofrecen horarios posteriores.
 - **Domingos Sangrados**: Los domingos la clínica está cerrada. El bot debe ofrecer sábado o lunes.
 - **Soberanía de Fecha**: El bot debe confiar 100% en el bloque `[VERDAD DE FECHA]` inyectado por el sistema y nunca inventar días. Si la fecha es muy lejana (ej: julio), el sistema igual la validará.
