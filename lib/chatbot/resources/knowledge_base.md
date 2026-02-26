@@ -7,11 +7,12 @@
 - **Zona Horaria**: UTC-5 (Ecuador)
 - **Métodos de Pago**: Efectivo y tarjeta
 
-## Horarios de Atención
-- **Lunes a Viernes**: 09:00 a 13:00 y 15:00 a 18:00
-- **Sábados**: 08:30 a 15:00 (Atención continua, sin cierre al mediodía)
-- **Horario Especial**: Disponible bajo solicitud previa y coordinación directa con la doctora.
-- **Domingos**: Cerrado
+- **Liderazgo**: Dra. Diana Rodríguez (Especializada en Rusia - Ortodoncia)
+- **Horarios de Atención**:
+  - **Lunes a Viernes**: 09:00 a 13:00 y 15:00 a 18:00
+  - **Sábados**: 08:30 a 15:00 (Atención continua, sin cierre al mediodía)
+  - **Horario Especial**: Disponible bajo solicitud previa y coordinación directa con la doctora.
+  - **Domingos**: Cerrado
 
 ## Servicios y Precios Aproximados
 
