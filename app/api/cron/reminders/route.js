@@ -10,27 +10,37 @@ export async function GET(req) {
     }
 
     try {
-        // 1. Get appointments for tomorrow that haven't received a reminder
+        // 1. Get appointments for TODAY that haven't received a reminder
         // Using Ecuador time (-5)
         const now = new Date();
-        const tomorrow = new Date(now.getTime() - (5 * 60 * 60 * 1000) + (24 * 60 * 60 * 1000));
-        const tomorrowStr = tomorrow.toISOString().split('T')[0];
+        const ecuadorToday = new Date(now.getTime() - (5 * 60 * 60 * 1000));
+        const todayStr = ecuadorToday.toISOString().split('T')[0];
 
-        console.log(`[Cron Reminders] Checking appointments for ${tomorrowStr}...`);
+        console.log(`[Cron Reminders] Checking appointments for TODAY (${todayStr})...`);
 
         const [appointments] = await db.execute(
             `SELECT id, patient_name, patient_phone, appointment_time 
              FROM appointments 
              WHERE appointment_date = ? AND status = 'scheduled' AND reminder_sent = 0`,
-            [tomorrowStr]
+            [todayStr]
         );
 
         console.log(`[Cron Reminders] Found ${appointments.length} appointments to remind.`);
 
+        const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
         let sentCount = 0;
-        for (const app of appointments) {
+
+        for (let i = 0; i < appointments.length; i++) {
+            const app = appointments[i];
+
+            // Apply 30s delay between messages (skip delay for the first one)
+            if (i > 0) {
+                console.log(`[Cron Reminders] Throttling... waiting 30 seconds before next message to ${app.patient_phone}`);
+                await sleep(30000);
+            }
+
             const timeFormatted = app.appointment_time.substring(0, 5);
-            const message = `¡Hola ${app.patient_name}! 👋 Te recordamos tu cita en *Hexadent* para mañana el ${tomorrowStr} a las *${timeFormatted}*. \n\n¿Confirmas tu asistencia? (Responde SÍ o NO)`;
+            const message = `¡Hola ${app.patient_name}! 👋 Te recordamos tu cita en *Hexadent* para hoy ${todayStr} a las *${timeFormatted}*. \n\n¿Confirmas tu asistencia? (Responde SÍ o NO)`;
 
             try {
                 const result = await sendWhatsAppMessage(app.patient_phone, message);
@@ -45,7 +55,7 @@ export async function GET(req) {
 
         return NextResponse.json({
             success: true,
-            message: `Sent ${sentCount} reminders for ${tomorrowStr}.`
+            message: `Sent ${sentCount} reminders for ${todayStr}.`
         });
 
     } catch (error) {
