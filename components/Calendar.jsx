@@ -29,6 +29,16 @@ export default function Calendar({ isAdmin = false }) {
     const [availableSlots, setAvailableSlots] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
+    const [showBookingForm, setShowBookingForm] = useState(false);
+    const [bookingSlot, setBookingSlot] = useState(null);
+    const [bookingData, setBookingData] = useState({
+        name: '',
+        cedula: '',
+        age: '',
+        phone: '',
+        motive: ''
+    });
+
     useEffect(() => {
         fetchMetadata();
     }, [currentMonth, currentYear]);
@@ -36,18 +46,18 @@ export default function Calendar({ isAdmin = false }) {
     useEffect(() => {
         if (selectedDate) {
             fetchDayDetails(selectedDate);
+            setShowBookingForm(false);
+            setBookingSlot(null);
         }
     }, [selectedDate]);
 
     const fetchMetadata = async () => {
         setIsLoading(true);
         try {
-            // Fetch blocked dates
             const blockedRes = await fetch('/api/admin/calendar/blocked-dates');
             const blockedData = await blockedRes.json();
             setBlockedDates(blockedData.map(d => d.blocked_date.split('T')[0]));
 
-            // If admin, fetch appointments for the month (simplified load)
             if (isAdmin) {
                 const appRes = await fetch(`/api/admin/calendar/appointments`);
                 const appData = await appRes.json();
@@ -62,19 +72,50 @@ export default function Calendar({ isAdmin = false }) {
     const fetchDayDetails = async (dateStr) => {
         setIsLoading(true);
         try {
+            // Both admin and public need availability for booking, but admin might need more for listing
+            const availRes = await fetch(`/api/calendar/availability?date=${dateStr}${isAdmin ? '&isAdmin=true' : ''}`);
+            const availData = await availRes.json();
+            setAvailableSlots(availData.slots || []);
+
             if (isAdmin) {
-                // Admin already has appointments, filter them locally or fetch fresh
                 const res = await fetch(`/api/admin/calendar/appointments?date=${dateStr}`);
                 const data = await res.json();
-                // Update local day appointments
-            } else {
-                // Public view: fetch availability
-                const res = await fetch(`/api/calendar/availability?date=${dateStr}`);
-                const data = await res.json();
-                setAvailableSlots(data.slots || []);
+                setAppointments(prev => {
+                    const otherDays = prev.filter(a => a.appointment_date.split('T')[0] !== dateStr);
+                    return [...otherDays, ...data];
+                });
             }
         } catch (e) {
             console.error("Error fetching day details:", e);
+        }
+        setIsLoading(false);
+    };
+
+    const handleManualBook = async (e) => {
+        e.preventDefault();
+        setIsLoading(true);
+        try {
+            const res = await fetch('/api/admin/calendar/book', {
+                method: 'POST',
+                body: JSON.stringify({
+                    ...bookingData,
+                    date: selectedDate,
+                    time: bookingSlot
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert('Cita agendada con éxito');
+                setShowBookingForm(false);
+                setBookingSlot(null);
+                setBookingData({ name: '', cedula: '', age: '', phone: '', motive: '' });
+                fetchDayDetails(selectedDate);
+                fetchMetadata(); // Update markers
+            } else {
+                alert('Error: ' + data.error);
+            }
+        } catch (e) {
+            alert('Error al agendar: ' + e.message);
         }
         setIsLoading(false);
     };
@@ -121,20 +162,16 @@ export default function Calendar({ isAdmin = false }) {
     const prevMonthDays = new Date(currentYear, currentMonth, 0).getDate();
 
     const calendarDays = [];
-    // Padding from prev month
     for (let i = firstDayOfMonth - 1; i >= 0; i--) {
         calendarDays.push({ day: prevMonthDays - i, currentMonth: false });
     }
-    // Current month
     for (let i = 1; i <= daysInMonth; i++) {
         calendarDays.push({ day: i, currentMonth: true });
     }
 
     return (
         <div className="flex flex-col lg:flex-row gap-8 animate-fade-in">
-            {/* Calendar Grid */}
             <div className="flex-1 bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
-                {/* Header */}
                 <div className="bg-gradient-to-r from-secondary to-blue-900 p-6 flex items-center justify-between text-white">
                     <button onClick={prevMonth} className="p-2 hover:bg-white/10 rounded-full transition-all">
                         <ChevronLeftIcon className="h-6 w-6" />
@@ -147,7 +184,6 @@ export default function Calendar({ isAdmin = false }) {
                     </button>
                 </div>
 
-                {/* Days Label */}
                 <div className="grid grid-cols-7 bg-gray-50 border-b border-gray-100">
                     {DAYS.map(day => (
                         <div key={day} className="py-3 text-center text-[10px] font-black uppercase text-gray-400 tracking-tighter">
@@ -156,7 +192,6 @@ export default function Calendar({ isAdmin = false }) {
                     ))}
                 </div>
 
-                {/* Grid */}
                 <div className="grid grid-cols-7 border-collapse">
                     {calendarDays.map((d, i) => {
                         const dateStr = `${currentYear}-${(currentMonth + 1).toString().padStart(2, '0')}-${d.day.toString().padStart(2, '0')}`;
@@ -185,7 +220,6 @@ export default function Calendar({ isAdmin = false }) {
                                     {d.day}
                                 </span>
 
-                                {/* Status Indicators */}
                                 <div className="mt-2 flex flex-wrap gap-1">
                                     {isBlocked && (
                                         <div className="w-full bg-red-100 text-red-600 text-[8px] font-bold px-1 rounded flex items-center gap-0.5">
@@ -227,7 +261,6 @@ export default function Calendar({ isAdmin = false }) {
                 </div>
             </div>
 
-            {/* Sidebar Details */}
             <div className="w-full lg:w-96 bg-white rounded-3xl shadow-xl border border-gray-100 flex flex-col">
                 <div className="p-8 border-b border-gray-50 bg-gray-50/50">
                     <h3 className="text-secondary font-black uppercase tracking-widest text-lg flex items-center gap-3">
@@ -249,9 +282,74 @@ export default function Calendar({ isAdmin = false }) {
                         <div className="flex justify-center items-center h-40">
                             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                         </div>
-                    ) : isAdmin ? (
+                    ) : showBookingForm ? (
+                        <div className="animate-fade-in shadow-inner bg-gray-50 p-6 rounded-3xl border border-gray-100">
+                            <div className="flex items-center justify-between mb-6">
+                                <h4 className="text-xs font-black uppercase text-primary tracking-widest">Agendar: {bookingSlot}</h4>
+                                <button onClick={() => setShowBookingForm(false)} className="text-[10px] font-black text-red-400 uppercase hover:underline">Cancelar</button>
+                            </div>
+                            <form onSubmit={handleManualBook} className="space-y-4">
+                                <div>
+                                    <label className="text-[10px] font-black uppercase text-gray-400 ml-1">Nombre Completo *</label>
+                                    <input
+                                        required
+                                        type="text"
+                                        className="w-full bg-white border-2 border-gray-100 rounded-xl px-4 py-2 text-sm focus:border-primary outline-none transition-all font-bold"
+                                        value={bookingData.name}
+                                        onChange={(e) => setBookingData({ ...bookingData, name: e.target.value })}
+                                    />
+                                </div>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="text-[10px] font-black uppercase text-gray-400 ml-1">Cédula</label>
+                                        <input
+                                            type="text"
+                                            className="w-full bg-white border-2 border-gray-100 rounded-xl px-4 py-2 text-sm focus:border-primary outline-none transition-all font-bold"
+                                            value={bookingData.cedula}
+                                            onChange={(e) => setBookingData({ ...bookingData, cedula: e.target.value })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] font-black uppercase text-gray-400 ml-1">Edad *</label>
+                                        <input
+                                            required
+                                            type="number"
+                                            className="w-full bg-white border-2 border-gray-100 rounded-xl px-4 py-2 text-sm focus:border-primary outline-none transition-all font-bold"
+                                            value={bookingData.age}
+                                            onChange={(e) => setBookingData({ ...bookingData, age: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="text-[10px] font-black uppercase text-gray-400 ml-1">Teléfono (WhatsApp)</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Ej. 096..."
+                                        className="w-full bg-white border-2 border-gray-100 rounded-xl px-4 py-2 text-sm focus:border-primary outline-none transition-all font-bold"
+                                        value={bookingData.phone}
+                                        onChange={(e) => setBookingData({ ...bookingData, phone: e.target.value })}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-[10px] font-black uppercase text-gray-400 ml-1">Motivo / Tratamiento *</label>
+                                    <textarea
+                                        required
+                                        rows="2"
+                                        className="w-full bg-white border-2 border-gray-100 rounded-xl px-4 py-2 text-sm focus:border-primary outline-none transition-all font-bold"
+                                        value={bookingData.motive}
+                                        onChange={(e) => setBookingData({ ...bookingData, motive: e.target.value })}
+                                    />
+                                </div>
+                                <button
+                                    type="submit"
+                                    className="w-full bg-primary text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs shadow-lg shadow-blue-200 hover:scale-[1.02] active:scale-95 transition-all mt-4"
+                                >
+                                    Confirmar Cita
+                                </button>
+                            </form>
+                        </div>
+                    ) : (
                         <div className="space-y-6">
-                            {/* ACTIVE APPOINTMENTS */}
                             <div className="space-y-4">
                                 <h4 className="text-xs font-black uppercase text-gray-400 tracking-widest px-2">Citas Agendadas</h4>
                                 {appointments.filter(a => a.appointment_date.split('T')[0] === selectedDate && a.status !== 'cancelled').length === 0 ? (
@@ -295,7 +393,27 @@ export default function Calendar({ isAdmin = false }) {
                                 )}
                             </div>
 
-                            {/* CANCELLED APPOINTMENTS */}
+                            {isAdmin && (
+                                <div className="space-y-4 pt-4 border-t border-gray-100">
+                                    <h4 className="text-xs font-black uppercase text-primary tracking-widest px-2">Agendar Manualmente</h4>
+                                    {availableSlots.length === 0 ? (
+                                        <p className="text-[10px] text-gray-400 italic px-2">No hay horarios disponibles para agendamiento manual.</p>
+                                    ) : (
+                                        <div className="grid grid-cols-3 gap-2">
+                                            {availableSlots.map(slot => (
+                                                <button
+                                                    key={slot}
+                                                    onClick={() => { setBookingSlot(slot); setShowBookingForm(true); }}
+                                                    className="bg-white border-2 border-gray-100 py-2 rounded-xl text-[11px] font-black text-secondary hover:border-primary hover:text-primary transition-all shadow-sm active:scale-95"
+                                                >
+                                                    {slot}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
                             {appointments.filter(a => a.appointment_date.split('T')[0] === selectedDate && a.status === 'cancelled').length > 0 && (
                                 <div className="space-y-4 pt-4 border-t border-dashed border-gray-100">
                                     <h4 className="text-xs font-black uppercase text-red-300 tracking-widest px-2">Historial / Canceladas</h4>
@@ -313,27 +431,6 @@ export default function Calendar({ isAdmin = false }) {
                                             </div>
                                         ))}
                                     </div>
-                                </div>
-                            )}
-                        </div>
-
-                    ) : (
-                        <div className="space-y-4">
-                            <h4 className="text-xs font-black uppercase text-gray-400 tracking-widest px-2">Horarios Disponibles</h4>
-                            {availableSlots.length === 0 ? (
-                                <div className="text-center py-10 bg-red-50 rounded-3xl border border-red-100 p-4">
-                                    <LockClosedIcon className="h-8 w-8 text-red-300 mx-auto mb-2" />
-                                    <p className="text-sm text-red-600 font-bold">No hay turnos disponibles.</p>
-                                    <p className="text-[10px] text-red-400 mt-1 uppercase font-black">Prueba otra fecha o consulta al chatbot</p>
-                                </div>
-                            ) : (
-                                <div className="grid grid-cols-3 gap-2">
-                                    {availableSlots.map(slot => (
-                                        <div key={slot} className="bg-white border-2 border-gray-100 py-3 rounded-xl text-center text-xs font-black text-secondary hover:border-primary hover:text-primary cursor-pointer transition-all overflow-hidden relative group">
-                                            {slot}
-                                            <div className="absolute inset-0 bg-primary translate-y-full group-hover:translate-y-0 transition-transform -z-10"></div>
-                                        </div>
-                                    ))}
                                 </div>
                             )}
                         </div>
