@@ -40,7 +40,7 @@ export async function GET(req) {
             }
 
             const timeFormatted = app.appointment_time.substring(0, 5);
-            const message = `¡Hola ${app.patient_name}! 👋 Te recordamos tu cita en *Hexadent* para hoy ${todayStr} a las *${timeFormatted}*. \n\n¿Confirmas tu asistencia? (Responde SÍ o NO)`;
+            const message = `¡Hola ${app.patient_name}! 👋 Te recordamos tu cita en *Hexadent* para hoy ${todayStr} a las *${timeFormatted}*. \n\n¿Confirmas tu asistencia? (Responde SÍ o NO). *Si respondes NO, tu cita se cancelará automáticamente para liberar el espacio.*`;
 
             try {
                 const result = await sendWhatsAppMessage(app.patient_phone, message);
