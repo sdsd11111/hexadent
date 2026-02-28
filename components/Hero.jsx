@@ -17,11 +17,11 @@ export default function Hero() {
     }
 
     return (
-        <section id="inicio" className="relative h-[calc(100dvh-85px)] md:h-auto md:min-h-screen flex items-center justify-center overflow-hidden">
+        <section id="inicio" className="relative h-screen flex items-center justify-center overflow-hidden">
             {/* Imagen de Fondo */}
             <div className="absolute inset-0 z-0">
                 <Image
-                    src="/hero-bg.jpg"
+                    src="/hero.webp"
                     alt="Clínica Dental Hexadent"
                     fill
                     className="object-cover"
@@ -29,7 +29,7 @@ export default function Hero() {
                     quality={90}
                 />
                 {/* Overlay oscuro */}
-                <div className="absolute inset-0 bg-black/60"></div>
+                <div className="absolute inset-0 bg-black/15"></div>
             </div>
 
             {/* Overlays Hexagonales Decorativos */}
@@ -39,7 +39,7 @@ export default function Hero() {
 
             {/* Contenido */}
             <div className="container-custom relative z-10 py-4 md:py-20 lg:py-32 w-full">
-                <div className="max-w-4xl mx-auto text-center text-white fade-in-up">
+                <div className="max-w-4xl mx-auto text-center text-white fade-in-up drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)]">
                     {/* H1 Optimizado para SEO */}
                     <h1 className="text-4xl md:text-5xl lg:text-6xl font-light mb-6 leading-tight tracking-tight">
                         Ortodoncia en Loja: <br className="hidden sm:block" />
@@ -50,12 +50,6 @@ export default function Hero() {
                     <p className="text-lg md:text-xl lg:text-2xl my-6 text-white font-medium">
                         Contamos con un equipo de especialistas altamente capacitados en el cuidado de tu salud bucal!
                     </p>
-
-                    {/* Tagline Cursiva */}
-                    <div className="font-script text-3xl md:text-4xl lg:text-5xl mb-6 drop-shadow-md">
-                        <span className="text-white">Cuidamos de tu </span>
-                        <span className="text-primary">Sonrisa...!</span>
-                    </div>
 
                     <p className="text-base md:text-lg mb-8 opacity-90 hidden md:block">
                         En <strong>San Sebastián, Loja</strong> - Tecnología de punta y atención personalizada
