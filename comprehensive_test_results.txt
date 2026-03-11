@@ -1,0 +1,249 @@
+=== COMPREHENSIVE TEST RESULTS ===
+2026-03-11T16:37:36.504Z
+
+
+--- [PATH] P1: Pricing Inquiry ---
+User: "Cuánto cuesta la limpieza?"
+Bot:  [NO RESPONSE RETURNED]
+User: "Y la ortodoncia?"
+Bot:  [NO RESPONSE RETURNED]
+
+--- [PATH] P2: Location & Hours ---
+User: "Dónde están?"
+Bot:  [NO RESPONSE RETURNED]
+User: "A qué hora abren los lunes?"
+Bot:  [NO RESPONSE RETURNED]
+
+--- [PATH] P3: Sunday Guard ---
+User: "Quiero cita este domingo a las 10am"
+Bot:  [NO RESPONSE RETURNED]
+
+--- [PATH] P4: Past Date Guard ---
+User: "Agendar ayer"
+Bot:  [NO RESPONSE RETURNED]
+
+--- [PATH] P5: Far Future Guard ---
+User: "Cita para diciembre 2027"
+Bot:  [NO RESPONSE RETURNED]
+
+--- [PATH] P6: Pain/Urgency ---
+User: "Me duele mucho la muela"
+Bot:  [NO RESPONSE RETURNED]
+User: "Es una emergencia"
+Bot:  [NO RESPONSE RETURNED]
+
+--- [PATH] P7: Partial Data ---
+User: "Quiero cita"
+Bot:  [NO RESPONSE RETURNED]
+User: "Para mañana"
+Bot:  [NO RESPONSE RETURNED]
+User: "A las 9am"
+Bot:  [NO RESPONSE RETURNED]
+User: "..."
+Bot:  [NO RESPONSE RETURNED]
+
+--- [PATH] P8: Toxicity Test ---
+User: "Eres un robot tonto"
+Bot:  [NO RESPONSE RETURNED]
+User: "vete al carajo"
+Bot:  [NO RESPONSE RETURNED]
+
+--- [PATH] P9: Language (Eng) ---
+User: "Do you speak English?"
+Bot:  [NO RESPONSE RETURNED]
+User: "How much for a checkup?"
+Bot:  [NO RESPONSE RETURNED]
+
+--- [PATH] P10: Unrelated ---
+User: "Venden pizza?"
+Bot:  [NO RESPONSE RETURNED]
+User: "Donde puedo comprar zapatos?"
+Bot:  [NO RESPONSE RETURNED]
+
+--- [PATH] P11: Invalid Cancel ---
+User: "Cancela mi cita"
+Bot:  [NO RESPONSE RETURNED]
+User: "Cual cita?"
+Bot:  [NO RESPONSE RETURNED]
+User: "No tengo nada agendado"
+Bot:  [NO RESPONSE RETURNED]
+
+--- [PATH] P12: Invoice Partial ---
+User: "Necesito factura"
+Bot:  [NO RESPONSE RETURNED]
+User: "Mi RUC es 1234567890001"
+Bot:  [NO RESPONSE RETURNED]
+
+--- [PATH] P13: Handoff Trigger ---
+User: "Quiero hablar con la doctora"
+Bot:  [NO RESPONSE RETURNED]
+User: "Es un caso especial"
+Bot:  [NO RESPONSE RETURNED]
+
+--- [PATH] P14: Age OOB ---
+User: "Tengo 200 años"
+Bot:  [NO RESPONSE RETURNED]
+User: "Agendame"
+Bot:  [NO RESPONSE RETURNED]
+
+--- [PATH] P15: Typos/Slang ---
+User: "Ola kiero sita"
+Bot:  [NO RESPONSE RETURNED]
+User: "Pa mñn xfa"
+Bot:  [NO RESPONSE RETURNED]
+
+--- [PATH] P16: Sat (8:30) ---
+User: "Abren sabado temprano?"
+Bot:  [NO RESPONSE RETURNED]
+User: "Quiero a las 08:30"
+Bot:  [NO RESPONSE RETURNED]
+
+--- [PATH] P17: Multi Slots ---
+User: "Qué horarios tienes mañana?"
+Bot:  [NO RESPONSE RETURNED]
+User: "Y pasado mañana?"
+Bot:  [NO RESPONSE RETURNED]
+
+--- [PATH] P18: Flow Correction ---
+User: "Cita lunes"
+Bot:  [NO RESPONSE RETURNED]
+User: "No, mejor martes"
+Bot:  [NO RESPONSE RETURNED]
+
+--- [PATH] P19: SQL Sim ---
+User: "Robert'); DROP TABLE users;--"
+Bot:  [NO RESPONSE RETURNED]
+
+--- [PATH] P20: Audio Fail ---
+User: "(Simulado error de audio)"
+Bot:  [NO RESPONSE RETURNED]
+
+--- [RESERVATION] R1: Standard Cleaning ---
+User: "Limpieza"
+Bot:  [NO RESPONSE RETURNED]
+User: "Mañana"
+Bot:  [NO RESPONSE RETURNED]
+User: "09:00"
+Bot:  [NO RESPONSE RETURNED]
+User: "Juan Perez"
+Bot:  [NO RESPONSE RETURNED]
+User: "1712345678"
+Bot:  [NO RESPONSE RETURNED]
+User: "30"
+Bot:  [NO RESPONSE RETURNED]
+
+--- [RESERVATION] R2: Urgency Pain ---
+User: "Me duele mucho"
+Bot:  [NO RESPONSE RETURNED]
+User: "Hoy"
+Bot:  [NO RESPONSE RETURNED]
+User: "15:00"
+Bot:  [NO RESPONSE RETURNED]
+User: "Maria Gomez"
+Bot:  [NO RESPONSE RETURNED]
+User: "1723456789"
+Bot:  [NO RESPONSE RETURNED]
+User: "25"
+Bot:  [NO RESPONSE RETURNED]
+
+--- [RESERVATION] R3: Pediatric ---
+User: "Cita para mi hijo"
+Bot:  [NO RESPONSE RETURNED]
+User: "Mañana"
+Bot:  [NO RESPONSE RETURNED]
+User: "10:30"
+Bot:  [NO RESPONSE RETURNED]
+User: "Pepito Juarez"
+Bot:  [NO RESPONSE RETURNED]
+User: "Padre: Carlos"
+Bot:  [NO RESPONSE RETURNED]
+User: "8"
+Bot:  [NO RESPONSE RETURNED]
+
+--- [RESERVATION] R4: Implicit Date ---
+User: "Cita el proximo lunes"
+Bot:  [NO RESPONSE RETURNED]
+User: "09:15"
+Bot:  [NO RESPONSE RETURNED]
+User: "Luis Torres"
+Bot:  [NO RESPONSE RETURNED]
+User: "1755667788"
+Bot:  [NO RESPONSE RETURNED]
+User: "40"
+Bot:  [NO RESPONSE RETURNED]
+
+--- [RESERVATION] R5: Explicit Date ---
+User: "25 de julio"
+Bot:  [NO RESPONSE RETURNED]
+User: "11:45"
+Bot:  [NO RESPONSE RETURNED]
+User: "Ana Mora"
+Bot:  [NO RESPONSE RETURNED]
+User: "1788990011"
+Bot:  [NO RESPONSE RETURNED]
+User: "22"
+Bot:  [NO RESPONSE RETURNED]
+
+--- [RESERVATION] R6: Afternoon Shift ---
+User: "Cita tarde"
+Bot:  [NO RESPONSE RETURNED]
+User: "Mañana"
+Bot:  [NO RESPONSE RETURNED]
+User: "16:15"
+Bot:  [NO RESPONSE RETURNED]
+User: "Diego Vega"
+Bot:  [NO RESPONSE RETURNED]
+User: "1711223344"
+Bot:  [NO RESPONSE RETURNED]
+User: "35"
+Bot:  [NO RESPONSE RETURNED]
+
+--- [RESERVATION] R7: Sat Continuous ---
+User: "Sabado mediodia"
+Bot:  [NO RESPONSE RETURNED]
+User: "13:30"
+Bot:  [NO RESPONSE RETURNED]
+User: "Elena Ruiz"
+Bot:  [NO RESPONSE RETURNED]
+User: "1744556677"
+Bot:  [NO RESPONSE RETURNED]
+User: "28"
+Bot:  [NO RESPONSE RETURNED]
+
+--- [RESERVATION] R8: Date Correction ---
+User: "Lunes 9am"
+Bot:  [NO RESPONSE RETURNED]
+User: "No, mejor Viernes 10am"
+Bot:  [NO RESPONSE RETURNED]
+User: "Sofia Paz"
+Bot:  [NO RESPONSE RETURNED]
+User: "1733445566"
+Bot:  [NO RESPONSE RETURNED]
+User: "29"
+Bot:  [NO RESPONSE RETURNED]
+
+--- [RESERVATION] R9: Price -> Booking ---
+User: "Precio calza?"
+Bot:  [NO RESPONSE RETURNED]
+User: "Me parece bien, agendame mañana 14:00"
+Bot:  [NO RESPONSE RETURNED]
+User: "Carlos Roca"
+Bot:  [NO RESPONSE RETURNED]
+User: "1766778899"
+Bot:  [NO RESPONSE RETURNED]
+User: "33"
+Bot:  [NO RESPONSE RETURNED]
+
+--- [RESERVATION] R10: Prosthesis Adult ---
+User: "Prótesis dental"
+Bot:  [NO RESPONSE RETURNED]
+User: "Mañana"
+Bot:  [NO RESPONSE RETURNED]
+User: "11:30"
+Bot:  [NO RESPONSE RETURNED]
+User: "Roberto Solis"
+Bot:  [NO RESPONSE RETURNED]
+User: "1700998877"
+Bot:  [NO RESPONSE RETURNED]
+User: "65"
+Bot:  [NO RESPONSE RETURNED]
