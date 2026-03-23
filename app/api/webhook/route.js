@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
-import { processChatbotMessage } from '../../../lib/chatbot/logic.js';
-import { debounceMessage } from '../../../lib/chatbot/debouncer.js';
+import { ensureTables } from '../../../lib/chatbot/logic.js';
+import { inngest } from '../../../lib/inngest/client.js';
+import db from '../../../lib/db.js';
 
 export const dynamic = 'force-dynamic';
 
@@ -121,8 +122,19 @@ export async function POST(request) {
 
         for (const msg of messages) {
             if (msg.from && msg.text) {
-                console.log(`[Webhook] Queuing message (3s debounce) from ${msg.from}: ${msg.text}`);
-                await debounceMessage(msg.from, msg.text, msg.to);
+                console.log(`[Webhook] Dispatching to Inngest for ${msg.from}`);
+                await ensureTables();
+                // We still buffer to handle rapid-fire grouping in Inngest
+                await db.execute('INSERT INTO chatbot_buffer (phone, message) VALUES (?, ?)', [msg.from, msg.text]);
+                
+                await inngest.send({
+                    name: "chatbot/message.received",
+                    data: {
+                        phoneNumber: msg.from,
+                        text: msg.text,
+                        clinicNumber: msg.to
+                    }
+                });
             }
         }
 
