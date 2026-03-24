@@ -108,25 +108,15 @@ export default function About() {
                         {/* Floating Badge -Visible on both mobile and desktop- */}
                         <div className="absolute -bottom-20 md:-bottom-6 left-1/2 -translate-x-1/2 md:left-auto md:translate-x-0 md:-left-6 bg-white p-5 shadow-2xl border-l-4 border-primary z-20 w-full max-w-[280px] md:max-w-[300px]">
                             {/* Logo en la tarjeta */}
-                            <div className="mb-4 pb-4 border-b border-gray-100">
-                                <svg width="200" height="75" viewBox="0 0 240 90" fill="none" xmlns="http://www.w3.org/2000/svg" className="mx-auto md:mx-0">
-                                    <g stroke="#009797" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                        <path d="M15 28 V85" strokeLinecap="butt" />
-                                        <path d="M25 15 V85" strokeLinecap="butt" />
-                                        <path d="M25 15 C65 15 75 30 75 50 C75 70 65 85 25 85" fill="none" />
-                                        <path d="M15 28 H52" strokeLinecap="butt" />
-                                        <path d="M52 28 C68 28 68 56 52 56" fill="none" />
-                                        <path d="M52 56 H15" strokeLinecap="butt" />
-                                        <path d="M35 56 L48 78" />
-                                    </g>
-                                    <text x="85" y="38" fill="#2a2b2e" fontSize="24" fontWeight="500" className="font-sans tracking-tight">DIANA</text>
-                                    <text x="85" y="65" fill="#2a2b2e" fontSize="24" fontWeight="500" className="font-sans tracking-tight">RODRÍGUEZ</text>
-                                    <rect x="85" y="72" width="145" height="1" fill="#f3f4f6" />
-                                    <text x="85" y="85" fill="#58595b" fontSize="10" fontWeight="400" letterSpacing="5" className="font-sans uppercase">Ortodoncista</text>
-                                </svg>
+                            <div className="mb-4 pb-4 border-b border-gray-100 flex justify-center md:justify-start">
+                                <Image
+                                    src="/logo-diana-rodriguez.png"
+                                    alt="Logo Dra. Diana Rodríguez"
+                                    width={200}
+                                    height={75}
+                                    className="h-auto w-auto max-h-[80px]"
+                                />
                             </div>
-                            <p className="text-xs font-bold text-gray-400 uppercase mb-1 text-center md:text-left">Especialista en</p>
-                            <p className="text-lg font-medium text-secondary leading-tight text-center md:text-left">ORTODONCIA</p>
                         </div>
                     </div>
                 </div>

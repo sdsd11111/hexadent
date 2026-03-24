@@ -6,7 +6,7 @@
 
 
 :root {
-  --color-primary: #009797;
+  --color-primary: #13a79b;
   --color-secondary: #58595b;
 }
 
@@ -36,7 +36,7 @@ body {
 
 /* Clase utilitaria para formas hexagonales */
 .hexagon {
-  clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%);
+  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
 }
 
 /* Hexágono más suave para overlays */
@@ -69,7 +69,7 @@ body {
 
 /* Gradiente corporativo */
 .gradient-primary {
-  background: linear-gradient(135deg, #009797 0%, #007575 100%);
+  background: linear-gradient(135deg, #13a79b 0%, #0f8578 100%);
 }
 
 /* Overlay oscuro para imágenes */
@@ -134,7 +134,7 @@ html {
 }
 
 .btn-primary:hover {
-  background-color: #007575;
+  background-color: #0f8578;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 151, 151, 0.3);
 }

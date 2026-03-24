@@ -8,7 +8,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#009797', // Teal del logo
+        primary: '#13a79b', // Teal del logo
         secondary: '#58595b', // Gris carbono
       },
       fontFamily: {

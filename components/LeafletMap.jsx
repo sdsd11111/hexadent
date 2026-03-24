@@ -152,7 +152,7 @@ export default function LeafletMap() {
                     width: 50px;
                     height: 50px;
                     background: white;
-                    border: 3px solid #009797;
+                    border: 3px solid #13a79b;
                     border-radius: 50%;
                     overflow: hidden;
                     display: flex;
@@ -171,7 +171,7 @@ export default function LeafletMap() {
                     height: 0;
                     border-left: 10px solid transparent;
                     border-right: 10px solid transparent;
-                    border-top: 15px solid #009797;
+                    border-top: 15px solid #13a79b;
                     margin-top: -5px;
                     z-index: 1;
                 }
@@ -184,7 +184,7 @@ export default function LeafletMap() {
                 }
                 .leaflet-popup-content-wrapper {
                     border-radius: 0 !important;
-                    border-left: 4px solid #009797;
+                    border-left: 4px solid #13a79b;
                     box-shadow: 0 10px 25px rgba(0,0,0,0.1);
                     font-family: inherit;
                 }

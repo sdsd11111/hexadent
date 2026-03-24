@@ -18,144 +18,93 @@ export default function Header() {
     }
 
     return (
-        <header className="sticky top-0 z-[100] bg-white border-b-4 border-primary shadow-md">
-            <div className="container-custom">
-                <nav className="flex items-center justify-between py-4">
-                    {/* Logo y Marca */}
-                    <Link href="/" className="flex items-center gap-3 hover-scale">
-                        <Image
-                            src="/logo.jpg"
-                            alt="Hexadent Logo"
-                            width={50}
-                            height={50}
-                            className="w-12 h-12"
-                            priority
-                        />
-                        <div className="flex flex-col justify-center">
-                            <span className="text-2xl font-light text-secondary tracking-tight leading-none mb-0.5">
-                                HEXA<span className="text-primary font-medium">DENT</span>
-                            </span>
-                            <div className="font-script text-xl md:text-2xl mt-[-4px]">
-                                <span className="text-secondary">Cuidamos de tu </span>
-                                <span className="text-primary">Sonrisa...!</span>
-                            </div>
+        <header className="sticky top-0 z-[100] bg-white shadow-sm border-b-[6px] border-[#13a79b]">
+            <div className="container-custom relative">
+                <nav className="flex items-center justify-between h-20 md:h-28 px-2 md:px-4 overflow-visible relative">
+                    {/* Fondo Slant Izquierdo (Blanco con sombra) */}
+                    <div className="absolute top-0 left-[-5%] bottom-0 z-0 w-[60%] md:w-[45%] lg:w-[38%] xl:w-[32%] pointer-events-none filter drop-shadow-[8px_0_15px_rgba(0,0,0,0.15)] hidden md:block">
+                        <div className="w-full h-full bg-white relative" style={{ clipPath: 'polygon(0 0, 85% 0, 100% 100%, 0% 100%)' }}>
+                        </div>
+                    </div>
+
+                    {/* Nuevo Fondo Slant Derecho Gris */}
+                    <div className="absolute top-0 right-0 bottom-0 z-0 w-[50%] md:w-[45%] lg:w-[32%] xl:w-[28%] pointer-events-none filter drop-shadow-[-8px_0_15px_rgba(0,0,0,0.15)] hidden md:block">
+                        <div className="w-full h-full bg-[#58595b] relative" style={{ clipPath: 'polygon(15% 0, 100% 0, 100% 100%, 0% 100%)' }}>
+                        </div>
+                    </div>
+
+                    {/* Solo Logo (Ajustado para formato rectangular) */}
+                    <Link href="/" className="relative z-20 flex items-center hover-scale group ml-2 md:ml-4 py-2">
+                        <div className="shrink-0 flex items-center transition-transform group-hover:scale-105">
+                            <Image
+                                src="/logo-rectangular.png"
+                                alt="Hexadent Logo"
+                                width={600}
+                                height={130}
+                                className="h-12 md:h-[60px] lg:h-[70px] w-auto object-contain"
+                                priority
+                            />
                         </div>
                     </Link>
 
-                    {/* Navegación Desktop */}
-                    <ul className="hidden md:flex items-center gap-8 font-medium text-secondary">
-                        <li>
-                            <Link href="#inicio" className="hover:text-primary transition-sharp">
-                                Inicio
-                            </Link>
-                        </li>
-                        <li>
-                            <Link href="#nosotros" className="hover:text-primary transition-sharp">
-                                Nosotros
-                            </Link>
-                        </li>
-                        <li>
-                            <Link href="#especialidades" className="hover:text-primary transition-sharp">
-                                Especialidades
-                            </Link>
-                        </li>
-                        <li>
-                            <Link href="#galeria" className="hover:text-primary transition-sharp">
-                                Casos Clínicos
-                            </Link>
-                        </li>
-                        <li>
-                            <Link href="#contacto" className="hover:text-primary transition-sharp">
-                                Contacto
-                            </Link>
-                        </li>
-                    </ul>
+                    {/* Navegación Desktop (z-index corregido) */}
+                    <div className="hidden lg:flex items-center gap-6 xl:gap-8 ml-auto mr-4 font-bold text-[#58595b] text-sm uppercase tracking-wider relative z-20">
+                        <Link href="#inicio" className="hover:text-[#13a79b] transition-colors">Inicio</Link>
+                        <Link href="#nosotros" className="hover:text-[#13a79b] transition-colors">Nosotros</Link>
+                        <Link href="#especialidades" className="hover:text-[#13a79b] transition-colors">Especialidades</Link>
+                        <Link href="#galeria" className="hover:text-[#13a79b] transition-colors">Casos Clínicos</Link>
+                        <Link href="#contacto" className="text-white hover:text-[#13a79b] transition-colors">Contacto</Link>
+                    </div>
 
-                    {/* Botón Reservar Cita y Menú Móvil */}
-                    <div className="flex items-center gap-2 md:gap-8">
-                        {/* Botón Reservar Cita */}
+                    {/* Botón Reservar y Menú Móvil */}
+                    <div className="flex items-center gap-4 relative z-10">
                         <button
                             onClick={handleReservarCita}
-                            className="bg-secondary text-white font-bold px-3 py-2 text-[10px] sm:text-xs md:px-8 md:py-4 md:text-sm hover:bg-primary transition-colors whitespace-nowrap tracking-widest uppercase md:btn-secondary md:bg-secondary md:hover:bg-primary md:hover:translate-y-[-2px] md:hover:shadow-[0_4px_8px_rgba(0,151,151,0.3)] md:border-none"
-                            style={{ clipPath: 'none', WebkitClipPath: 'none' }} // Para la version móvil
+                            className="hidden md:block bg-transparent border-2 border-white text-white font-bold px-8 py-3 lg:py-4 text-sm hover:bg-white hover:text-[#13a79b] transition-all uppercase tracking-widest"
                         >
-                            <span className="md:hidden">RESERVAR</span>
-                            <span className="hidden md:inline">RESERVAR CITA</span>
+                            RESERVAR CITA
                         </button>
 
-                        {/* Botón Menú Móvil */}
                         <button
                             onClick={toggleMenu}
-                            className="md:hidden flex flex-col gap-1.5 w-8 h-8 justify-center items-center shrink-0"
+                            className="lg:hidden flex flex-col gap-1.5 w-10 h-10 justify-center items-center shrink-0"
                             aria-label="Toggle menu"
                         >
-                            <span className={`w-full h-0.5 bg-secondary transition-transform ${isMenuOpen ? 'rotate-45 translate-y-2' : ''}`}></span>
-                            <span className={`w-full h-0.5 bg-secondary transition-opacity ${isMenuOpen ? 'opacity-0' : ''}`}></span>
-                            <span className={`w-full h-0.5 bg-secondary transition-transform ${isMenuOpen ? '-rotate-45 -translate-y-2' : ''}`}></span>
+                            <span className={`w-8 h-1 bg-[#58595b] transition-transform ${isMenuOpen ? 'rotate-45 translate-y-2.5' : ''}`}></span>
+                            <span className={`w-8 h-1 bg-[#58595b] transition-opacity ${isMenuOpen ? 'opacity-0' : ''}`}></span>
+                            <span className={`w-8 h-1 bg-[#58595b] transition-transform ${isMenuOpen ? '-rotate-45 -translate-y-2.5' : ''}`}></span>
                         </button>
                     </div>
                 </nav>
+            </div>
 
-                {/* Menú Móvil */}
-                <div
-                    className={`md:hidden overflow-hidden transition-all duration-300 ${isMenuOpen ? 'max-h-96' : 'max-h-0'
-                        }`}
-                >
-                    <ul className="flex flex-col gap-4 py-6 font-medium text-secondary">
-                        <li>
-                            <Link
-                                href="#inicio"
-                                onClick={() => setIsMenuOpen(false)}
-                                className="block hover:text-primary transition-sharp"
-                            >
-                                Inicio
-                            </Link>
-                        </li>
-                        <li>
-                            <Link
-                                href="#nosotros"
-                                onClick={() => setIsMenuOpen(false)}
-                                className="block hover:text-primary transition-sharp"
-                            >
-                                Nosotros
-                            </Link>
-                        </li>
-                        <li>
-                            <Link
-                                href="#especialidades"
-                                onClick={() => setIsMenuOpen(false)}
-                                className="block hover:text-primary transition-sharp"
-                            >
-                                Especialidades
-                            </Link>
-                        </li>
-                        <li>
-                            <Link
-                                href="#galeria"
-                                onClick={() => setIsMenuOpen(false)}
-                                className="block hover:text-primary transition-sharp"
-                            >
-                                Casos Clínicos
-                            </Link>
-                        </li>
-                        <li>
-                            <Link
-                                href="#contacto"
-                                onClick={() => setIsMenuOpen(false)}
-                                className="block hover:text-primary transition-sharp"
-                            >
-                                Contacto
-                            </Link>
-                        </li>
-                        <li className="pt-4 hidden md:block">
-                            <button
-                                onClick={handleReservarCita}
-                                className="btn btn-secondary w-full"
-                            >
-                                RESERVAR CITA
-                            </button>
-                        </li>
-                    </ul>
+            {/* Menú Móvil */}
+            <div
+                className={`lg:hidden overflow-hidden transition-all duration-500 bg-white ${isMenuOpen ? 'max-h-screen border-t border-gray-100' : 'max-h-0'}`}
+            >
+                <div className="flex flex-col p-8 gap-6">
+                    {[
+                        { name: 'Inicio', href: '#inicio' },
+                        { name: 'Nosotros', href: '#nosotros' },
+                        { name: 'Especialidades', href: '#especialidades' },
+                        { name: 'Casos Clínicos', href: '#galeria' },
+                        { name: 'Contacto', href: '#contacto' }
+                    ].map((item) => (
+                        <Link
+                            key={item.name}
+                            href={item.href}
+                            onClick={() => setIsMenuOpen(false)}
+                            className="text-[#58595b] font-bold py-2 uppercase tracking-[0.2em] text-sm hover:text-[#13a79b]"
+                        >
+                            {item.name}
+                        </Link>
+                    ))}
+                    <button
+                        onClick={() => { handleReservarCita(); setIsMenuOpen(false); }}
+                        className="bg-[#58595b] text-white font-bold py-5 px-6 text-sm uppercase tracking-widest"
+                    >
+                        RESERVAR CITA
+                    </button>
                 </div>
             </div>
         </header>

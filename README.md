@@ -13,7 +13,7 @@ Landing Page profesional para el Centro Odontológico Hexadent en Loja, Ecuador.
 
 ## 🎨 Paleta de Colores
 
-- **Primary (Teal)**: #009797
+- **Primary (Teal)**: #13a79b
 - **Secondary (Gris Carbono)**: #58595b
 - **Background**: #FFFFFF
 
