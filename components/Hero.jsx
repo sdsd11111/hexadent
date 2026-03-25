@@ -73,11 +73,11 @@ export default function Hero() {
 
                 {/* Columna Derecha: Imagen Hexagonal y Texto */}
                 <div className="w-full lg:w-1/2 flex flex-col justify-center items-center lg:items-end relative gap-6 lg:gap-8 mt-12 lg:mt-0">
-                    <div className="relative w-72 h-72 md:w-[420px] md:h-[420px]">
-                        {/* Sombra/Fondo del hexágono gris */}
-                        <div className="absolute inset-0 bg-gray-200/70 hexagon transform scale-110"></div>
+                    <div className="relative w-80 h-[28rem] md:w-[480px] md:h-[580px]">
+                        {/* Sombra/Fondo del hexágono gris claro */}
+                        <div className="absolute inset-0 bg-gray-100/80 hexagon transform scale-110"></div>
                         
-                        {/* Contenedor de la Imagen Hexagonal */}
+                        {/* Fondo blanco del hexágono principal */}
                         <div className="absolute inset-0 bg-white hexagon shadow-2xl overflow-hidden">
                             <Image
                                 src="/hero-image.webp"

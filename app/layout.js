@@ -70,6 +70,8 @@ export const metadata = {
     },
 }
 
+import WhatsAppButton from '@/components/WhatsAppButton'
+
 export default function RootLayout({ children }) {
     return (
         <html lang="es-EC">
@@ -82,6 +84,7 @@ export default function RootLayout({ children }) {
             </head>
             <body className={`${outfit.variable} ${dancingScript.variable} font-sans`}>
                 {children}
+                <WhatsAppButton />
             </body>
         </html>
     )
