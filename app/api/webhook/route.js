@@ -41,7 +41,7 @@ export async function POST(request) {
             const msg = data?.message;
             const remoteJid = data?.key?.remoteJid || '';
             const isGroup = remoteJid.includes('@g.us');
-            const from = remoteJid.split('@')[0];
+            const from = remoteJid.split('@')[0].split(':')[0];
 
             // Detect text in various spots
             let text = msg?.conversation || msg?.extendedTextMessage?.text;
@@ -71,13 +71,17 @@ export async function POST(request) {
                 }
             }
 
-            // DETECT OTHER MEDIA (IMAGE, VIDEO, STICKER)
+            // DETECT OTHER MEDIA (IMAGE, VIDEO, STICKER) - IGNORE COMPLETELY
             if (!text && (msg?.imageMessage || msg?.videoMessage || msg?.stickerMessage || msg?.documentMessage)) {
-                console.log(`[Webhook] Non-audio media detected from ${from}.`);
-                text = "(El usuario envió un archivo multimedia: foto, video, sticker o documento que no puedes visualizar. Pídele amablemente que te lo explique en texto)";
+                console.log(`[Webhook] Non-audio media from ${from}. IGNORING - no bot processing.`);
+                // Return early - do not send to bot
+                return NextResponse.json({ status: 'media_ignored' }, { status: 200 });
             }
 
-            if (from && text && !data?.key?.fromMe && !isGroup) {
+            // RESTRICTED TEST MODE: Only respond to specific number
+            const allowedNumber = '593983237491';
+
+            if (from && text && !data?.key?.fromMe && !isGroup && from === allowedNumber) {
                 // Ignore empty status updates or empty text
                 if (text && text.trim().length > 0) {
                     messages.push({
@@ -86,6 +90,8 @@ export async function POST(request) {
                         text: text.trim()
                     });
                 }
+            } else if (from && text && !data?.key?.fromMe && !isGroup && from !== allowedNumber) {
+                console.log(`[RESTRICTION] Ignoring unauthorized message from ${from}`);
             } else if (from && data?.key?.fromMe && !isGroup) {
                 // AUTO-RELIEVE: If doctor sends a message, put bot to sleep for 12h
                 console.log(`[Webhook] Outgoing message detected to ${from}. Activation SLEEP mode for bot.`);
@@ -104,13 +110,19 @@ export async function POST(request) {
             const value = change?.value;
             const metaMessages = value?.messages || [];
 
+            // RESTRICTED TEST MODE: Apply same filter to Meta path
+            const allowedNumberMeta = '593983237491';
+
             for (const m of metaMessages) {
-                if (m.type === 'text') {
+                const metaFrom = m.from?.replace(/\D/g, '').split(':')[0];
+                if (m.type === 'text' && metaFrom === allowedNumberMeta) {
                     messages.push({
                         from: m.from,
                         to: value.metadata?.display_phone_number,
                         text: m.text?.body
                     });
+                } else if (m.type === 'text') {
+                    console.log(`[RESTRICTION-META] Ignoring unauthorized message from ${m.from}`);
                 }
             }
         }
