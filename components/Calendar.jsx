@@ -169,6 +169,8 @@ export default function Calendar({ isAdmin = false }) {
         calendarDays.push({ day: i, currentMonth: true });
     }
 
+    const isPastSelected = selectedDate ? new Date(selectedDate) < new Date(today.toISOString().split('T')[0]) : false;
+
     return (
         <div className="flex flex-col lg:flex-row gap-8 animate-fade-in">
             <div className="flex-1 bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
@@ -204,11 +206,14 @@ export default function Calendar({ isAdmin = false }) {
                         return (
                             <div
                                 key={i}
-                                onClick={() => d.currentMonth && !isPast && !isSunday && setSelectedDate(dateStr)}
+                                onClick={() => d.currentMonth && !(isPast && !isAdmin) && !isSunday && setSelectedDate(dateStr)}
                                 className={`
                                     h-24 p-2 border-r border-b border-gray-50 cursor-pointer transition-all relative group
                                     ${!d.currentMonth ? 'bg-gray-50/50 opacity-30 cursor-default' : ''}
-                                    ${isPast || isSunday ? 'cursor-not-allowed bg-gray-50/30' : 'hover:bg-blue-50'}
+                                    ${isSunday ? 'cursor-not-allowed bg-gray-50/30' : ''}
+                                    ${isPast && !isAdmin ? 'cursor-not-allowed bg-gray-50/30' : ''}
+                                    ${isPast && isAdmin ? 'hover:bg-amber-50/50 opacity-75' : ''}
+                                    ${!isPast && !isSunday ? 'hover:bg-blue-50' : ''}
                                     ${isSelected ? 'bg-blue-50 !border-blue-200' : ''}
                                 `}
                             >
@@ -229,7 +234,7 @@ export default function Calendar({ isAdmin = false }) {
                                     {isSunday && d.currentMonth && (
                                         <div className="w-full bg-gray-100 text-gray-400 text-[8px] font-bold px-1 rounded">Cerrado</div>
                                     )}
-                                    {isAdmin && d.currentMonth && !isSunday && !isPast && (
+                                    {isAdmin && d.currentMonth && !isSunday && (
                                         <>
                                             {(() => {
                                                 const count = appointments
@@ -393,7 +398,7 @@ export default function Calendar({ isAdmin = false }) {
                                 )}
                             </div>
 
-                            {isAdmin && (
+                            {isAdmin && !isPastSelected && (
                                 <div className="space-y-4 pt-4 border-t border-gray-100">
                                     <h4 className="text-xs font-black uppercase text-primary tracking-widest px-2">Agendar Manualmente</h4>
                                     {availableSlots.length === 0 ? (
