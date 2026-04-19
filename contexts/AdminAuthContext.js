@@ -21,7 +21,7 @@ export function AdminAuthProvider({ children }) {
 
     const login = async (username, password) => {
         // Simple authentication - in production, use a proper backend API
-        if (username === 'admin' && password === 'admin123') {
+        if (username === 'Hexadent' && password === 'Contraseña123') {
             const userData = { username, role: 'admin' };
             setUser(userData);
             localStorage.setItem('adminUser', JSON.stringify(userData));
