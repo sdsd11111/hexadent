@@ -488,11 +488,11 @@ export default function ModalFichaOdontologiaGeneral({ isOpen, onClose, onSucces
                     // Do not alert here, just transition smoothly
                 } else {
                     alert('Ficha completada y guardada exitosamente');
-                    // reset();
-                    // setStep(1);
-                    // setRecordId(null);
+                    reset();
+                    setStep(1);
+                    setRecordId(null);
                     onSuccess?.();
-                    // onClose();
+                    onClose();
                 }
             } else {
                 throw new Error('Error al guardar en el servidor');

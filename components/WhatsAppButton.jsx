@@ -1,6 +1,15 @@
 'use client'
 
+import { usePathname } from 'next/navigation'
+
 export default function WhatsAppButton() {
+    const pathname = usePathname()
+
+    // Hide WhatsApp button on admin routes
+    if (pathname && pathname.startsWith('/admin')) {
+        return null
+    }
+
     const handleWhatsAppClick = () => {
         const phone = '593967885039'
         const message = encodeURIComponent('¡Hola! Me gustaría recibir más información sobre los servicios de Hexadent.')
