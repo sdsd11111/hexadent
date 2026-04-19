@@ -502,9 +502,11 @@ export default function ModalFichaOrtodoncia({ isOpen, onClose, onSuccess, editD
                     setMainAccordion(1);
                 } else {
                     alert('Ficha de Ortodoncia guardada exitosamente');
-                    // reset(); // Keep form data
+                    reset();
+                    setStep(1);
+                    setRecordId(null);
                     onSuccess?.();
-                    // onClose(); // Keep modal open
+                    onClose();
                 }
             } else {
                 throw new Error('Error al guardar');
@@ -517,7 +519,15 @@ export default function ModalFichaOrtodoncia({ isOpen, onClose, onSuccess, editD
     };
 
     const toggleSection = (sectionId) => {
+        const isOpening = activeSection !== sectionId;
         setActiveSection(prev => prev === sectionId ? null : sectionId);
+        
+        if (isOpening) {
+            setTimeout(() => {
+                const el = document.getElementById(`section-orto-${sectionId}`);
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
     };
 
     const sections = [
@@ -1157,7 +1167,7 @@ export default function ModalFichaOrtodoncia({ isOpen, onClose, onSuccess, editD
     };
 
     const renderSection = (section) => (
-        <div key={section.id} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div key={section.id} id={`section-orto-${section.id}`} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <button
                 type="button"
                 onClick={() => toggleSection(section.id)}
@@ -1206,7 +1216,7 @@ export default function ModalFichaOrtodoncia({ isOpen, onClose, onSuccess, editD
                                             sections.filter(s => s.id === 1).map(renderSection)
                                         ) : (
                                             <div className="space-y-4">
-                                                <div className={`rounded-xl border-2 transition-all ${mainAccordion === 1 ? 'border-orange-500 bg-orange-50/10 shadow-lg' : 'border-slate-200 bg-white'}`}>
+                                                <div ref={el => accordionRefs.current[1] = el} className={`rounded-xl border-2 transition-all ${mainAccordion === 1 ? 'border-orange-500 bg-orange-50/10 shadow-lg' : 'border-slate-200 bg-white'}`}>
                                                     <button type="button" onClick={() => setMainAccordion(mainAccordion === 1 ? null : 1)} className="flex w-full items-center justify-between px-5 py-4 text-left">
                                                         <div className="flex items-center gap-3">
                                                             <div className={`p-2 rounded-lg ${mainAccordion === 1 ? 'bg-orange-600 text-white' : 'bg-slate-100 text-slate-500'}`}><DocumentTextIcon className="h-5 w-5" /></div>
@@ -1224,7 +1234,7 @@ export default function ModalFichaOrtodoncia({ isOpen, onClose, onSuccess, editD
                                                     )}
                                                 </div>
 
-                                                <div className={`rounded-xl border-2 transition-all ${mainAccordion === 2 ? 'border-orange-500 bg-orange-50/10 shadow-lg' : 'border-slate-200 bg-white'}`}>
+                                                <div ref={el => accordionRefs.current[2] = el} className={`rounded-xl border-2 transition-all ${mainAccordion === 2 ? 'border-orange-500 bg-orange-50/10 shadow-lg' : 'border-slate-200 bg-white'}`}>
                                                     <button type="button" onClick={() => setMainAccordion(mainAccordion === 2 ? null : 2)} className="flex w-full items-center justify-between px-5 py-4 text-left">
                                                         <div className="flex items-center gap-3">
                                                             <div className={`p-2 rounded-lg ${mainAccordion === 2 ? 'bg-orange-600 text-white' : 'bg-slate-100 text-slate-500'}`}><ClipboardDocumentListIcon className="h-5 w-5" /></div>
@@ -1323,7 +1333,7 @@ export default function ModalFichaOrtodoncia({ isOpen, onClose, onSuccess, editD
                                                     )}
                                                 </div>
 
-                                                <div className={`rounded-xl border-2 transition-all ${mainAccordion === 3 ? 'border-orange-500 bg-orange-50/10 shadow-lg' : 'border-slate-200 bg-white'}`}>
+                                                <div ref={el => accordionRefs.current[3] = el} className={`rounded-xl border-2 transition-all ${mainAccordion === 3 ? 'border-orange-500 bg-orange-50/10 shadow-lg' : 'border-slate-200 bg-white'}`}>
                                                     <button type="button" onClick={() => setMainAccordion(mainAccordion === 3 ? null : 3)} className="flex w-full items-center justify-between px-5 py-4 text-left">
                                                         <div className="flex items-center gap-3">
                                                             <div className={`p-2 rounded-lg ${mainAccordion === 3 ? 'bg-orange-600 text-white' : 'bg-slate-100 text-slate-500'}`}><ListBulletIcon className="h-5 w-5" /></div>

@@ -603,16 +603,16 @@ export default function ModalFichaOdontologiaGeneral({ isOpen, onClose, onSucces
                                                                         <Disclosure key={section.id}>
                                                                             <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                                                                                 <Disclosure.Button
-                                                                                    onClick={() => {
-                                                                                        const newState = subAccordion === section.id ? null : section.id;
-                                                                                        setSubAccordion(newState);
-                                                                                        if (newState) {
-                                                                                            setTimeout(() => {
-                                                                                                const el = document.getElementById(`sub-accordion-${section.id}`);
-                                                                                                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                                                                                            }, 100);
-                                                                                        }
-                                                                                    }}
+                                                                                        onClick={() => {
+                                                                                            const newState = subAccordion === section.id ? null : section.id;
+                                                                                            setSubAccordion(newState);
+                                                                                            if (newState) {
+                                                                                                setTimeout(() => {
+                                                                                                    const el = document.getElementById(`sub-accordion-${section.id}`);
+                                                                                                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                                                                                }, 100);
+                                                                                            }
+                                                                                        }}
                                                                                     id={`sub-accordion-${section.id}`}
                                                                                     className="flex w-full justify-between items-center px-4 py-3 text-left hover:bg-slate-50 transition-colors"
                                                                                 >

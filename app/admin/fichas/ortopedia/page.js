@@ -347,7 +347,8 @@ export default function OrtopediaFichasPage() {
                 setValue('s14_justificacion_imagenes', validSelection)
             }
         }
-    }, [patientHistoryImages, watch('imagenes'), setValue, watch]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [patientHistoryImages]);
 
     const refreshPDF = () => {
         const mode = mainAccordion === 4 ? (subAccordion === 1 ? 4 : (subAccordion === 2 ? 5 : 4)) : mainAccordion;
