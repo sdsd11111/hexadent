@@ -476,6 +476,25 @@ export default function OrtopediaFichasPage() {
         }
     };
 
+    const deleteClient = async (id) => {
+        if (!confirm('¿Estás seguro de que deseas eliminar esta ficha? Esta acción no se puede deshacer.')) return;
+        
+        try {
+            const response = await fetch(`/api/fichas?id=${id}`, {
+                method: 'DELETE',
+            });
+            
+            if (response.ok) {
+                alert('Ficha eliminada exitosamente');
+                fetchClients(); // Refrescar la lista
+            } else {
+                throw new Error('Error al eliminar la ficha');
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    };
+
 
     return (
         <div className="max-w-7xl mx-auto">
