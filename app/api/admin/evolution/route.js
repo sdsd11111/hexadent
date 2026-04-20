@@ -19,14 +19,16 @@ export async function GET() {
             const statusRes = await axios.get(statusUrl, {
                 headers: { 'apikey': EVOLUTION_API_KEY }
             });
-            connectionStatus = statusRes.data.instance.state;
+            // Support both v1 and v2 structures
+            connectionStatus = statusRes.data.instance?.state || statusRes.data.status || 'unknown';
         } catch (e) {
-            console.error("Error checking connection state:", e.message);
+            console.error("[Evolution Proxy] Error checking connection state:", e.message);
+            // If instance doesn't exist (404), we'll try to get QR which might trigger creation/reconnect
         }
 
         // 2. If not connected, try to get QR
         let qrData = null;
-        if (connectionStatus !== 'open') {
+        if (connectionStatus !== 'open' && connectionStatus !== 'CONNECTED') {
             const qrUrl = `${EVOLUTION_API_URL}/instance/connect/${EVOLUTION_INSTANCE}`;
             try {
                 const qrRes = await axios.get(qrUrl, {
@@ -34,18 +36,21 @@ export async function GET() {
                 });
 
                 // Evolution API returns base64 or code depending on config
-                let rawQr = qrRes.data.base64 || qrRes.data.code;
+                // Check multiple possible paths for QR data
+                let rawQr = qrRes.data.base64 || qrRes.data.code || qrRes.data.qrcode?.base64 || qrRes.data.qrcode?.code;
 
-                // Clean base64 if it has the prefix already, to avoid double prefixing in frontend
-                if (rawQr && rawQr.includes('base64,')) {
-                    qrData = rawQr.split('base64,')[1];
-                } else {
-                    qrData = rawQr;
+                if (rawQr) {
+                    // Clean base64 if it has the prefix already, to avoid double prefixing in frontend
+                    if (typeof rawQr === 'string' && rawQr.includes('base64,')) {
+                        qrData = rawQr.split('base64,')[1];
+                    } else {
+                        qrData = rawQr;
+                    }
                 }
 
-                console.log("[Evolution Proxy] QR Data length:", qrData?.length);
+                console.log("[Evolution Proxy] QR Data retrieved, length:", qrData?.length);
             } catch (e) {
-                console.error("Error fetching QR code:", e.message);
+                console.error("[Evolution Proxy] Error fetching QR code:", e.message);
             }
         }
 
@@ -71,6 +76,12 @@ export async function POST(request) {
         if (action === 'logout') {
             const logoutUrl = `${EVOLUTION_API_URL}/instance/logout/${EVOLUTION_INSTANCE}`;
             await axios.delete(logoutUrl, { headers: { 'apikey': EVOLUTION_API_KEY } });
+            return NextResponse.json({ success: true });
+        }
+
+        if (action === 'restart') {
+            const restartUrl = `${EVOLUTION_API_URL}/instance/restart/${EVOLUTION_INSTANCE}`;
+            await axios.post(restartUrl, {}, { headers: { 'apikey': EVOLUTION_API_KEY } });
             return NextResponse.json({ success: true });
         }
 
