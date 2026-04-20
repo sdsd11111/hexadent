@@ -12,9 +12,14 @@ export function AdminAuthProvider({ children }) {
 
     useEffect(() => {
         // Check if user is logged in from localStorage
-        const storedUser = localStorage.getItem('adminUser');
-        if (storedUser) {
-            setUser(JSON.parse(storedUser));
+        try {
+            const storedUser = localStorage.getItem('adminUser');
+            if (storedUser && storedUser !== 'undefined') {
+                setUser(JSON.parse(storedUser));
+            }
+        } catch (e) {
+            console.error('Error parsing stored user:', e);
+            localStorage.removeItem('adminUser');
         }
         setLoading(false);
     }, []);

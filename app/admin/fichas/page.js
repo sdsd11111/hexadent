@@ -115,13 +115,24 @@ export default function FichasPage() {
 
             {/* Fichas Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {fichas.map((ficha) => {
+                {(fichas || []).map((ficha) => {
+                    if (!ficha) return null;
                     const Icon = ficha.icon;
                     return (
                         <button
-                            key={ficha.id}
-                            onClick={() => ficha.action ? ficha.action() : goToFichaTipo(ficha.id)}
-                            disabled={ficha.disabled}
+                            key={ficha.id || Math.random()}
+                            onClick={() => {
+                                try {
+                                    if (ficha.action) {
+                                        ficha.action();
+                                    } else if (ficha.id) {
+                                        goToFichaTipo(ficha.id);
+                                    }
+                                } catch (err) {
+                                    console.error('Action error:', err);
+                                }
+                            }}
+                            disabled={Boolean(ficha.disabled)}
                             className={`
                 relative overflow-hidden rounded-2xl p-6 text-left transition-all
                 ${ficha.disabled
@@ -131,15 +142,15 @@ export default function FichasPage() {
               `}
                         >
                             {/* Gradient Background */}
-                            <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${ficha.color} opacity-10 rounded-full -mr-16 -mt-16`} />
+                            <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${ficha.color || 'from-gray-500 to-gray-600'} opacity-10 rounded-full -mr-16 -mt-16`} />
 
                             <div className="relative">
-                                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${ficha.color} flex items-center justify-center mb-4`}>
-                                    <Icon className="h-6 w-6 text-white" />
+                                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${ficha.color || 'from-gray-500 to-gray-600'} flex items-center justify-center mb-4`}>
+                                    {Icon && <Icon className="h-6 w-6 text-white" />}
                                 </div>
 
-                                <h3 className="text-xl font-bold text-gray-900 mb-2">{ficha.title}</h3>
-                                <p className="text-sm text-gray-600 mb-4">{ficha.description}</p>
+                                <h3 className="text-xl font-bold text-gray-900 mb-2">{ficha.title || 'Sin Título'}</h3>
+                                <p className="text-sm text-gray-600 mb-4">{ficha.description || ''}</p>
 
                                 {ficha.isSpecial ? (
                                     <div className="text-sm font-bold text-emerald-600 group-hover:translate-x-1 transition-transform flex items-center gap-1">
@@ -153,9 +164,9 @@ export default function FichasPage() {
                                                 <div className="h-6 w-20 bg-slate-100 animate-pulse rounded-full" />
                                             ) : (
                                                 <div className="px-3 py-1 bg-slate-100 rounded-full border border-slate-200 flex items-center gap-2 group-hover:bg-blue-50 group-hover:border-blue-200 transition-colors">
-                                                    <UserIcon className="h-3 w-3 text-slate-400 group-hover:text-blue-500" />
+                                                    {UserIcon && <UserIcon className="h-3 w-3 text-slate-400 group-hover:text-blue-500" />}
                                                     <span className="text-xs font-bold text-slate-700 group-hover:text-blue-700">
-                                                        {ficha.clientCount} {ficha.clientCount === 1 ? 'Paciente' : 'Pacientes'}
+                                                        {ficha.clientCount || 0} {(ficha.clientCount || 0) === 1 ? 'Paciente' : 'Pacientes'}
                                                     </span>
                                                 </div>
                                             )}

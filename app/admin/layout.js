@@ -10,8 +10,61 @@ import {
     Bars3Icon,
     XMarkIcon
 } from '@heroicons/react/24/outline';
-import { useState } from 'react';
+import { useState, Component } from 'react';
 import Link from 'next/link';
+
+class ErrorBoundary extends Component {
+    constructor(props) {
+        super(props);
+        this.state = { hasError: false, error: null };
+    }
+
+    static getDerivedStateFromError(error) {
+        return { hasError: true, error };
+    }
+
+    componentDidCatch(error, errorInfo) {
+        console.error('Admin Layout Error Boundary caught an error:', error, errorInfo);
+    }
+
+    render() {
+        if (this.state.hasError) {
+            return (
+                <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+                    <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border border-red-100">
+                        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-6 mx-auto">
+                            <XMarkIcon className="h-8 w-8 text-red-600" />
+                        </div>
+                        <h2 className="text-2xl font-bold text-gray-900 text-center mb-4">¡Ups! Algo salió mal</h2>
+                        <p className="text-gray-600 text-center mb-8">
+                            Ha ocurrido un error inesperado en esta sección. Por favor, intenta recargar la página.
+                        </p>
+                        <div className="space-y-3">
+                            <button
+                                onClick={() => window.location.reload()}
+                                className="w-full py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors"
+                            >
+                                Recargar página
+                            </button>
+                            <button
+                                onClick={() => this.setState({ hasError: false })}
+                                className="w-full py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-colors"
+                            >
+                                Intentar de nuevo
+                            </button>
+                        </div>
+                        <div className="mt-6 p-4 bg-gray-50 rounded-lg overflow-auto max-h-40 border border-gray-100">
+                            <p className="text-[10px] font-mono text-red-600 break-all">
+                                {this.state.error?.stack || this.state.error?.toString()}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+        return this.props.children;
+    }
+}
 
 function AdminLayoutContent({ children }) {
     const { user, logout, loading } = useAdminAuth();
@@ -143,7 +196,9 @@ function AdminLayoutContent({ children }) {
 
                 {/* Page Content */}
                 <main className="p-4 lg:p-8">
-                    {children}
+                    <ErrorBoundary>
+                        {children}
+                    </ErrorBoundary>
                 </main>
             </div>
         </div>
