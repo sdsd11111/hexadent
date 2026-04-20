@@ -312,6 +312,7 @@ export default function ModalFichaOrtodoncia({ isOpen, onClose, onSuccess, editD
     const [mainAccordion, setMainAccordion] = useState(null);
     const [subAccordion, setSubAccordion] = useState(null); // For payment sub-sections: 1 or 2
     const accordionRefs = useRef({});
+    const imageCacheRef = useRef({});
 
     const { register, handleSubmit, reset, watch, control, setValue, formState: { errors } } = useForm({
         resolver: zodResolver(fichaSchema),
@@ -359,6 +360,26 @@ export default function ModalFichaOrtodoncia({ isOpen, onClose, onSuccess, editD
             s16_consent_acepta_uso_registros: false,
             s16_proc_adhesion_u_check: '',
             s16_proc_adhesion_l_check: '',
+            s16_proc_image1: '',
+            s16_proc_image2: '',
+            s16_proc_microtornillos: '',
+            s16_proc_biotipo_facial: '',
+            s16_proc_simetria_cara: '',
+            s16_proc_alineacion: '',
+            s16_proc_perfil: '',
+            s16_proc_tercio_sup: '',
+            s16_proc_tercio_medio: '',
+            s16_proc_tercio_inf: '',
+            s16_proc_altura_sonrisa: '',
+            s16_proc_arco_sonrisa: '',
+            s16_proc_exp_gingival: '',
+            s16_proc_corredores_bucales: '',
+            s16_proc_linea_media_dentaria: '',
+            s16_proc_habitos: '',
+            s16_proc_alteraciones_atm: '',
+            s16_proc_adhesion_l_41_42: '',
+            ...[11, 12, 13, 14, 15, 16, 37].reduce((acc, num) => ({ ...acc, [`s16_proc_adhesion_u_${num}`]: '' }), {}),
+            ...[43, 44, 45, 46, 47].reduce((acc, num) => ({ ...acc, [`s16_proc_adhesion_l_${num}`]: '' }), {}),
         }
     });
 
@@ -369,6 +390,8 @@ export default function ModalFichaOrtodoncia({ isOpen, onClose, onSuccess, editD
     const { fields: pagoCirugiaFields, append: appendPagoCirugia, remove: removePagoCirugia } = useFieldArray({ control, name: "s16_ppto_cirugia_pagos_filas" });
     const { fields: procFields, append: appendProc, remove: removeProc } = useFieldArray({ control, name: "s16_proc_filas" });
     const { fields: bracketFields, append: appendBracket, remove: removeBracket } = useFieldArray({ control, name: "s16_proc_brackets_filas" });
+
+    const formData = watch();
 
     useEffect(() => {
         if (!isOpen) {
@@ -439,6 +462,26 @@ export default function ModalFichaOrtodoncia({ isOpen, onClose, onSuccess, editD
                 s16_consent_acepta_uso_registros: false,
                 s16_proc_adhesion_u_check: '',
                 s16_proc_adhesion_l_check: '',
+                s16_proc_image1: '',
+                s16_proc_image2: '',
+                s16_proc_microtornillos: '',
+                s16_proc_biotipo_facial: '',
+                s16_proc_simetria_cara: '',
+                s16_proc_alineacion: '',
+                s16_proc_perfil: '',
+                s16_proc_tercio_sup: '',
+                s16_proc_tercio_medio: '',
+                s16_proc_tercio_inf: '',
+                s16_proc_altura_sonrisa: '',
+                s16_proc_arco_sonrisa: '',
+                s16_proc_exp_gingival: '',
+                s16_proc_corredores_bucales: '',
+                s16_proc_linea_media_dentaria: '',
+                s16_proc_habitos: '',
+                s16_proc_alteraciones_atm: '',
+                s16_proc_adhesion_l_41_42: '',
+                ...[11, 12, 13, 14, 15, 16, 37].reduce((acc, num) => ({ ...acc, [`s16_proc_adhesion_u_${num}`]: '' }), {}),
+                ...[43, 44, 45, 46, 47].reduce((acc, num) => ({ ...acc, [`s16_proc_adhesion_l_${num}`]: '' }), {}),
             });
             setActiveSection(1);
             setMainAccordion(1);
@@ -459,25 +502,71 @@ export default function ModalFichaOrtodoncia({ isOpen, onClose, onSuccess, editD
     }, [mainAccordion]);
 
 
-    const formData = watch();
-
-    const refreshPDF = () => {
-        let mode = 1;
-        if (mainAccordion === 2) mode = 5; // Consentimiento
-        else if (mainAccordion === 3) mode = 2; // Procedimientos
-        else if (mainAccordion === 4) {
-            mode = subAccordion === 2 ? 4 : 3;
-        } else {
-            mode = mainAccordion || 1;
-        }
-        setPdfData({ ...JSON.parse(JSON.stringify(formData)), pdfMode: mode });
-    };
-
+    // Automatic PDF sync with WebP to Base64 conversion
     useEffect(() => {
-        if (isOpen && (editData || recordId)) {
-            setPdfData(JSON.parse(JSON.stringify(formData)));
-        }
-    }, [isOpen, editData, recordId]);
+        let isMounted = true;
+        
+        const syncPdfData = async () => {
+            const currentData = watch();
+            let mode = 1;
+            if (mainAccordion === 2) mode = 5; // Consentimiento
+            else if (mainAccordion === 3) mode = 2; // Procedimientos
+            else if (mainAccordion === 4) {
+                mode = subAccordion === 2 ? 4 : 3;
+            } else {
+                mode = mainAccordion || 1;
+            }
+
+            const processedData = { ...JSON.parse(JSON.stringify(currentData)) };
+            
+            // Convert images to Base64 JPEG for react-pdf (WebP fix)
+            const imagesToConvert = ['s16_proc_image1', 's16_proc_image2'];
+            
+            await Promise.all(imagesToConvert.map(async (key) => {
+                const url = processedData[key];
+                if (!url || url.startsWith('data:')) return;
+                
+                if (imageCacheRef.current[url]) {
+                    processedData[key] = imageCacheRef.current[url];
+                    return;
+                }
+
+                return new Promise((resolve) => {
+                    const img = new window.Image();
+                    img.crossOrigin = 'Anonymous';
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.fillStyle = '#FFFFFF';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        ctx.drawImage(img, 0, 0);
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                        imageCacheRef.current[url] = dataUrl;
+                        processedData[key] = dataUrl;
+                        resolve();
+                    };
+                    img.onerror = () => resolve(); // Keep original if error
+                    img.src = (url.startsWith('/') && !url.startsWith('//')) ? window.location.origin + url : url;
+                });
+            }));
+
+            if (!isMounted) return;
+            
+            const newData = { ...processedData, pdfMode: mode };
+            setPdfData(prev => {
+                if (JSON.stringify(prev) === JSON.stringify(newData)) return prev;
+                return newData;
+            });
+        };
+
+        const timer = setTimeout(syncPdfData, 400);
+        return () => {
+            isMounted = false;
+            clearTimeout(timer);
+        };
+    }, [formData, mainAccordion, subAccordion]);
 
     const onSubmit = async (data) => {
         setIsSaving(true);
@@ -1247,7 +1336,7 @@ export default function ModalFichaOrtodoncia({ isOpen, onClose, onSuccess, editD
                                                     </button>
                                                     {mainAccordion === 2 && (
                                                         <div className="px-5 pb-5 pt-2 space-y-4">
-                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                            <div className="grid grid-cols-1 gap-4">
                                                                 <div className="space-y-1">
                                                                     <label className="text-[10px] font-bold text-slate-500 uppercase">Yo (Firmante / Paciente)</label>
                                                                     <input {...register('s16_consent_representante')} className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-orange-500 font-bold" placeholder="Nombre completo del que firma" />
@@ -1869,9 +1958,9 @@ export default function ModalFichaOrtodoncia({ isOpen, onClose, onSuccess, editD
 
                                 <div className={`${step === 1 ? 'hidden' : 'hidden lg:flex'} w-[40%] bg-slate-800 flex flex-col p-4 relative`}>
                                     <div className="absolute top-6 right-6 z-10 flex gap-2">
-                                        <button type="button" onClick={refreshPDF} className="px-3 py-1.5 bg-orange-600 hover:bg-orange-500 text-white rounded-lg text-[10px] font-bold shadow-lg transition-all flex items-center gap-2 active:scale-95">
-                                            <ArrowPathIcon className="h-4 w-4" /> ACTUALIZAR VISTA
-                                        </button>
+                                        <div className="px-3 py-1.5 bg-orange-600/20 backdrop-blur-sm border border-orange-600/30 text-orange-200 rounded-lg text-[10px] font-bold shadow-lg flex items-center gap-2">
+                                            <ArrowPathIcon className="h-4 w-4 animate-spin-slow" /> VISTA SINCRONIZADA
+                                        </div>
                                     </div>
                                     <div className="flex-1 bg-white rounded-xl overflow-hidden shadow-inner relative">
                                         <PDFViewer width="100%" height="100%" showToolbar={false} className="border-none">

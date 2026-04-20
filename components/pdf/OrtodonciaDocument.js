@@ -661,13 +661,13 @@ const ConsentimientoPage = ({ data }) => {
                     <View style={{ borderBottom: '1 solid #000', height: 20, width: 100, marginBottom: 5 }} />
                     <Text style={{ fontSize: 9, fontFamily: 'Helvetica-Bold' }}>Sello</Text>
                 </View>
-                <View style={{ flex: 1 }}>
-                    <View style={{ flexDirection: 'row', borderBottom: '1 solid #000', paddingBottom: 2, marginBottom: 5 }}>
-                        <Text style={{ fontSize: 9, fontFamily: 'Helvetica-Bold' }}>Paciente o Representante</Text>
-                        <Text style={{ fontSize: 9, marginLeft: 5 }}>{data.s16_consent_representante || ''}</Text>
+                <View style={{ flex: 1.2 }}>
+                    <View style={{ borderBottom: '1 solid #000', paddingBottom: 2, marginBottom: 5, minHeight: 20 }}>
+                        <Text style={{ fontSize: 9, fontFamily: 'Helvetica-Bold' }}>Paciente o Representante:</Text>
+                        <Text style={{ fontSize: 9, marginTop: 2 }}>{data.s16_consent_representante || ''}</Text>
                     </View>
                     <View style={{ flexDirection: 'row', borderBottom: '1 solid #000', paddingBottom: 2, marginBottom: 5 }}>
-                        <Text style={{ fontSize: 9, fontFamily: 'Helvetica-Bold' }}>Pasaporte/C.I.</Text>
+                        <Text style={{ fontSize: 9, fontFamily: 'Helvetica-Bold' }}>Pasaporte/C.I.:</Text>
                         <Text style={{ fontSize: 9, marginLeft: 5 }}>{data.s16_consent_ci || ''}</Text>
                     </View>
                     <View style={{ flexDirection: 'row', borderBottom: '1 solid #000', paddingBottom: 2 }}>

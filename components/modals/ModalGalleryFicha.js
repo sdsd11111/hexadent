@@ -15,7 +15,7 @@ import {
     ChevronDownIcon
 } from '@heroicons/react/24/outline';
 
-export default function ModalGalleryFicha({ isOpen, onClose, images = [], recordId, cedula, modulo, onSelectImage }) {
+export default function ModalGalleryFicha({ isOpen, onClose, images = [], recordId, cedula, modulo, onSelectImage, onUploadSuccess }) {
     const [mediaList, setMediaList] = useState([]);
     const [loading, setLoading] = useState(false);
     const [uploading, setUploading] = useState(false);
@@ -70,8 +70,8 @@ export default function ModalGalleryFicha({ isOpen, onClose, images = [], record
                 const isPdf = file.type === 'application/pdf';
 
                 // LIMITS ENFORCEMENT
-                if (isImage && file.size > 1 * 1024 * 1024) {
-                    alert(`La imagen "${file.name}" supera el límite de 1MB.`);
+                if (isImage && file.size > 4.5 * 1024 * 1024) {
+                    alert(`La imagen "${file.name}" supera el límite de 4.5MB.`);
                     continue;
                 }
                 if (isVideo && file.size > 10 * 1024 * 1024) {
@@ -305,7 +305,7 @@ export default function ModalGalleryFicha({ isOpen, onClose, images = [], record
                                             </div>
 
                                             <div className="md:col-span-2 space-y-3">
-                                                <label className="text-[10px] font-bold text-slate-500 uppercase block">Subir Multimedia (Máx 4MB)</label>
+                                                <label className="text-[10px] font-bold text-slate-500 uppercase block">Subir Multimedia (Máx 4.5MB)</label>
                                                 <label className={`relative flex items-center justify-center h-14 border-2 border-dashed border-slate-300 rounded-2xl hover:border-blue-400 hover:bg-blue-50 transition-all cursor-pointer group ${uploading ? 'pointer-events-none opacity-50' : ''}`}>
                                                     <div className="flex items-center gap-3">
                                                         <CloudArrowUpIcon className="h-6 w-6 text-slate-400 group-hover:text-blue-500" />

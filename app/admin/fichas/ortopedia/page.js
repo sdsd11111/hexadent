@@ -299,40 +299,110 @@ export default function OrtopediaFichasPage() {
 
     // Add state for patient history images
     const [patientHistoryImages, setPatientHistoryImages] = useState([]);
+    
+    // Cache for base64 images to avoid reconverting
+    const imageCacheRef = useRef({});
 
+    // Automatic PDF sync
     useEffect(() => {
-        const fetchPatientHistory = async () => {
-            if (formData.cedula && step === 2) {
-                try {
-                    // Fetch ALL fichas for this patient to get their full gallery
-                    const response = await fetch(`/api/fichas?cedula=${formData.cedula}`);
-                    if (response.ok) {
-                        const data = await response.json();
-                        // Extract all images from all fichas EXCEPT the current one
-                        const history = data.fichas
-                            .filter(f => f.id !== recordId)
-                            .map(f => f.data.imagenes || []).flat();
-                        // Flatten the nested structure (groups -> data)
-                        const flatImages = history
-                            .flatMap(group => group.data || [])
-                            .filter(img => img); // Remove empty/null
+        let isMounted = true;
+        
+        const syncPdfData = async () => {
+            const currentValues = watch();
+            const mode = mainAccordion === 4 ? (subAccordion === 1 ? 4 : (subAccordion === 2 ? 5 : 4)) : (mainAccordion || 1);
 
-                        setPatientHistoryImages(flatImages.slice(0, 20));
-                    }
-                } catch (error) {
-                    console.error("Error fetching patient history:", error);
-                }
-            } else if (!formData.cedula) {
-                setPatientHistoryImages([]);
+            const processedValues = { ...currentValues };
+            
+            // Convert WebP/URLs to Base64 JPEG for react-pdf compatibility
+            if (Array.isArray(processedValues.s14_justificacion_imagenes)) {
+                const base64Images = await Promise.all(processedValues.s14_justificacion_imagenes.map(async (url) => {
+                    if (!url) return null;
+                    if (url.startsWith('data:')) return url; // Already base64
+                    if (imageCacheRef.current[url]) return imageCacheRef.current[url];
+                    
+                    return new Promise((resolve) => {
+                        const img = new window.Image();
+                        img.crossOrigin = 'Anonymous';
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = img.width;
+                            canvas.height = img.height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.fillStyle = '#FFFFFF';
+                            ctx.fillRect(0, 0, canvas.width, canvas.height);
+                            ctx.drawImage(img, 0, 0);
+                            const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                            imageCacheRef.current[url] = dataUrl;
+                            resolve(dataUrl);
+                        };
+                        img.onerror = () => resolve(url); // Fallback to original
+                        img.src = (url.startsWith('/') && !url.startsWith('//')) ? window.location.origin + url : url;
+                    });
+                }));
+                processedValues.s14_justificacion_imagenes = base64Images;
             }
+
+            if (!isMounted) return;
+
+            const newData = { ...processedValues, pdfMode: mode };
+            
+            setPdfData(prev => {
+                // deep comparison to avoid unnecessary state updates
+                if (JSON.stringify(prev) === JSON.stringify(newData)) return prev;
+                return newData;
+            });
         };
 
+        const timer = setTimeout(syncPdfData, 400); // Faster sync
+        return () => {
+            isMounted = false;
+            clearTimeout(timer);
+        };
+    }, [formData, mainAccordion, subAccordion]);
+
+    useEffect(() => {
         const timer = setTimeout(() => {
             fetchPatientHistory();
         }, 500);
-
         return () => clearTimeout(timer);
-    }, [formData.cedula, step]);
+    }, [formData.cedula, step, isGalleryOpen]);
+
+    const refreshHistory = () => {
+        fetchPatientHistory();
+    };
+
+    const fetchPatientHistory = async () => {
+        if (!formData.cedula || step !== 2) return;
+        
+        try {
+            // 1. Fetch ALL media from the gallery table for this patient
+            const mediaResponse = await fetch(`/api/media?cedula=${formData.cedula}&modulo=ortopedia&t=${Date.now()}`);
+            let galleryImages = [];
+            if (mediaResponse.ok) {
+                const mediaData = await mediaResponse.json();
+                galleryImages = (mediaData.media || [])
+                    .filter(m => m.tipo === 'foto')
+                    .map(m => `/api/media/${m.id}`);
+            }
+
+            // 2. Fetch all fichas to get images that might only exist in old ficha data (legacy)
+            const fichasResponse = await fetch(`/api/fichas?cedula=${formData.cedula}&t=${Date.now()}`);
+            let legacyImages = [];
+            if (fichasResponse.ok) {
+                const fichasData = await fichasResponse.json();
+                legacyImages = fichasData.fichas
+                    .map(f => f.data.imagenes || []).flat()
+                    .flatMap(group => group.data || [])
+                    .filter(img => img);
+            }
+
+            // Combine and deduplicate
+            const combined = Array.from(new Set([...galleryImages, ...legacyImages]));
+            setPatientHistoryImages(combined.slice(0, 40));
+        } catch (error) {
+            console.error("Error fetching patient history:", error);
+        }
+    };
 
     useEffect(() => {
         // CLEANUP: Ensure selected images for PDF still exist in the available pool
@@ -351,9 +421,9 @@ export default function OrtopediaFichasPage() {
     }, [patientHistoryImages]);
 
     const refreshPDF = () => {
+        const currentData = watch();
         const mode = mainAccordion === 4 ? (subAccordion === 1 ? 4 : (subAccordion === 2 ? 5 : 4)) : mainAccordion;
-        // Deep clone to prevent reference sharing which causes auto-updates
-        setPdfData(JSON.parse(JSON.stringify({ ...formData, pdfMode: mode })));
+        setPdfData(JSON.parse(JSON.stringify({ ...currentData, pdfMode: mode })));
     };
 
     useEffect(() => {
@@ -714,7 +784,10 @@ export default function OrtopediaFichasPage() {
                                                                     onClick={() => {
                                                                         const isOpen = mainAccordion === 1;
                                                                         setMainAccordion(isOpen ? null : 1);
-                                                                        if (!isOpen) scrollToRef(acc1Ref);
+                                                                        if (!isOpen) {
+                                                                            scrollToRef(acc1Ref);
+                                                                            setTimeout(() => refreshPDF(), 200);
+                                                                        }
                                                                     }}
                                                                     className="flex w-full items-center justify-between px-5 py-4 text-left"
                                                                 >
@@ -1620,7 +1693,10 @@ export default function OrtopediaFichasPage() {
                                                                     onClick={() => {
                                                                         const isOpen = mainAccordion === 2;
                                                                         setMainAccordion(isOpen ? null : 2);
-                                                                        if (!isOpen) scrollToRef(acc2Ref);
+                                                                        if (!isOpen) {
+                                                                            scrollToRef(acc2Ref);
+                                                                            setTimeout(() => refreshPDF(), 200);
+                                                                        }
                                                                     }}
                                                                     className="flex w-full items-center justify-between px-5 py-4 text-left"
                                                                 >
@@ -1737,18 +1813,28 @@ export default function OrtopediaFichasPage() {
                                                                                 ))}
                                                                             </div>
                                                                         </div>
-
                                                                         {/* Image Selection Section */}
                                                                         <div className="space-y-3 pt-4 border-t border-slate-100">
                                                                             <div className="flex justify-between items-center">
                                                                                 <label className="text-[10px] font-bold text-slate-500 uppercase italic">
                                                                                     ANÁLISIS CLÍNICO - RADIOGRÁFICO (MÁX. 3 IMÁGENES):
                                                                                 </label>
-                                                                                <div className="flex items-center gap-2">
+                                                                                <div className="flex items-center gap-3">
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        onClick={refreshHistory}
+                                                                                        className="flex items-center gap-1 text-[9px] font-black text-purple-600 hover:text-purple-700 uppercase"
+                                                                                        title="Actualizar lista de imágenes"
+                                                                                    >
+                                                                                        <ArrowPathIcon className="h-3 w-3" /> Actualizar
+                                                                                    </button>
                                                                                     {(watch('s14_justificacion_imagenes') || []).length > 0 && (
                                                                                         <button
                                                                                             type="button"
-                                                                                            onClick={() => setValue('s14_justificacion_imagenes', [])}
+                                                                                            onClick={() => {
+                                                                                                setValue('s14_justificacion_imagenes', []);
+                                                                                                setTimeout(() => refreshPDF(), 100);
+                                                                                            }}
                                                                                             className="text-[9px] font-bold text-red-500 hover:text-red-700 underline uppercase"
                                                                                         >
                                                                                             Limpiar selección
@@ -1801,6 +1887,8 @@ export default function OrtopediaFichasPage() {
                                                                                                                 setValue('s14_justificacion_imagenes', [...selectedImages, img]);
                                                                                                             }
                                                                                                         }
+                                                                                                        // Force PDF refresh after selection
+                                                                                                        setTimeout(() => refreshPDF(), 100);
                                                                                                     }}
                                                                                                     className={`relative aspect-square cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${isSelected ? 'border-purple-600 ring-2 ring-purple-200' : 'border-slate-200 hover:border-purple-300'}`}
                                                                                                 >
@@ -1831,7 +1919,10 @@ export default function OrtopediaFichasPage() {
                                                                     onClick={() => {
                                                                         const isOpen = mainAccordion === 3;
                                                                         setMainAccordion(isOpen ? null : 3);
-                                                                        if (!isOpen) scrollToRef(acc3Ref);
+                                                                        if (!isOpen) {
+                                                                            scrollToRef(acc3Ref);
+                                                                            setTimeout(() => refreshPDF(), 200);
+                                                                        }
                                                                     }}
                                                                     className="flex w-full items-center justify-between px-5 py-4 text-left"
                                                                 >
@@ -1894,7 +1985,10 @@ export default function OrtopediaFichasPage() {
                                                                     onClick={() => {
                                                                         const isOpen = mainAccordion === 4;
                                                                         setMainAccordion(isOpen ? null : 4);
-                                                                        if (!isOpen) scrollToRef(acc4Ref);
+                                                                        if (!isOpen) {
+                                                                            scrollToRef(acc4Ref);
+                                                                            setTimeout(() => refreshPDF(), 200);
+                                                                        }
                                                                     }}
                                                                     className="flex w-full items-center justify-between px-5 py-4 text-left"
                                                                 >
@@ -1918,7 +2012,10 @@ export default function OrtopediaFichasPage() {
                                                                                 onClick={() => {
                                                                                     const isOpen = subAccordion === 1;
                                                                                     setSubAccordion(isOpen ? null : 1);
-                                                                                    if (!isOpen) scrollToRef(subAcc1Ref);
+                                                                                    if (!isOpen) {
+                                                                                        scrollToRef(subAcc1Ref);
+                                                                                        setTimeout(() => refreshPDF(), 200);
+                                                                                    }
                                                                                 }}
                                                                                 className="flex w-full items-center justify-between px-4 py-3 text-left"
                                                                             >
@@ -2007,7 +2104,10 @@ export default function OrtopediaFichasPage() {
                                                                                 onClick={() => {
                                                                                     const isOpen = subAccordion === 2;
                                                                                     setSubAccordion(isOpen ? null : 2);
-                                                                                    if (!isOpen) scrollToRef(subAcc2Ref);
+                                                                                    if (!isOpen) {
+                                                                                        scrollToRef(subAcc2Ref);
+                                                                                        setTimeout(() => refreshPDF(), 200);
+                                                                                    }
                                                                                 }}
                                                                                 className="flex w-full items-center justify-between px-4 py-3 text-left"
                                                                             >
@@ -2198,10 +2298,25 @@ export default function OrtopediaFichasPage() {
 
             <ModalGalleryFicha
                 isOpen={isGalleryOpen}
-                onClose={() => setIsGalleryOpen(false)}
+                onClose={() => {
+                    setIsGalleryOpen(false);
+                    refreshHistory();
+                }}
                 images={watch('imagenes') || []}
                 historyImages={patientHistoryImages}
-                onSave={(newImages) => setValue('imagenes', newImages, { shouldDirty: true })}
+                onUploadSuccess={() => refreshHistory()}
+                onSelectImage={(url) => {
+                    const selectedImages = watch('s14_justificacion_imagenes') || [];
+                    if (!selectedImages.includes(url) && selectedImages.length < 3) {
+                        setValue('s14_justificacion_imagenes', [...selectedImages, url]);
+                        setTimeout(() => refreshPDF(), 100);
+                    }
+                    setIsGalleryOpen(false);
+                }}
+                onSave={(newImages) => {
+                    setValue('imagenes', newImages, { shouldDirty: true });
+                    refreshHistory();
+                }}
                 recordId={recordId}
                 cedula={watch('cedula')}
                 modulo="ortopedia"

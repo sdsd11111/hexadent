@@ -826,10 +826,15 @@ const OrtopediaDocument = ({ data = {}, mode = 1 }) => {
                                     </View>
                                     <View style={{ width: '80%', flexDirection: 'row' }}>
                                         {Array.from({ length: 3 }).map((_, i) => {
-                                            const img = (data.s14_justificacion_imagenes || [])[i];
+                                            const imagesArray = data?.s14_justificacion_imagenes || [];
+                                            const img = imagesArray[i];
                                             return (
-                                                <View key={i} style={{ flex: 1, borderRight: i < 2 ? '1 solid #000' : 'none', padding: 2 }}>
-                                                    {img && <Image src={img} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />}
+                                                <View key={i} style={{ flex: 1, borderRight: i < 2 ? '1 solid #000' : 'none', padding: 2, justifyContent: 'center', alignItems: 'center' }}>
+                                                    {img ? (
+                                                        <Image src={img} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                                                    ) : (
+                                                        <Text style={{ fontSize: 6, color: '#9CA3AF', textAlign: 'center' }}>[ESPACIO PARA IMAGEN {i + 1}]</Text>
+                                                    )}
                                                 </View>
                                             );
                                         })}
