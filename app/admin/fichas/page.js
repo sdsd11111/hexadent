@@ -29,7 +29,11 @@ export default function FichasPage() {
             const res = await fetch('/api/fichas?summary=true');
             if (res.ok) {
                 const data = await res.json();
-                setCounts(data.counts);
+                if (data && data.counts) {
+                    setCounts(data.counts);
+                } else {
+                    console.warn('API returned unexpected format for counts:', data);
+                }
             }
         } catch (e) {
             console.error('Error fetching counts:', e);
@@ -51,7 +55,7 @@ export default function FichasPage() {
             description: 'Gestión de fichas de odontología general',
             icon: DocumentTextIcon,
             color: 'from-blue-500 to-cyan-500',
-            clientCount: counts.odontologia,
+            clientCount: counts?.odontologia || 0,
         },
         {
             id: 'ortopedia',
@@ -59,7 +63,7 @@ export default function FichasPage() {
             description: 'Gestión de fichas de ortopedia maxilar',
             icon: ClipboardDocumentCheckIcon,
             color: 'from-purple-500 to-pink-500',
-            clientCount: counts.ortopedia,
+            clientCount: counts?.ortopedia || 0,
         },
         {
             id: 'ortodoncia',
@@ -67,7 +71,7 @@ export default function FichasPage() {
             description: 'Gestión de fichas de ortodoncia especializada',
             icon: DocumentTextIcon,
             color: 'from-orange-500 to-amber-500',
-            clientCount: counts.ortodoncia,
+            clientCount: counts?.ortodoncia || 0,
         },
         {
             id: 'archivos_complemento',
