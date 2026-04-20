@@ -5,21 +5,29 @@ import { useRouter } from 'next/navigation';
 import {
     DocumentTextIcon,
     ClipboardDocumentCheckIcon,
-    UserIcon,
-    PlusIcon,
-    MagnifyingGlassIcon,
+    FolderPlusIcon,
     ArrowPathIcon,
-    FolderPlusIcon
+    ChevronRightIcon,
+    UsersIcon,
+    HeartIcon,
+    PlusCircleIcon,
+    UserIcon
 } from '@heroicons/react/24/outline';
+import dynamic from 'next/dynamic';
 import { useEffect } from 'react';
-import ModalArchivosComplemento from '@/components/modals/ModalArchivosComplemento';
+
+const ModalArchivosComplemento = dynamic(
+    () => import('@/components/modals/ModalArchivosComplemento'),
+    { ssr: false }
+);
 
 export default function FichasPage() {
     const router = useRouter();
     const [counts, setCounts] = useState({
         odontologia: 0,
         ortopedia: 0,
-        ortodoncia: 0
+        ortodoncia: 0,
+        anexos: 0
     });
     const [isLoading, setIsLoading] = useState(true);
     const [isComplementOpen, setIsComplementOpen] = useState(false);
@@ -76,10 +84,11 @@ export default function FichasPage() {
         {
             id: 'archivos_complemento',
             title: 'Archivos de complemento',
-            description: 'Gestión de documentos PDF adicionales',
+            description: 'Archivos PDF, certificados y documentos complementarios del paciente.',
             icon: FolderPlusIcon,
-            color: 'from-emerald-500 to-teal-500',
+            color: 'from-slate-600 to-slate-800',
             isSpecial: true,
+            clientCount: counts?.anexos || 0,
             action: () => setIsComplementOpen(true)
         }
     ];

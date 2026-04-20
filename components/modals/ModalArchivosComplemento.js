@@ -77,7 +77,7 @@ export default function ModalArchivosComplemento({ isOpen, onClose }) {
             const res = await fetch('/api/fichas?type=archivos_complemento');
             if (res.ok) {
                 const data = await res.json();
-                setFiles(data.fichas || []);
+                setFiles(data?.fichas || []);
             }
         } catch (error) {
             console.error('Error fetching files:', error);
@@ -91,7 +91,7 @@ export default function ModalArchivosComplemento({ isOpen, onClose }) {
             const res = await fetch('/api/media?cedula=GENERAL&modulo=complemento');
             if (res.ok) {
                 const data = await res.json();
-                setMediaList(data.media || []);
+                setMediaList(data?.media || []);
             }
         } catch (error) {
             console.error('Error fetching media:', error);
@@ -106,7 +106,7 @@ export default function ModalArchivosComplemento({ isOpen, onClose }) {
     }, [isOpen]);
 
     const handleMediaUpload = async (e) => {
-        const selectedFiles = Array.from(e.target.files || []);
+        const selectedFiles = Array.from(e.target?.files || []);
         if (selectedFiles.length === 0) return;
 
         setUploadingMedia(true);
@@ -118,26 +118,26 @@ export default function ModalArchivosComplemento({ isOpen, onClose }) {
 
             for (const file of selectedFiles) {
                 // Validate file type
-                const isImage = file.type.startsWith('image/');
-                const isVideo = file.type.startsWith('video/');
-                const isPdf = file.type === 'application/pdf';
+                const isImage = file?.type.startsWith('image/');
+                const isVideo = file?.type.startsWith('video/');
+                const isPdf = file?.type === 'application/pdf';
 
                 if (!isImage && !isVideo && !isPdf) {
-                    alert(`${file.name} no es un archivo válido. Solo se permiten imágenes, videos y PDFs.`);
+                    alert(`${file?.name} no es un archivo válido. Solo se permiten imágenes, videos y PDFs.`);
                     continue;
                 }
 
                 // LIMITS ENFORCEMENT
-                if (isImage && file.size > 1 * 1024 * 1024) {
-                    alert(`La imagen "${file.name}" supera el límite de 1MB.`);
+                if (isImage && file?.size > 1 * 1024 * 1024) {
+                    alert(`La imagen "${file?.name}" supera el límite de 1MB.`);
                     continue;
                 }
-                if (isVideo && file.size > 10 * 1024 * 1024) {
-                    alert(`El video "${file.name}" supera el límite de 10MB.`);
+                if (isVideo && file?.size > 10 * 1024 * 1024) {
+                    alert(`El video "${file?.name}" supera el límite de 10MB.`);
                     continue;
                 }
-                if (isPdf && file.size > 5 * 1024 * 1024) {
-                    alert(`El PDF "${file.name}" supera el límite de 5MB.`);
+                if (isPdf && file?.size > 5 * 1024 * 1024) {
+                    alert(`El PDF "${file?.name}" supera el límite de 5MB.`);
                     continue;
                 }
 
@@ -171,14 +171,14 @@ export default function ModalArchivosComplemento({ isOpen, onClose }) {
                 }
 
                 const CHUNK_SIZE = 3.5 * 1024 * 1024;
-                if (fileToUpload.size > CHUNK_SIZE) {
+                if (fileToUpload?.size > CHUNK_SIZE) {
                     const uploadId = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2) + Date.now();
-                    const totalChunks = Math.ceil(fileToUpload.size / CHUNK_SIZE);
+                    const totalChunks = Math.ceil(fileToUpload?.size / CHUNK_SIZE);
 
                     for (let i = 0; i < totalChunks; i++) {
                         const start = i * CHUNK_SIZE;
-                        const end = Math.min(fileToUpload.size, start + CHUNK_SIZE);
-                        const chunk = fileToUpload.slice(start, end);
+                        const end = Math.min(fileToUpload?.size, start + CHUNK_SIZE);
+                        const chunk = fileToUpload?.slice(start, end);
                         const formData = new FormData();
                         formData.append('upload_id', uploadId);
                         formData.append('chunk_index', i);
@@ -198,9 +198,9 @@ export default function ModalArchivosComplemento({ isOpen, onClose }) {
                             cedula: 'GENERAL',
                             modulo: 'complemento',
                             categoria: 'General',
-                            nombre: file.name,
-                            mime_type: fileToUpload.type,
-                            size: fileToUpload.size
+                            nombre: file?.name,
+                            mime_type: fileToUpload?.type,
+                            size: fileToUpload?.size
                         })
                     });
                 } else {
@@ -209,7 +209,7 @@ export default function ModalArchivosComplemento({ isOpen, onClose }) {
                     formData.append('cedula', 'GENERAL');
                     formData.append('modulo', 'complemento');
                     formData.append('categoria', 'General');
-                    formData.append('nombre', file.name);
+                    formData.append('nombre', file?.name);
 
                     await fetch('/api/media', { method: 'POST', body: formData });
                 }
@@ -234,7 +234,7 @@ export default function ModalArchivosComplemento({ isOpen, onClose }) {
         try {
             const res = await fetch(`/api/media?id=${id}`, { method: 'DELETE' });
             if (res.ok) {
-                setMediaList(mediaList.filter(m => m.id !== id));
+                setMediaList(mediaList?.filter(m => m?.id !== id));
             }
         } catch (error) {
             console.error('Error deleting media:', error);
@@ -242,10 +242,10 @@ export default function ModalArchivosComplemento({ isOpen, onClose }) {
     };
 
     const handleFileUpload = async (e) => {
-        const file = e.target.files[0];
+        const file = e.target?.files[0];
         if (!file) return;
 
-        if (file.type !== 'application/pdf') {
+        if (file?.type !== 'application/pdf') {
             alert('Por favor, sube solo archivos PDF.');
             return;
         }
@@ -259,10 +259,10 @@ export default function ModalArchivosComplemento({ isOpen, onClose }) {
                 const body = {
                     fichaType: 'archivos_complemento',
                     data: {
-                        name: file.name,
+                        name: file?.name,
                         content: base64Data,
-                        size: file.size,
-                        type: file.type
+                        size: file?.size,
+                        type: file?.type
                     }
                 };
 
@@ -383,12 +383,12 @@ export default function ModalArchivosComplemento({ isOpen, onClose }) {
                     ...formData,
                     isDynamic: true,
                     templateType: selectedTemplate || 'clareamiento',
-                    name: `${formData.title} - ${formData.patientName || 'Sin Nombre'}`
+                    name: `${formData?.title} - ${formData?.patientName || 'Sin Nombre'}`
                 }
             };
 
             const method = editingFile ? 'PUT' : 'POST';
-            if (editingFile) body.id = editingFile.id;
+            if (editingFile) body.id = editingFile?.id;
 
             const res = await fetch('/api/fichas', {
                 method: method,
@@ -413,9 +413,9 @@ export default function ModalArchivosComplemento({ isOpen, onClose }) {
 
     const handleEditDynamic = (file) => {
         setEditingFile(file);
-        setSelectedTemplate(file.data.templateType);
-        reset(file.data);
-        setPreviewData(file.data);
+        setSelectedTemplate(file?.data?.templateType);
+        reset(file?.data);
+        setPreviewData(file?.data);
         setView('edit_dynamic');
     };
 
@@ -428,7 +428,7 @@ export default function ModalArchivosComplemento({ isOpen, onClose }) {
             });
 
             if (res.ok) {
-                setFiles(files.filter(f => f.id !== id));
+                setFiles(files?.filter(f => f?.id !== id));
             } else {
                 alert('Error al eliminar el archivo');
             }
@@ -439,7 +439,9 @@ export default function ModalArchivosComplemento({ isOpen, onClose }) {
 
     const openPdf = (base64) => {
         const win = window.open();
-        win.document.write(`<iframe src="${base64}" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>`);
+        if (win) {
+            win.document.write(`<iframe src="${base64}" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>`);
+        }
     };
 
     const formatSize = (bytes) => {
@@ -453,7 +455,7 @@ export default function ModalArchivosComplemento({ isOpen, onClose }) {
 
     return (
         <>
-            <Transition appear show={isOpen} as={Fragment}>
+            <Transition appear show={!!isOpen} as={Fragment}>
                 <Dialog as="div" className="relative z-[60]" onClose={onClose}>
                     <Transition.Child
                         as={Fragment}
@@ -544,19 +546,19 @@ export default function ModalArchivosComplemento({ isOpen, onClose }) {
 
                                                                 {/* List existing files of this type */}
                                                                 <div className="grid grid-cols-1 gap-2">
-                                                                    {files.filter(f => f.data?.templateType === 'clareamiento').map(file => (
-                                                                        <div key={file.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100 hover:border-emerald-200 transition-all">
+                                                                    {files?.filter(f => f?.data?.templateType === 'clareamiento').map(file => (
+                                                                        <div key={file?.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100 hover:border-emerald-200 transition-all">
                                                                             <div className="flex-1 min-w-0">
-                                                                                <p className="text-xs font-bold text-slate-700 truncate">{file.data?.name}</p>
-                                                                                <p className="text-[9px] text-slate-400">{new Date(file.timestamp).toLocaleDateString()}</p>
+                                                                                <p className="text-xs font-bold text-slate-700 truncate">{file?.data?.name}</p>
+                                                                                <p className="text-[9px] text-slate-400">{new Date(file?.timestamp).toLocaleDateString()}</p>
                                                                             </div>
                                                                             <div className="flex gap-2">
                                                                                 <button onClick={() => handleEditDynamic(file)} className="p-1.5 text-emerald-500 hover:bg-emerald-100 rounded-lg"><PrinterIcon className="h-4 w-4" /></button>
-                                                                                <button onClick={() => handleDelete(file.id)} className="p-1.5 text-red-400 hover:bg-red-100 rounded-lg"><TrashIcon className="h-4 w-4" /></button>
+                                                                                <button onClick={() => handleDelete(file?.id)} className="p-1.5 text-red-400 hover:bg-red-100 rounded-lg"><TrashIcon className="h-4 w-4" /></button>
                                                                             </div>
                                                                         </div>
                                                                     ))}
-                                                                    {files.filter(f => f.data?.templateType === 'clareamiento').length === 0 && (
+                                                                    {files?.filter(f => f?.data?.templateType === 'clareamiento').length === 0 && (
                                                                         <p className="text-center text-[10px] text-slate-400 py-2">No hay documentos creados aún.</p>
                                                                     )}
                                                                 </div>
@@ -596,19 +598,19 @@ export default function ModalArchivosComplemento({ isOpen, onClose }) {
 
                                                                 {/* List existing files of this type */}
                                                                 <div className="grid grid-cols-1 gap-2">
-                                                                    {files.filter(f => f.data?.templateType === 'frenectomia').map(file => (
-                                                                        <div key={file.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100 hover:border-blue-200 transition-all">
+                                                                    {files?.filter(f => f?.data?.templateType === 'frenectomia').map(file => (
+                                                                        <div key={file?.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100 hover:border-blue-200 transition-all">
                                                                             <div className="flex-1 min-w-0">
-                                                                                <p className="text-xs font-bold text-slate-700 truncate">{file.data?.name}</p>
-                                                                                <p className="text-[9px] text-slate-400">{new Date(file.timestamp).toLocaleDateString()}</p>
+                                                                                <p className="text-xs font-bold text-slate-700 truncate">{file?.data?.name}</p>
+                                                                                <p className="text-[9px] text-slate-400">{new Date(file?.timestamp).toLocaleDateString()}</p>
                                                                             </div>
                                                                             <div className="flex gap-2">
                                                                                 <button onClick={() => handleEditDynamic(file)} className="p-1.5 text-blue-500 hover:bg-blue-100 rounded-lg"><PrinterIcon className="h-4 w-4" /></button>
-                                                                                <button onClick={() => handleDelete(file.id)} className="p-1.5 text-red-400 hover:bg-red-100 rounded-lg"><TrashIcon className="h-4 w-4" /></button>
+                                                                                <button onClick={() => handleDelete(file?.id)} className="p-1.5 text-red-400 hover:bg-red-100 rounded-lg"><TrashIcon className="h-4 w-4" /></button>
                                                                             </div>
                                                                         </div>
                                                                     ))}
-                                                                    {files.filter(f => f.data?.templateType === 'frenectomia').length === 0 && (
+                                                                    {files?.filter(f => f?.data?.templateType === 'frenectomia').length === 0 && (
                                                                         <p className="text-center text-[10px] text-slate-400 py-2">No hay documentos creados aún.</p>
                                                                     )}
                                                                 </div>
@@ -645,19 +647,19 @@ export default function ModalArchivosComplemento({ isOpen, onClose }) {
                                                                 <div className="p-4 border-t border-slate-100 bg-white">
                                                                     {/* List existing files of this type */}
                                                                     <div className="grid grid-cols-1 gap-2">
-                                                                        {files.filter(f => f.data?.templateType === 'postquirurgico').map(file => (
-                                                                            <div key={file.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100 hover:border-amber-200 transition-all">
+                                                                        {files?.filter(f => f?.data?.templateType === 'postquirurgico').map(file => (
+                                                                            <div key={file?.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100 hover:border-amber-200 transition-all">
                                                                                 <div className="flex-1 min-w-0">
-                                                                                    <p className="text-xs font-bold text-slate-700 truncate">{file.data?.name}</p>
-                                                                                    <p className="text-[9px] text-slate-400">{new Date(file.timestamp).toLocaleDateString()}</p>
+                                                                                    <p className="text-xs font-bold text-slate-700 truncate">{file?.data?.name}</p>
+                                                                                    <p className="text-[9px] text-slate-400">{new Date(file?.timestamp).toLocaleDateString()}</p>
                                                                                 </div>
                                                                                 <div className="flex gap-2">
                                                                                     <button onClick={() => handleEditDynamic(file)} className="p-1.5 text-amber-500 hover:bg-amber-100 rounded-lg"><PrinterIcon className="h-4 w-4" /></button>
-                                                                                    <button onClick={() => handleDelete(file.id)} className="p-1.5 text-red-400 hover:bg-red-100 rounded-lg"><TrashIcon className="h-4 w-4" /></button>
+                                                                                    <button onClick={() => handleDelete(file?.id)} className="p-1.5 text-red-400 hover:bg-red-100 rounded-lg"><TrashIcon className="h-4 w-4" /></button>
                                                                                 </div>
                                                                             </div>
                                                                         ))}
-                                                                        {files.filter(f => f.data?.templateType === 'postquirurgico').length === 0 && (
+                                                                        {files?.filter(f => f?.data?.templateType === 'postquirurgico').length === 0 && (
                                                                             <p className="text-center text-[10px] text-slate-400 py-2">No hay documentos creados aún.</p>
                                                                         )}
                                                                     </div>
@@ -702,7 +704,7 @@ export default function ModalArchivosComplemento({ isOpen, onClose }) {
                                                                                 <input
                                                                                     type="date"
                                                                                     value={filterDate}
-                                                                                    onChange={(e) => setFilterDate(e.target.value)}
+                                                                                    onChange={(e) => setFilterDate(e.target?.value)}
                                                                                     className="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-600"
                                                                                 />
                                                                             </div>
@@ -741,30 +743,30 @@ export default function ModalArchivosComplemento({ isOpen, onClose }) {
                                                                     {/* Media Grid */}
                                                                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                                                                         {mediaList
-                                                                            .filter(media => {
+                                                                            ?.filter(media => {
                                                                                 if (!filterDate) return true;
-                                                                                const mediaDate = new Date(media.created_at).toISOString().split('T')[0];
+                                                                                const mediaDate = new Date(media?.created_at).toISOString().split('T')[0];
                                                                                 return mediaDate === filterDate;
                                                                             })
                                                                             .map((media) => (
                                                                                 <div
-                                                                                    key={media.id}
+                                                                                    key={media?.id}
                                                                                     onClick={() => setPreviewMedia(media)}
                                                                                     className="group relative bg-slate-50 rounded-xl overflow-hidden border border-slate-200 hover:border-purple-300 transition-all hover:shadow-lg cursor-pointer"
                                                                                 >
                                                                                     {/* Media Preview */}
                                                                                     <div className="aspect-square bg-slate-100 relative flex items-center justify-center">
-                                                                                        {media.tipo === 'foto' ? (
+                                                                                        {media?.tipo === 'foto' ? (
                                                                                             <img
-                                                                                                src={`/api/media/${media.id}`}
-                                                                                                alt={media.nombre}
+                                                                                                src={`/api/media/${media?.id}`}
+                                                                                                alt={media?.nombre}
                                                                                                 className="w-full h-full object-cover"
                                                                                                 onError={(e) => { e.target.onerror = null; e.target.src = '/placeholder-image.png'; }}
                                                                                             />
-                                                                                        ) : media.tipo === 'video' ? (
+                                                                                        ) : media?.tipo === 'video' ? (
                                                                                             <div className="w-full h-full flex items-center justify-center bg-slate-900">
                                                                                                 <video
-                                                                                                    src={`/api/media/${media.id}#t=0.5`}
+                                                                                                    src={`/api/media/${media?.id}#t=0.5`}
                                                                                                     className="w-full h-full object-cover opacity-60"
                                                                                                     preload="metadata"
                                                                                                 />
@@ -782,15 +784,15 @@ export default function ModalArchivosComplemento({ isOpen, onClose }) {
 
                                                                                     {/* Media Info */}
                                                                                     <div className="p-2">
-                                                                                        <p className="text-[9px] font-bold text-slate-700 truncate">{media.nombre}</p>
-                                                                                        <p className="text-[8px] text-slate-400">{media.categoria}</p>
+                                                                                        <p className="text-[9px] font-bold text-slate-700 truncate">{media?.nombre}</p>
+                                                                                        <p className="text-[8px] text-slate-400">{media?.categoria}</p>
                                                                                     </div>
 
                                                                                     {/* Delete Button */}
                                                                                     <button
                                                                                         onClick={(e) => {
                                                                                             e.stopPropagation();
-                                                                                            handleDeleteMedia(media.id);
+                                                                                            handleDeleteMedia(media?.id);
                                                                                         }}
                                                                                         className="absolute top-2 right-2 p-1.5 bg-red-500/90 hover:bg-red-600 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-all z-10"
                                                                                         title="Eliminar"
@@ -808,7 +810,7 @@ export default function ModalArchivosComplemento({ isOpen, onClose }) {
                                                                             ))}
                                                                     </div>
 
-                                                                    {mediaList.length === 0 && (
+                                                                    {mediaList?.length === 0 && (
                                                                         <div className="flex flex-col items-center justify-center py-12 text-slate-300">
                                                                             <PhotoIcon className="h-16 w-16 mb-3 opacity-20" />
                                                                             <p className="text-sm font-bold uppercase tracking-wider">No hay archivos multimedia todavía</p>
@@ -840,16 +842,16 @@ export default function ModalArchivosComplemento({ isOpen, onClose }) {
                                                                         <div key={i} className="h-20 bg-white rounded-2xl border border-slate-100 animate-pulse" />
                                                                     ))}
                                                                 </div>
-                                                            ) : files.filter(f => !f.data?.isDynamic).length === 0 ? (
+                                                            ) : files?.filter(f => !f?.data?.isDynamic).length === 0 ? (
                                                                 <div className="flex flex-col items-center justify-center py-16 text-slate-300">
                                                                     <DocumentIcon className="h-12 w-12 mb-3 opacity-20" />
                                                                     <p className="text-sm font-bold uppercase tracking-wider">No hay archivos PDF estáticos subidos todavía</p>
                                                                 </div>
                                                             ) : (
                                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                                    {files.filter(f => !f.data?.isDynamic).map((file) => (
+                                                                    {files?.filter(f => !f?.data?.isDynamic).map((file) => (
                                                                         <div
-                                                                            key={file.id}
+                                                                            key={file?.id}
                                                                             className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all group flex items-center gap-4"
                                                                         >
                                                                             <div className={`w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center shrink-0`}>
@@ -857,24 +859,24 @@ export default function ModalArchivosComplemento({ isOpen, onClose }) {
                                                                             </div>
                                                                             <div className="flex-1 min-w-0">
                                                                                 <h4 className="text-sm font-bold text-slate-800 truncate uppercase tracking-tight">
-                                                                                    {file.data?.name || 'Archivo sin nombre'}
+                                                                                    {file?.data?.name || 'Archivo sin nombre'}
                                                                                 </h4>
                                                                                 <div className="flex items-center gap-3 text-[10px] text-slate-500 font-bold uppercase mt-1">
-                                                                                    <span>{formatSize(file.data?.size || 0)}</span>
+                                                                                    <span>{formatSize(file?.data?.size || 0)}</span>
                                                                                     <span className="w-1 h-1 bg-slate-300 rounded-full" />
-                                                                                    <span>{new Date(file.timestamp).toLocaleDateString()}</span>
+                                                                                    <span>{new Date(file?.timestamp).toLocaleDateString()}</span>
                                                                                 </div>
                                                                             </div>
                                                                             <div className="flex gap-2">
                                                                                 <button
-                                                                                    onClick={() => openPdf(file.data?.content)}
+                                                                                    onClick={() => openPdf(file?.data?.content)}
                                                                                     className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
                                                                                     title="Ver documento"
                                                                                 >
                                                                                     <ArrowTopRightOnSquareIcon className="h-5 w-5" />
                                                                                 </button>
                                                                                 <button
-                                                                                    onClick={() => handleDelete(file.id)}
+                                                                                    onClick={() => handleDelete(file?.id)}
                                                                                     className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
                                                                                     title="Eliminar"
                                                                                 >
@@ -949,8 +951,8 @@ export default function ModalArchivosComplemento({ isOpen, onClose }) {
                                                             </button>
                                                         </div>
                                                         <div className="space-y-3">
-                                                            {fields.map((field, index) => (
-                                                                <div key={field.id} className="flex gap-2">
+                                                            {fields?.map((field, index) => (
+                                                                <div key={field?.id} className="flex gap-2">
                                                                     <div className="w-6 h-8 bg-slate-100 rounded-lg flex items-center justify-center text-[10px] font-bold text-slate-500 shrink-0 mt-1">
                                                                         {index + 1}
                                                                     </div>
@@ -1074,13 +1076,13 @@ export default function ModalArchivosComplemento({ isOpen, onClose }) {
                                     <div className="flex items-center justify-center min-h-[60vh] max-h-[85vh] bg-black">
                                         {previewMedia?.tipo === 'foto' ? (
                                             <img
-                                                src={previewMedia ? `/api/media/${previewMedia.id}` : ''}
+                                                src={previewMedia ? `/api/media/${previewMedia?.id}` : ''}
                                                 alt={previewMedia?.nombre}
                                                 className="max-w-full max-h-[85vh] object-contain"
                                             />
                                         ) : previewMedia?.tipo === 'video' ? (
                                             <video
-                                                src={previewMedia ? `/api/media/${previewMedia.id}` : ''}
+                                                src={previewMedia ? `/api/media/${previewMedia?.id}` : ''}
                                                 className="max-w-full max-h-[85vh]"
                                                 controls
                                                 autoPlay
