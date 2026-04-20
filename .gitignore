@@ -36,6 +36,36 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Google Cloud credentials and test outputs
+# Sensitive data and credentials
 service-account.json
 test_output.json
+api_output.json
+firebase-key.json
+credentials.json
+*.pem
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env*.local
+
+# IDEs
+.idea/
+.vscode/
+
+# Logs and temporary files
+*.log
+*.txt
+*.json
+!package.json
+!package-lock.json
+!jsconfig.json
+!.eslintrc.json
+!tsconfig.json
+
+# Utility scripts (often contain sensitive logic or one-off DB access)
+clear_all_memory.js
+diagnose_db.js
+full_harden_db.js
+*.bat

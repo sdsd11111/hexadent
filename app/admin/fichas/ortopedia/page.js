@@ -303,62 +303,52 @@ export default function OrtopediaFichasPage() {
     // Cache for base64 images to avoid reconverting
     const imageCacheRef = useRef({});
 
-    // Automatic PDF sync
-    useEffect(() => {
-        let isMounted = true;
+    // Manual PDF sync with WebP to Base64 conversion
+    const refreshPDF = async () => {
+        const currentValues = watch();
+        const mode = mainAccordion === 4 ? (subAccordion === 1 ? 4 : (subAccordion === 2 ? 5 : 4)) : (mainAccordion || 1);
+
+        const processedValues = { ...currentValues };
         
-        const syncPdfData = async () => {
-            const currentValues = watch();
-            const mode = mainAccordion === 4 ? (subAccordion === 1 ? 4 : (subAccordion === 2 ? 5 : 4)) : (mainAccordion || 1);
+        // Convert WebP/URLs to Base64 JPEG for react-pdf compatibility
+        if (Array.isArray(processedValues.s14_justificacion_imagenes)) {
+            const base64Images = await Promise.all(processedValues.s14_justificacion_imagenes.map(async (url) => {
+                if (!url) return null;
+                if (url.startsWith('data:')) return url; // Already base64
+                if (imageCacheRef.current[url]) return imageCacheRef.current[url];
+                
+                return new Promise((resolve) => {
+                    const img = new window.Image();
+                    img.crossOrigin = 'Anonymous';
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.fillStyle = '#FFFFFF';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        ctx.drawImage(img, 0, 0);
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                        imageCacheRef.current[url] = dataUrl;
+                        resolve(dataUrl);
+                    };
+                    img.onerror = () => resolve(url); // Fallback to original
+                    img.src = (url.startsWith('/') && !url.startsWith('//')) ? window.location.origin + url : url;
+                });
+            }));
+            processedValues.s14_justificacion_imagenes = base64Images;
+        }
 
-            const processedValues = { ...currentValues };
-            
-            // Convert WebP/URLs to Base64 JPEG for react-pdf compatibility
-            if (Array.isArray(processedValues.s14_justificacion_imagenes)) {
-                const base64Images = await Promise.all(processedValues.s14_justificacion_imagenes.map(async (url) => {
-                    if (!url) return null;
-                    if (url.startsWith('data:')) return url; // Already base64
-                    if (imageCacheRef.current[url]) return imageCacheRef.current[url];
-                    
-                    return new Promise((resolve) => {
-                        const img = new window.Image();
-                        img.crossOrigin = 'Anonymous';
-                        img.onload = () => {
-                            const canvas = document.createElement('canvas');
-                            canvas.width = img.width;
-                            canvas.height = img.height;
-                            const ctx = canvas.getContext('2d');
-                            ctx.fillStyle = '#FFFFFF';
-                            ctx.fillRect(0, 0, canvas.width, canvas.height);
-                            ctx.drawImage(img, 0, 0);
-                            const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-                            imageCacheRef.current[url] = dataUrl;
-                            resolve(dataUrl);
-                        };
-                        img.onerror = () => resolve(url); // Fallback to original
-                        img.src = (url.startsWith('/') && !url.startsWith('//')) ? window.location.origin + url : url;
-                    });
-                }));
-                processedValues.s14_justificacion_imagenes = base64Images;
-            }
+        const newData = { ...processedValues, pdfMode: mode };
+        setPdfData(newData);
+    };
 
-            if (!isMounted) return;
-
-            const newData = { ...processedValues, pdfMode: mode };
-            
-            setPdfData(prev => {
-                // deep comparison to avoid unnecessary state updates
-                if (JSON.stringify(prev) === JSON.stringify(newData)) return prev;
-                return newData;
-            });
-        };
-
-        const timer = setTimeout(syncPdfData, 400); // Faster sync
-        return () => {
-            isMounted = false;
-            clearTimeout(timer);
-        };
-    }, [formData, mainAccordion, subAccordion]);
+    // Initial sync on mount
+    useEffect(() => {
+        if (isOpen && editData) {
+            refreshPDF();
+        }
+    }, [isOpen]);
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -420,11 +410,6 @@ export default function OrtopediaFichasPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [patientHistoryImages]);
 
-    const refreshPDF = () => {
-        const currentData = watch();
-        const mode = mainAccordion === 4 ? (subAccordion === 1 ? 4 : (subAccordion === 2 ? 5 : 4)) : mainAccordion;
-        setPdfData(JSON.parse(JSON.stringify({ ...currentData, pdfMode: mode })));
-    };
 
     useEffect(() => {
         fetchClients();
