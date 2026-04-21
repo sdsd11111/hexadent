@@ -14,21 +14,46 @@ export async function GET() {
         // 1. Check connection status
         const statusUrl = `${EVOLUTION_API_URL}/instance/connectionState/${EVOLUTION_INSTANCE}`;
         let connectionStatus = 'unknown';
+        let instanceExists = true;
 
         try {
             const statusRes = await axios.get(statusUrl, {
                 headers: { 'apikey': EVOLUTION_API_KEY }
             });
             // Support both v1 and v2 structures
-            connectionStatus = statusRes.data.instance?.state || statusRes.data.status || 'unknown';
+            connectionStatus = statusRes.data?.instance?.state || statusRes.data?.status || 'unknown';
         } catch (e) {
             console.error("[Evolution Proxy] Error checking connection state:", e.message);
-            // If instance doesn't exist (404), we'll try to get QR which might trigger creation/reconnect
+            if (e.response?.status === 404) {
+                instanceExists = false;
+                connectionStatus = 'disconnected';
+            }
         }
 
-        // 2. If not connected, try to get QR
+        // 2. If instance doesn't exist, try to create it
+        if (!instanceExists) {
+            try {
+                console.log("[Evolution Proxy] Instance not found, attempting to create:", EVOLUTION_INSTANCE);
+                await axios.post(`${EVOLUTION_API_URL}/instance/create`, {
+                    instanceName: EVOLUTION_INSTANCE,
+                    token: EVOLUTION_API_KEY,
+                    number: "",
+                    qrcode: true
+                }, {
+                    headers: { 'apikey': EVOLUTION_API_KEY }
+                });
+                // After creating, we wait a bit and mark as disconnected to trigger QR fetch
+                connectionStatus = 'disconnected';
+            } catch (createErr) {
+                console.error("[Evolution Proxy] Error creating instance:", createErr.message);
+            }
+        }
+
+        // 3. If not connected, try to get QR
         let qrData = null;
-        if (connectionStatus !== 'open' && connectionStatus !== 'CONNECTED') {
+        const isConnected = ['open', 'CONNECTED', 'connected'].includes(connectionStatus);
+
+        if (!isConnected) {
             const qrUrl = `${EVOLUTION_API_URL}/instance/connect/${EVOLUTION_INSTANCE}`;
             try {
                 const qrRes = await axios.get(qrUrl, {
@@ -37,7 +62,13 @@ export async function GET() {
 
                 // Evolution API returns base64 or code depending on config
                 // Check multiple possible paths for QR data
-                let rawQr = qrRes.data.base64 || qrRes.data.code || qrRes.data.qrcode?.base64 || qrRes.data.qrcode?.code;
+                const resData = qrRes.data;
+                let rawQr = resData.base64 || 
+                            resData.code || 
+                            resData.qrcode?.base64 || 
+                            resData.qrcode?.code ||
+                            resData.data?.qrcode ||
+                            resData.data?.base64;
 
                 if (rawQr) {
                     // Clean base64 if it has the prefix already, to avoid double prefixing in frontend

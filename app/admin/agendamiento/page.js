@@ -16,9 +16,11 @@ export default function AgendamientoPage() {
 
     useEffect(() => {
         fetchAll();
-        const interval = setInterval(fetchAll, 10000); // Polling
+        // Faster polling if waiting for QR (2s), slower if connected (10s)
+        const isWaitingForQR = evolutionStatus.status !== 'open' && evolutionStatus.status !== 'CONNECTED';
+        const interval = setInterval(fetchAll, isWaitingForQR ? 2000 : 10000); 
         return () => clearInterval(interval);
-    }, []);
+    }, [evolutionStatus.status]);
 
     const fetchAll = () => {
         fetchEvolutionStatus();
