@@ -13,6 +13,7 @@ export default function AgendamientoPage() {
     const [evolutionStatus, setEvolutionStatus] = useState({ status: 'loading', qr: null });
     const [ignoredNumbers, setIgnoredNumbers] = useState([]);
     const [newIgnoredNumber, setNewIgnoredNumber] = useState('');
+    const [isActionLoading, setIsActionLoading] = useState(false);
 
     useEffect(() => {
         fetchAll();
@@ -21,11 +22,37 @@ export default function AgendamientoPage() {
         const isWaitingForQR = evolutionStatus.status !== 'open' && evolutionStatus.status !== 'CONNECTED';
         const interval = setInterval(fetchAll, isWaitingForQR ? 20000 : 30000); 
         return () => clearInterval(interval);
-    }, [evolutionStatus.status]);
+    }, [evolutionStatus.status]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const fetchAll = () => {
         fetchEvolutionStatus();
         fetchIgnoredNumbers();
+    };
+
+    const handleAction = async (action, confirmMsg) => {
+        if (confirmMsg && !confirm(confirmMsg)) return;
+        setIsActionLoading(true);
+        try {
+            console.log("Ejecutando acción:", action);
+            const res = await fetch('/api/admin/evolution', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action })
+            });
+            
+            if (res.ok) {
+                // Wait 3 seconds for the server to process and then refresh status
+                setTimeout(() => {
+                    fetchEvolutionStatus();
+                    setIsActionLoading(false);
+                }, 3000);
+            } else {
+                setIsActionLoading(false);
+            }
+        } catch (e) {
+            console.error("Error en acción:", e);
+            setIsActionLoading(false);
+        }
     };
 
     const fetchEvolutionStatus = async () => {
@@ -127,6 +154,7 @@ export default function AgendamientoPage() {
                                     <div className="p-4 bg-white border-4 border-dashed border-blue-100 rounded-3xl shadow-inner mb-4">
                                         {evolutionStatus.qr ? (
                                             <img
+                                                key={evolutionStatus.qr.substring(0, 50)}
                                                 src={evolutionStatus.qr.startsWith('data:') ? evolutionStatus.qr : `data:image/png;base64,${evolutionStatus.qr}`}
                                                 alt="WhatsApp QR"
                                                 className="w-64 h-64 object-contain mx-auto"
@@ -139,25 +167,33 @@ export default function AgendamientoPage() {
                                     </div>
                                     <div className="flex flex-col gap-3">
                                         <button
-                                            onClick={fetchEvolutionStatus}
-                                            className="text-xs text-blue-600 font-bold uppercase tracking-widest hover:underline"
-                                        >
-                                            Actualizar QR
-                                        </button>
-                                        <button
-                                            onClick={async () => {
-                                                if (confirm('¿Quieres reiniciar la instancia? Esto puede ayudar si el QR no aparece.')) {
-                                                    await fetch('/api/admin/evolution', {
-                                                        method: 'POST',
-                                                        body: JSON.stringify({ action: 'restart' })
-                                                    });
-                                                    setTimeout(fetchEvolutionStatus, 2000);
-                                                }
+                                            onClick={() => {
+                                                console.log("Actualizando QR manualmente...");
+                                                fetchEvolutionStatus();
                                             }}
-                                            className="text-[10px] text-gray-400 font-bold uppercase tracking-widest hover:text-blue-500 transition-colors"
+                                            disabled={isActionLoading}
+                                            className="w-full py-3 px-4 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-2xl text-sm font-bold transition-all flex items-center justify-center gap-2"
                                         >
-                                            Reiniciar Conexión
+                                            {isActionLoading ? <ArrowPathIcon className="h-4 w-4 animate-spin" /> : 'ACTUALIZAR QR'}
                                         </button>
+                                        
+                                        <div className="mt-6 flex flex-col gap-3">
+                                            <button
+                                                onClick={() => handleAction('restart')}
+                                                disabled={isActionLoading}
+                                                className="w-full py-3 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-2xl text-sm font-medium transition-all flex items-center justify-center gap-2"
+                                            >
+                                                {isActionLoading ? <ArrowPathIcon className="h-4 w-4 animate-spin" /> : 'Reiniciar Instancia'}
+                                            </button>
+                                            
+                                            <button
+                                                onClick={() => handleAction('delete', '¿ESTÁS SEGURO? Esto borrará la instancia "odontologa" por completo y la volverá a crear. Úsalo si el QR sigue sin funcionar.')}
+                                                disabled={isActionLoading}
+                                                className="w-full py-3 px-4 bg-red-50 hover:bg-red-100 text-red-600 rounded-2xl text-sm font-bold transition-all flex items-center justify-center gap-2 border border-red-100"
+                                            >
+                                                {isActionLoading ? <ArrowPathIcon className="h-4 w-4 animate-spin" /> : 'RESET TOTAL (Borrar y Crear)'}
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             ) : (
