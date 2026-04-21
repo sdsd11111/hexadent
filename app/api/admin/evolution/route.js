@@ -121,7 +121,17 @@ export async function POST(request) {
         const { action } = await request.json();
 
         if (action === 'logout') {
-            await axios.delete(`${EVOLUTION_API_URL}/instance/logout/${EVOLUTION_INSTANCE}`, { headers });
+            try {
+                console.log("[Evolution] Logging out instance...");
+                await axios.delete(`${EVOLUTION_API_URL}/instance/logout/${EVOLUTION_INSTANCE}`, { 
+                    headers,
+                    timeout: 5000 // Only wait 5 seconds max
+                });
+            } catch (e) {
+                console.log("[Evolution] Logout response delayed or error (ignoring):", e.message);
+                // We ignore the error because Evolution API often disconnects the instance 
+                // in the background even if the HTTP request times out.
+            }
             return NextResponse.json({ success: true });
         }
 
