@@ -124,18 +124,12 @@ export default function AgendamientoPage() {
                                 <div className="text-center">
                                     <p className="text-sm text-gray-600 mb-4 font-bold">Escanea con tu WhatsApp Business:</p>
                                     <div className="p-4 bg-white border-4 border-dashed border-blue-100 rounded-3xl shadow-inner mb-4">
-                                        {evolutionStatus.qr && evolutionStatus.qr.length > 100 && (evolutionStatus.qr.startsWith('iVBOR') || evolutionStatus.qr.includes('base64')) ? (
+                                        {evolutionStatus.qr ? (
                                             <img
-                                                src={evolutionStatus.qr.includes('base64') ? evolutionStatus.qr : `data:image/png;base64,${evolutionStatus.qr}`}
+                                                src={evolutionStatus.qr.startsWith('data:') ? evolutionStatus.qr : `data:image/png;base64,${evolutionStatus.qr}`}
                                                 alt="WhatsApp QR"
                                                 className="w-64 h-64 object-contain mx-auto"
                                             />
-                                        ) : evolutionStatus.qr ? (
-                                            <div className="w-64 h-64 flex flex-col items-center justify-center p-4 mx-auto">
-                                                <p className="text-[10px] text-gray-400 mb-2">Código de conexión:</p>
-                                                <code className="text-xs break-all bg-gray-50 p-2 rounded border border-gray-100">{evolutionStatus.qr}</code>
-                                                <p className="text-[10px] text-blue-500 mt-4 font-bold italic text-center">Escanea el código de texto en WhatsApp</p>
-                                            </div>
                                         ) : (
                                             <div className="w-64 h-64 flex items-center justify-center">
                                                 <ArrowPathIcon className="h-8 w-8 text-blue-200 animate-spin" />

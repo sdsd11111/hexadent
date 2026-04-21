@@ -60,26 +60,12 @@ export async function GET() {
                     headers: { 'apikey': EVOLUTION_API_KEY }
                 });
 
-                // Evolution API returns base64 or code depending on config
-                // Check multiple possible paths for QR data
+                // Follow the pattern that works in the other project:
+                // The service responds with a JSON that contains a field called qrcode or base64
                 const resData = qrRes.data;
-                let rawQr = resData.base64 || 
-                            resData.code || 
-                            resData.qrcode?.base64 || 
-                            resData.qrcode?.code ||
-                            resData.data?.qrcode ||
-                            resData.data?.base64;
+                qrData = resData.qrcode || resData.base64 || (resData.data && (resData.data.qrcode || resData.data.base64));
 
-                if (rawQr) {
-                    // Clean base64 if it has the prefix already, to avoid double prefixing in frontend
-                    if (typeof rawQr === 'string' && rawQr.includes('base64,')) {
-                        qrData = rawQr.split('base64,')[1];
-                    } else {
-                        qrData = rawQr;
-                    }
-                }
-
-                console.log("[Evolution Proxy] QR Data retrieved, length:", qrData?.length);
+                console.log("[Evolution Proxy] QR Data retrieved, exists:", !!qrData);
             } catch (e) {
                 console.error("[Evolution Proxy] Error fetching QR code:", e.message);
             }
