@@ -228,16 +228,6 @@ export default function AgendamientoPage() {
                                         >
                                             {isActionLoading ? <ArrowPathIcon className="h-4 w-4 animate-spin" /> : 'OBTENER NUEVO QR'}
                                         </button>
-
-                                        <div className="mt-4 flex flex-col gap-3">
-                                            <button
-                                                onClick={() => handleAction('full_reset', '¿ESTÁS SEGURO? Esto borrará la instancia por completo y la recreará. Úsalo SOLO si el QR sigue sin funcionar después de varios intentos.')}
-                                                disabled={isActionLoading}
-                                                className="w-full py-3 px-4 bg-red-50 hover:bg-red-100 text-red-600 rounded-2xl text-sm font-bold transition-all flex items-center justify-center gap-2 border border-red-100 disabled:opacity-50"
-                                            >
-                                                {isActionLoading ? <ArrowPathIcon className="h-4 w-4 animate-spin" /> : 'RESET TOTAL (Último recurso)'}
-                                            </button>
-                                        </div>
                                     </div>
                                 </div>
                             ) : (
