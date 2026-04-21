@@ -51,6 +51,22 @@ async function createInstance() {
         qrcode: true,
         number: ""
     }, { headers, timeout: 15000 });
+
+    // Ensure webhook is set so the bot can receive messages
+    const hostUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.hexadentdradianarodriguez.com';
+    console.log("[Evolution] Configuring webhook for:", hostUrl);
+    try {
+        await axios.post(`${EVOLUTION_API_URL}/webhook/set/${EVOLUTION_INSTANCE}`, {
+            webhook: {
+                enabled: true,
+                url: `${hostUrl}/api/webhook`,
+                events: ['MESSAGES_UPSERT']
+            }
+        }, { headers, timeout: 10000 });
+        console.log("[Evolution] Webhook configured successfully.");
+    } catch (e) {
+        console.error("[Evolution] Failed to set webhook:", e.message);
+    }
 }
 
 // ===== GET: Check status OR fetch QR =====
