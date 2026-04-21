@@ -16,9 +16,10 @@ export default function AgendamientoPage() {
 
     useEffect(() => {
         fetchAll();
-        // Faster polling if waiting for QR (2s), slower if connected (10s)
+        // Faster polling if waiting for QR (20s), slower if connected (30s)
+        // 2s was too fast and invalidated the QR before it could be scanned!
         const isWaitingForQR = evolutionStatus.status !== 'open' && evolutionStatus.status !== 'CONNECTED';
-        const interval = setInterval(fetchAll, isWaitingForQR ? 2000 : 10000); 
+        const interval = setInterval(fetchAll, isWaitingForQR ? 20000 : 30000); 
         return () => clearInterval(interval);
     }, [evolutionStatus.status]);
 

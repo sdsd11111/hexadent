@@ -37,15 +37,16 @@ export async function GET() {
                 await axios.post(`${EVOLUTION_API_URL}/instance/create`, {
                     instanceName: EVOLUTION_INSTANCE,
                     token: EVOLUTION_API_KEY,
-                    number: "",
-                    qrcode: true
+                    qrcode: true,
+                    number: ""
                 }, {
                     headers: { 'apikey': EVOLUTION_API_KEY }
                 });
-                // After creating, we wait a bit and mark as disconnected to trigger QR fetch
+                // Small delay to let the instance initialize
+                await new Promise(r => setTimeout(r, 1000));
                 connectionStatus = 'disconnected';
             } catch (createErr) {
-                console.error("[Evolution Proxy] Error creating instance:", createErr.message);
+                console.error("[Evolution Proxy] Error creating instance:", createErr.response?.data || createErr.message);
             }
         }
 
