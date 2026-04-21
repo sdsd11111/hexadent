@@ -345,10 +345,10 @@ export default function OrtopediaFichasPage() {
 
     // Initial sync on mount
     useEffect(() => {
-        if (isOpen && editData) {
+        if (isModalOpen) {
             refreshPDF();
         }
-    }, [isOpen]);
+    }, [isModalOpen]);
 
     useEffect(() => {
         const timer = setTimeout(() => {
