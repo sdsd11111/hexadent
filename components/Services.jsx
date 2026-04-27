@@ -28,7 +28,7 @@ export default function Especialidades() {
             subtitle: 'Alineación y Desarrollo',
             description: 'Brackets metálicos, estéticos e invisibles. Guía del crecimiento maxilar con ortopedia.',
             detailedDescription: 'Tratamientos especializados para corregir la posición de los dientes y guiar el correcto desarrollo maxilofacial. Utilizamos tecnología de vanguardia en brackets metálicos, cerámicos (estéticos) y alineadores invisibles (Invisalign), asegurando una sonrisa funcional, estética y armónica desde la infancia hasta la edad adulta.',
-            iconPath: '/images/icon_ortodoncia.png'
+            iconPath: '/images/icon_ortodoncia.webp'
         },
         {
             id: 2,
@@ -36,7 +36,7 @@ export default function Especialidades() {
             subtitle: 'Restauración Integral',
             description: 'Recupera la funcionalidad y estética con restauraciones dentales de alta calidad.',
             detailedDescription: 'Soluciones integrales diseñadas para restaurar la función masticatoria, la salud y la estética dental. Incluye prótesis fijas, removeribles, coronas de porcelana y restauraciones estéticas, devolviéndote la confianza al sonreír con resultados naturales y duraderos.',
-            iconPath: '/images/icon_rehabilitacion.png'
+            iconPath: '/images/icon_rehabilitacion.webp'
         },
         {
             id: 3,
@@ -44,7 +44,7 @@ export default function Especialidades() {
             subtitle: 'Procedimientos Seguros',
             description: 'Extracciones y cirugías dentales precisas con tecnología avanzada y segura.',
             detailedDescription: 'Procedimientos quirúrgicos realizados bajo los más estrictos estándares de bioseguridad. Especialistas en extracciones de cordales (terceros molares), frenectomías e intervenciones complejas, garantizando bienestar en todo momento y una recuperación rápida y segura.',
-            iconPath: '/images/icon_cirugia.png'
+            iconPath: '/images/icon_cirugia.webp'
         },
         {
             id: 4,
@@ -52,7 +52,7 @@ export default function Especialidades() {
             subtitle: 'Cuidado Dental Infantil',
             description: 'Atención dental preventiva y amigable diseñada especialmente para los más pequeños.',
             detailedDescription: 'Cuidado dental integral y preventivo para niños y adolescentes. Nos enfocamos en crear experiencias positivas desde la primera visita, fomentando hábitos de higiene saludables y protegiendo la salud bucal en desarrollo en un ambiente diseñado para su comodidad.',
-            iconPath: '/images/icon_odontopediatria.png'
+            iconPath: '/images/icon_odontopediatria.webp'
         },
         {
             id: 5,
@@ -60,7 +60,7 @@ export default function Especialidades() {
             subtitle: 'Tratamiento de Conductos',
             description: 'Salvamos tus dientes naturales eliminando infecciones y dolor dental interno.',
             detailedDescription: 'Terapia dental avanzada para tratar el interior del diente (pulpa dental). Mediante tecnología moderna, eliminamos focos infecciosos y aliviamos el dolor profundo, permitiendo conservar tu pieza dental natural sin necesidad de extracciones, con el máximo confort.',
-            iconPath: '/images/icon_endodoncia.png'
+            iconPath: '/images/icon_endodoncia.webp'
         }
     ]
 
