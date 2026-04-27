@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 
+
+
 export default function Especialidades() {
     const [selectedService, setSelectedService] = useState(null)
 
@@ -26,7 +28,7 @@ export default function Especialidades() {
             subtitle: 'Alineación y Desarrollo',
             description: 'Brackets metálicos, estéticos e invisibles. Guía del crecimiento maxilar con ortopedia.',
             detailedDescription: 'Tratamientos especializados para corregir la posición de los dientes y guiar el correcto desarrollo maxilofacial. Utilizamos tecnología de vanguardia en brackets metálicos, cerámicos (estéticos) y alineadores invisibles (Invisalign), asegurando una sonrisa funcional, estética y armónica desde la infancia hasta la edad adulta.',
-            image: '/images/ortodoncia.webp'
+            iconPath: '/images/icon_ortodoncia.png'
         },
         {
             id: 2,
@@ -34,7 +36,7 @@ export default function Especialidades() {
             subtitle: 'Restauración Integral',
             description: 'Recupera la funcionalidad y estética con restauraciones dentales de alta calidad.',
             detailedDescription: 'Soluciones integrales diseñadas para restaurar la función masticatoria, la salud y la estética dental. Incluye prótesis fijas, removeribles, coronas de porcelana y restauraciones estéticas, devolviéndote la confianza al sonreír con resultados naturales y duraderos.',
-            image: '/images/rehabilitacion_oral.webp'
+            iconPath: '/images/icon_rehabilitacion.png'
         },
         {
             id: 3,
@@ -42,7 +44,7 @@ export default function Especialidades() {
             subtitle: 'Procedimientos Seguros',
             description: 'Extracciones y cirugías dentales precisas con tecnología avanzada y segura.',
             detailedDescription: 'Procedimientos quirúrgicos realizados bajo los más estrictos estándares de bioseguridad. Especialistas en extracciones de cordales (terceros molares), frenectomías e intervenciones complejas, garantizando bienestar en todo momento y una recuperación rápida y segura.',
-            image: '/images/cirugia_oral.webp'
+            iconPath: '/images/icon_cirugia.png'
         },
         {
             id: 4,
@@ -50,7 +52,7 @@ export default function Especialidades() {
             subtitle: 'Cuidado Dental Infantil',
             description: 'Atención dental preventiva y amigable diseñada especialmente para los más pequeños.',
             detailedDescription: 'Cuidado dental integral y preventivo para niños y adolescentes. Nos enfocamos en crear experiencias positivas desde la primera visita, fomentando hábitos de higiene saludables y protegiendo la salud bucal en desarrollo en un ambiente diseñado para su comodidad.',
-            image: '/images/odontopediatria.webp'
+            iconPath: '/images/icon_odontopediatria.png'
         },
         {
             id: 5,
@@ -58,7 +60,7 @@ export default function Especialidades() {
             subtitle: 'Tratamiento de Conductos',
             description: 'Salvamos tus dientes naturales eliminando infecciones y dolor dental interno.',
             detailedDescription: 'Terapia dental avanzada para tratar el interior del diente (pulpa dental). Mediante tecnología moderna, eliminamos focos infecciosos y aliviamos el dolor profundo, permitiendo conservar tu pieza dental natural sin necesidad de extracciones, con el máximo confort.',
-            image: '/images/endodoncia.webp'
+            iconPath: '/images/icon_endodoncia.png'
         }
     ]
 
@@ -102,14 +104,15 @@ export default function Especialidades() {
                             <div className="bg-white h-full p-8 flex flex-col relative z-10"
                                 style={{ clipPath: 'polygon(0 0, 100% 0, 100% 90%, 90% 100%, 0 100%)' }}>
 
-                                {/* Imagen de Especialidad */}
-                                <div className="w-full h-48 relative mb-6 rounded-lg overflow-hidden bg-gray-100">
-                                    <Image
-                                        src={service.image}
-                                        alt={service.title}
-                                        fill
-                                        className="object-cover group-hover:scale-110 transition-transform duration-500"
-                                    />
+                                {/* Icono de Especialidad */}
+                                <div className="w-full h-48 relative mb-6 rounded-lg overflow-hidden flex items-center justify-center bg-gray-50">
+                                    {service.iconPath && (
+                                        <img 
+                                            src={service.iconPath} 
+                                            alt={service.title}
+                                            className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                                        />
+                                    )}
                                 </div>
 
                                 <h3 className="text-xl font-medium text-secondary mb-2 uppercase tracking-tight group-hover:text-primary transition-colors">
@@ -159,13 +162,14 @@ export default function Especialidades() {
                             onClick={(e) => e.stopPropagation()}
                         >
                             {/* Header del Lightbox */}
-                            <div className="relative h-64 md:h-80 bg-gray-100 flex items-center justify-center overflow-hidden">
-                                <Image
-                                    src={selectedService.image}
-                                    alt={selectedService.title}
-                                    fill
-                                    className="object-contain p-4 transition-all duration-700 hover:scale-105"
-                                />
+                            <div className="relative h-64 md:h-80 bg-gray-50 flex items-center justify-center overflow-hidden">
+                                {selectedService.iconPath && (
+                                    <img 
+                                        src={selectedService.iconPath} 
+                                        alt={selectedService.title}
+                                        className="w-full h-full object-cover transition-all duration-700 hover:scale-105"
+                                    />
+                                )}
                                 <div className="absolute inset-x-0 bottom-0 h-2 bg-gradient-to-r from-primary via-secondary to-primary"></div>
                             </div>
 

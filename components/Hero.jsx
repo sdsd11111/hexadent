@@ -24,14 +24,14 @@ export default function Hero() {
                     src="/hero-pattern-bg.png"
                     alt="Background Pattern"
                     fill
-                    className="object-cover opacity-60"
+                    className="object-cover opacity-30"
                     priority
                 />
             </div>
 
             {/* Decoración: Hexágonos sutiles adicionales */}
-            <div className="absolute top-20 left-10 w-64 h-64 border border-primary/10 hexagon rotate-12 pointer-events-none"></div>
-            <div className="absolute bottom-10 right-1/4 w-96 h-96 border border-primary/5 hexagon -rotate-12 pointer-events-none"></div>
+            <div className="absolute top-20 left-10 w-64 h-64 border border-primary/5 hexagon rotate-12 pointer-events-none"></div>
+            <div className="absolute bottom-10 right-1/4 w-96 h-96 border border-primary/3 hexagon -rotate-12 pointer-events-none"></div>
 
             <div className="container-custom relative z-10 w-full flex flex-col lg:flex-row items-center gap-12 pt-12 lg:pt-0">
                 {/* Columna Izquierda: Texto y CTAs */}
@@ -53,8 +53,7 @@ export default function Hero() {
                         <div className="drop-shadow-lg filter">
                             <button
                                 onClick={handleAgendarWhatsApp}
-                                className="w-full bg-primary text-white font-bold py-4 px-10 hover:bg-[#007575] transition-all uppercase tracking-widest text-sm"
-                                style={{ clipPath: 'polygon(15px 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 15px 100%, 0 50%)' }}
+                                className="w-full bg-primary text-white font-bold py-4 px-10 hover:bg-[#007575] transition-all rounded-full uppercase tracking-widest text-sm"
                             >
                                 Agendar Cita
                             </button>
@@ -62,8 +61,7 @@ export default function Hero() {
                         <div className="drop-shadow-lg filter">
                             <button
                                 onClick={scrollToEspecialidades}
-                                className="w-full bg-primary text-white font-bold py-4 px-10 hover:bg-[#007575] transition-all uppercase tracking-widest text-sm"
-                                style={{ clipPath: 'polygon(15px 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 15px 100%, 0 50%)' }}
+                                className="w-full bg-primary text-white font-bold py-4 px-10 hover:bg-[#007575] transition-all rounded-full uppercase tracking-widest text-sm"
                             >
                                 Especialidades
                             </button>
@@ -73,9 +71,9 @@ export default function Hero() {
 
                 {/* Columna Derecha: Imagen Hexagonal y Texto */}
                 <div className="w-full lg:w-1/2 flex flex-col justify-center items-center lg:items-end relative gap-6 lg:gap-8 mt-12 lg:mt-0">
-                    <div className="relative w-80 h-[28rem] md:w-[480px] md:h-[580px]">
+                    <div className="relative w-64 h-[22rem] md:w-[380px] md:h-[460px]">
                         {/* Sombra/Fondo del hexágono gris claro */}
-                        <div className="absolute inset-0 bg-gray-100/80 hexagon transform scale-110"></div>
+                        <div className="absolute inset-0 bg-gray-100/30 hexagon transform scale-110"></div>
                         
                         {/* Fondo blanco del hexágono principal */}
                         <div className="absolute inset-0 bg-white hexagon shadow-2xl overflow-hidden">
