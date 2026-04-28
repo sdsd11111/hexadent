@@ -26,6 +26,9 @@ export default function AgendamientoPage() {
     const [isActionLoading, setIsActionLoading] = useState(false);
     const [ignoredNumbers, setIgnoredNumbers] = useState([]);
     const [newIgnoredNumber, setNewIgnoredNumber] = useState('');
+    const [newIgnoredName, setNewIgnoredName] = useState('');
+    const [editingPhone, setEditingPhone] = useState(null);
+    const [editingName, setEditingName] = useState('');
 
     // --- STATUS POLLING: Only checks connection state, never touches QR ---
     const checkStatus = useCallback(async () => {
@@ -126,7 +129,7 @@ export default function AgendamientoPage() {
         try {
             const res = await fetch('/api/admin/ignored-numbers');
             const data = await res.json();
-            setIgnoredNumbers(data || []);
+            setIgnoredNumbers(Array.isArray(data) ? data : []);
         } catch (e) {
             console.error("Error fetching ignored numbers:", e);
         }
@@ -139,9 +142,14 @@ export default function AgendamientoPage() {
 
         await fetch('/api/admin/ignored-numbers', {
             method: 'POST',
-            body: JSON.stringify({ phone: cleanPhone, action: 'add' })
+            body: JSON.stringify({ 
+                phone: cleanPhone, 
+                name: newIgnoredName || 'Sin Nombre',
+                action: 'add' 
+            })
         });
         setNewIgnoredNumber('');
+        setNewIgnoredName('');
         fetchIgnoredNumbers();
     };
 
@@ -150,6 +158,26 @@ export default function AgendamientoPage() {
             method: 'POST',
             body: JSON.stringify({ phone, action: 'remove' })
         });
+        fetchIgnoredNumbers();
+    };
+
+    const handleStartEdit = (item) => {
+        setEditingPhone(item.phone);
+        setEditingName(item.name || '');
+    };
+
+    const handleSaveEdit = async () => {
+        if (!editingPhone) return;
+        await fetch('/api/admin/ignored-numbers', {
+            method: 'POST',
+            body: JSON.stringify({ 
+                phone: editingPhone, 
+                name: editingName || 'Sin Nombre',
+                action: 'add' 
+            })
+        });
+        setEditingPhone(null);
+        setEditingName('');
         fetchIgnoredNumbers();
     };
 
@@ -251,7 +279,15 @@ export default function AgendamientoPage() {
                         </h3>
                         <div className="space-y-4">
                             <p className="text-xs text-gray-500 mb-2">Ingresa los números a los que el bot NO debe contestar automáticamente.</p>
+                        <div className="flex flex-col gap-2">
                             <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    placeholder="Nombre (ej. Doctora)"
+                                    className="flex-1 text-sm border-2 border-gray-100 rounded-2xl px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-0 transition-all font-medium"
+                                    value={newIgnoredName}
+                                    onChange={(e) => setNewIgnoredName(e.target.value)}
+                                />
                                 <input
                                     type="text"
                                     placeholder="Número (ej. 593963410409)"
@@ -259,13 +295,14 @@ export default function AgendamientoPage() {
                                     value={newIgnoredNumber}
                                     onChange={(e) => setNewIgnoredNumber(e.target.value)}
                                 />
-                                <button
-                                    onClick={handleAddIgnored}
-                                    className="bg-blue-600 text-white px-6 py-3 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all"
-                                >
-                                    Añadir
-                                </button>
                             </div>
+                            <button
+                                onClick={handleAddIgnored}
+                                className="w-full bg-blue-600 text-white px-6 py-3 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all"
+                            >
+                                Añadir a Exclusión
+                            </button>
+                        </div>
                             <div className="max-h-60 overflow-y-auto pr-2 custom-scrollbar">
                                 {ignoredNumbers.length === 0 ? (
                                     <div className="text-center py-8 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-100 italic text-gray-400 text-sm">
@@ -273,15 +310,43 @@ export default function AgendamientoPage() {
                                     </div>
                                 ) : (
                                     <div className="grid grid-cols-1 gap-2">
-                                        {ignoredNumbers.map(phone => (
-                                            <div key={phone} className="flex items-center justify-between bg-gray-50 hover:bg-red-50 px-4 py-3 rounded-2xl group transition-all">
-                                                <span className="text-sm font-bold text-gray-700">{phone}</span>
-                                                <button
-                                                    onClick={() => handleRemoveIgnored(phone)}
-                                                    className="text-gray-300 hover:text-red-500 font-bold p-1"
-                                                >
-                                                    Eliminar
-                                                </button>
+                                        {ignoredNumbers.map(item => (
+                                            <div key={item.phone} className="flex items-center justify-between bg-gray-50 hover:bg-blue-50 px-4 py-3 rounded-2xl group transition-all border-2 border-transparent hover:border-blue-100">
+                                                {editingPhone === item.phone ? (
+                                                    <div className="flex-1 flex gap-2 mr-2">
+                                                        <input 
+                                                            className="flex-1 text-sm border-2 border-blue-200 rounded-xl px-3 py-1 focus:outline-none bg-white font-bold"
+                                                            placeholder="Editar nombre..."
+                                                            value={editingName}
+                                                            onChange={(e) => setEditingName(e.target.value)}
+                                                            autoFocus
+                                                        />
+                                                        <button onClick={handleSaveEdit} className="text-green-600 font-black text-xs uppercase">Guardar</button>
+                                                        <button onClick={() => setEditingPhone(null)} className="text-gray-400 font-black text-xs uppercase">X</button>
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex flex-col">
+                                                        <span className="text-xs font-black uppercase tracking-widest text-blue-500">{item.name || 'Sin Nombre'}</span>
+                                                        <span className="text-sm font-bold text-gray-700">{item.phone}</span>
+                                                    </div>
+                                                )}
+                                                
+                                                <div className="flex gap-3 opacity-0 group-hover:opacity-100 transition-all">
+                                                    {editingPhone !== item.phone && (
+                                                        <button
+                                                            onClick={() => handleStartEdit(item)}
+                                                            className="text-blue-400 hover:text-blue-600 font-bold p-1 text-[10px] uppercase tracking-tighter"
+                                                        >
+                                                            Editar nombre
+                                                        </button>
+                                                    )}
+                                                    <button
+                                                        onClick={() => handleRemoveIgnored(item.phone)}
+                                                        className="text-gray-300 hover:text-red-500 font-bold p-1 text-[10px] uppercase tracking-tighter"
+                                                    >
+                                                        Eliminar
+                                                    </button>
+                                                </div>
                                             </div>
                                         ))}
                                     </div>
