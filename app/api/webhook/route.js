@@ -43,26 +43,25 @@ export async function POST(request) {
             const isGroup = remoteJid.includes('@g.us');
             const from = remoteJid.split('@')[0].split(':')[0];
 
-            // Detect text in various spots
-            let text = msg?.conversation || msg?.extendedTextMessage?.text;
+            // Detect text in various spots (including captions in images/videos)
+            let text = msg?.conversation || 
+                       msg?.extendedTextMessage?.text || 
+                       msg?.imageMessage?.caption || 
+                       msg?.videoMessage?.caption || 
+                       msg?.documentMessage?.caption;
 
             // DETECT AUDIO
             if (!text && (msg?.audioMessage || data?.messageType === 'audio')) {
                 console.log(`[Webhook] Audio detected from ${from}. Attempting transcription...`);
                 try {
-                    // Import dynamically to avoid overhead on text-only messages
                     const { transcribeAudio } = await import('../../../lib/chatbot/transcription');
-
-                    // Evolution API usually sends base64 in data.base64 or we might need to fetch it
-                    // Check multiple paths where Evolution API variants might inject the base64 string
                     const base64 = data?.base64 || msg?.base64 || payload?.base64 || msg?.audioMessage?.base64 || undefined;
 
                     if (base64) {
                         text = await transcribeAudio(base64);
                         console.log(`[Webhook] Audio transcribed for ${from}: "${text}"`);
                     } else {
-                        console.warn(`[Webhook] Audio message received but no base64 found. Ensure Evolution API has media base64 enabled.`);
-                        // STILL send a message to the bot so it can respond to the user
+                        console.warn(`[Webhook] Audio message received but no base64 found.`);
                         text = "El usuario envió un mensaje de voz que no pudo ser transcrito. Pídele amablemente que lo escriba en texto.";
                     }
                 } catch (e) {
@@ -71,11 +70,10 @@ export async function POST(request) {
                 }
             }
 
-            // DETECT OTHER MEDIA (IMAGE, VIDEO, STICKER) - IGNORE COMPLETELY
-            if (!text && (msg?.imageMessage || msg?.videoMessage || msg?.stickerMessage || msg?.documentMessage)) {
-                console.log(`[Webhook] Non-audio media from ${from}. IGNORING - no bot processing.`);
-                // Return early - do not send to bot
-                return NextResponse.json({ status: 'media_ignored' }, { status: 200 });
+            // DETECT OTHER MEDIA (IMAGE, VIDEO, STICKER, ETC) - If no caption was found
+            if (!text && (msg?.imageMessage || msg?.videoMessage || msg?.stickerMessage || msg?.documentMessage || msg?.contactMessage || msg?.locationMessage)) {
+                console.log(`[Webhook] Unsupported media (no text) from ${from}. Sending fallback to bot.`);
+                text = "El usuario envió un archivo (imagen, sticker, ubicación o contacto) sin texto. Dile que por ahora solo puedes entender mensajes de texto y notas de voz, y pregúntale en qué puedes ayudarle.";
             }
 
             // PRODUCTION MODE: Respond to ALL numbers
