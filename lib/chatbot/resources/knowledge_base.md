@@ -11,7 +11,10 @@
 - **Horarios de Atención**:
   - **Lunes a Viernes**: 09:00 a 13:00 y 15:00 a 18:00
   - **Sábados**: 08:30 a 15:00 (Atención continua, sin cierre al mediodía)
-  - **Horario Especial**: Disponible bajo solicitud previa y coordinación directa con la doctora.
+  - **Horarios Especiales**: Si el paciente pide un horario fuera de los normales o pregunta por horarios especiales (ej: 14:00 entre semana o sábados a las 8 am / 4 pm), menciónale que los horarios **establecidos** son los indicados arriba, PERO se pueden agendar los siguientes **Horarios Especiales**:
+    - **Entre semana (Lunes a Viernes)**: 14:00 (hora de almuerzo).
+    - **Sábados**: 08:00 am (antes de abrir) y 16:00 (4:00 pm, después del cierre).
+    - *IMPORTANTE: El paciente debe entender que los horarios regulares son los establecidos y estos son solo horarios especiales.*
   - **Domingos**: Cerrado
 
 ## Servicios y Precios Aproximados
