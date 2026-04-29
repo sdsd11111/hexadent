@@ -10,7 +10,8 @@ export async function GET(request) {
     }
 
     try {
-        const slots = await getAvailableSlots(date);
+        const isAdmin = searchParams.get('isAdmin') === 'true';
+        const slots = await getAvailableSlots(date, 45, null, isAdmin);
         return NextResponse.json({ date, slots }, { status: 200 });
     } catch (error) {
         console.error('API Calendar Availability Error:', error);

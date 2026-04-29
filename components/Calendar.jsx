@@ -10,7 +10,8 @@ import {
     UserIcon,
     ClockIcon,
     PhoneIcon,
-    ChatBubbleBottomCenterTextIcon
+    ChatBubbleBottomCenterTextIcon,
+    TrashIcon
 } from '@heroicons/react/24/outline';
 
 const DAYS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
@@ -116,6 +117,28 @@ export default function Calendar({ isAdmin = false }) {
             }
         } catch (e) {
             alert('Error al agendar: ' + e.message);
+        }
+        setIsLoading(false);
+    };
+
+    const handleCancelAppointment = async (id) => {
+        if (!confirm('¿Estás seguro de cancelar esta cita?')) return;
+        setIsLoading(true);
+        try {
+            const res = await fetch('/api/admin/calendar/appointments', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, status: 'cancelled' })
+            });
+            const data = await res.json();
+            if (data.success) {
+                fetchDayDetails(selectedDate);
+                fetchMetadata(); // Update markers
+            } else {
+                alert('Error al cancelar: ' + data.error);
+            }
+        } catch (e) {
+            alert('Error al conectar con el servidor');
         }
         setIsLoading(false);
     };
@@ -365,9 +388,20 @@ export default function Calendar({ isAdmin = false }) {
                                             <div key={app.id} className="p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:shadow-md transition-all">
                                                 <div className="flex justify-between items-start mb-2">
                                                     <span className="text-xs font-black text-primary bg-blue-100 px-2 py-1 rounded-full">{app.appointment_time.substring(0, 5)}</span>
-                                                    <span className={`text-[9px] font-black uppercase px-2 py-1 rounded-full bg-green-100 text-green-700`}>
-                                                        Confirmada
-                                                    </span>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className={`text-[9px] font-black uppercase px-2 py-1 rounded-full bg-green-100 text-green-700`}>
+                                                            Confirmada
+                                                        </span>
+                                                        {isAdmin && (
+                                                            <button
+                                                                onClick={() => handleCancelAppointment(app.id)}
+                                                                className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                                                                title="Cancelar Cita"
+                                                            >
+                                                                <TrashIcon className="h-4 w-4" />
+                                                            </button>
+                                                        )}
+                                                    </div>
                                                 </div>
                                                 <div className="flex items-center gap-2 mb-1">
                                                     <UserIcon className="h-4 w-4 text-secondary" />

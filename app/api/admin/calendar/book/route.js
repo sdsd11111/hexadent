@@ -19,7 +19,7 @@ export async function POST(request) {
             date,
             time,
             motive,
-            duration: 20 // Standard duration
+            duration: 45 // Standard duration
         }, true); // isAdmin = true
 
         return NextResponse.json(result, { status: 201 });
