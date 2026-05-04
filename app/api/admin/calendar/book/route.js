@@ -4,7 +4,7 @@ import { bookAppointment } from '../../../../../lib/chatbot/scripts/calendar_hel
 export async function POST(request) {
     try {
         const body = await request.json();
-        const { name, phone, cedula, age, date, time, motive } = body;
+        const { name, phone, cedula, age, date, time, motive, duration } = body;
 
         // Validation for manual booking
         if (!name || !date || !time || !motive) {
@@ -19,7 +19,7 @@ export async function POST(request) {
             date,
             time,
             motive,
-            duration: 45 // Standard duration
+            duration: parseInt(duration) || 45 // Duration from form, default 45
         }, true); // isAdmin = true
 
         return NextResponse.json(result, { status: 201 });

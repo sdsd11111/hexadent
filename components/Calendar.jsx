@@ -32,12 +32,14 @@ export default function Calendar({ isAdmin = false }) {
 
     const [showBookingForm, setShowBookingForm] = useState(false);
     const [bookingSlot, setBookingSlot] = useState(null);
+    const [customTime, setCustomTime] = useState('');
     const [bookingData, setBookingData] = useState({
         name: '',
         cedula: '',
         age: '',
         phone: '',
-        motive: ''
+        motive: '',
+        endTime: ''
     });
 
     useEffect(() => {
@@ -94,6 +96,21 @@ export default function Calendar({ isAdmin = false }) {
 
     const handleManualBook = async (e) => {
         e.preventDefault();
+        const finalTime = customTime || bookingSlot;
+        if (!finalTime) { alert('Selecciona o escribe una hora.'); return; }
+        
+        // Calculate duration from start time to end time
+        let duration = 45;
+        if (bookingData.endTime) {
+            const [startH, startM] = finalTime.split(':').map(Number);
+            const [endH, endM] = bookingData.endTime.split(':').map(Number);
+            const startMin = startH * 60 + startM;
+            const endMin = endH * 60 + endM;
+            const diff = endMin - startMin;
+            if (diff <= 0) { alert('La hora de fin debe ser después de la hora de inicio.'); setIsLoading(false); return; }
+            duration = diff;
+        }
+        
         setIsLoading(true);
         try {
             const res = await fetch('/api/admin/calendar/book', {
@@ -101,7 +118,8 @@ export default function Calendar({ isAdmin = false }) {
                 body: JSON.stringify({
                     ...bookingData,
                     date: selectedDate,
-                    time: bookingSlot
+                    time: finalTime,
+                    duration
                 })
             });
             const data = await res.json();
@@ -109,7 +127,8 @@ export default function Calendar({ isAdmin = false }) {
                 alert('Cita agendada con éxito');
                 setShowBookingForm(false);
                 setBookingSlot(null);
-                setBookingData({ name: '', cedula: '', age: '', phone: '', motive: '' });
+                setCustomTime('');
+                setBookingData({ name: '', cedula: '', age: '', phone: '', motive: '', endTime: '' });
                 fetchDayDetails(selectedDate);
                 fetchMetadata(); // Update markers
             } else {
@@ -195,23 +214,23 @@ export default function Calendar({ isAdmin = false }) {
     const isPastSelected = selectedDate ? new Date(selectedDate) < new Date(today.toISOString().split('T')[0]) : false;
 
     return (
-        <div className="flex flex-col lg:flex-row gap-8 animate-fade-in">
-            <div className="flex-1 bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
-                <div className="bg-gradient-to-r from-secondary to-blue-900 p-6 flex items-center justify-between text-white">
-                    <button onClick={prevMonth} className="p-2 hover:bg-white/10 rounded-full transition-all">
-                        <ChevronLeftIcon className="h-6 w-6" />
+        <div className="flex flex-col lg:flex-row gap-4 lg:gap-8 animate-fade-in">
+            <div className="flex-1 bg-white rounded-2xl lg:rounded-3xl shadow-xl lg:shadow-2xl border border-gray-100 overflow-hidden">
+                <div className="bg-gradient-to-r from-secondary to-blue-900 p-3 lg:p-6 flex items-center justify-between text-white">
+                    <button onClick={prevMonth} className="p-1.5 lg:p-2 hover:bg-white/10 rounded-full transition-all">
+                        <ChevronLeftIcon className="h-5 w-5 lg:h-6 lg:w-6" />
                     </button>
-                    <h2 className="text-xl font-black uppercase tracking-widest">
+                    <h2 className="text-sm lg:text-xl font-black uppercase tracking-widest">
                         {MONTHS[currentMonth]} {currentYear}
                     </h2>
-                    <button onClick={nextMonth} className="p-2 hover:bg-white/10 rounded-full transition-all">
-                        <ChevronRightIcon className="h-6 w-6" />
+                    <button onClick={nextMonth} className="p-1.5 lg:p-2 hover:bg-white/10 rounded-full transition-all">
+                        <ChevronRightIcon className="h-5 w-5 lg:h-6 lg:w-6" />
                     </button>
                 </div>
 
                 <div className="grid grid-cols-7 bg-gray-50 border-b border-gray-100">
                     {DAYS.map(day => (
-                        <div key={day} className="py-3 text-center text-[10px] font-black uppercase text-gray-400 tracking-tighter">
+                        <div key={day} className="py-2 lg:py-3 text-center text-[9px] lg:text-[10px] font-black uppercase text-gray-400 tracking-tighter">
                             {day}
                         </div>
                     ))}
@@ -231,7 +250,7 @@ export default function Calendar({ isAdmin = false }) {
                                 key={i}
                                 onClick={() => d.currentMonth && !(isPast && !isAdmin) && !isSunday && setSelectedDate(dateStr)}
                                 className={`
-                                    h-24 p-2 border-r border-b border-gray-50 cursor-pointer transition-all relative group
+                                    min-h-[56px] lg:h-24 p-1 lg:p-2 border-r border-b border-gray-50 cursor-pointer transition-all relative group
                                     ${!d.currentMonth ? 'bg-gray-50/50 opacity-30 cursor-default' : ''}
                                     ${isSunday ? 'cursor-not-allowed bg-gray-50/30' : ''}
                                     ${isPast && !isAdmin ? 'cursor-not-allowed bg-gray-50/30' : ''}
@@ -241,21 +260,21 @@ export default function Calendar({ isAdmin = false }) {
                                 `}
                             >
                                 <span className={`
-                                    text-sm font-black 
-                                    ${isToday ? 'bg-primary text-white w-7 h-7 flex items-center justify-center rounded-full' : 'text-secondary'}
+                                    text-[11px] lg:text-sm font-black 
+                                    ${isToday ? 'bg-primary text-white w-5 h-5 lg:w-7 lg:h-7 flex items-center justify-center rounded-full text-[9px] lg:text-sm' : 'text-secondary'}
                                     ${isSunday ? 'text-red-300' : ''}
                                 `}>
                                     {d.day}
                                 </span>
 
-                                <div className="mt-2 flex flex-wrap gap-1">
+                                <div className="mt-0.5 lg:mt-2 flex flex-wrap gap-0.5 lg:gap-1">
                                     {isBlocked && (
-                                        <div className="w-full bg-red-100 text-red-600 text-[8px] font-bold px-1 rounded flex items-center gap-0.5">
-                                            <LockClosedIcon className="h-2 w-2" /> Bloqueado
+                                        <div className="w-full bg-red-100 text-red-600 text-[6px] lg:text-[8px] font-bold px-0.5 lg:px-1 rounded flex items-center gap-0.5">
+                                            <LockClosedIcon className="h-1.5 w-1.5 lg:h-2 lg:w-2" /> Blq
                                         </div>
                                     )}
                                     {isSunday && d.currentMonth && (
-                                        <div className="w-full bg-gray-100 text-gray-400 text-[8px] font-bold px-1 rounded">Cerrado</div>
+                                        <div className="w-full bg-gray-100 text-gray-400 text-[6px] lg:text-[8px] font-bold px-0.5 lg:px-1 rounded">Cerrado</div>
                                     )}
                                     {isAdmin && d.currentMonth && !isSunday && (
                                         <>
@@ -264,9 +283,9 @@ export default function Calendar({ isAdmin = false }) {
                                                     .filter(a => a.appointment_date.split('T')[0] === dateStr && a.status !== 'cancelled')
                                                     .length;
                                                 return count > 0 ? (
-                                                    <div className="w-full bg-blue-100 text-blue-700 text-[9px] font-black px-1.5 py-0.5 rounded-lg flex items-center justify-between">
-                                                        <span>Citas:</span>
-                                                        <span className="bg-blue-600 text-white w-3.5 h-3.5 flex items-center justify-center rounded-full text-[8px]">{count}</span>
+                                                    <div className="w-full bg-blue-100 text-blue-700 text-[7px] lg:text-[9px] font-black px-1 lg:px-1.5 py-0.5 rounded-lg flex items-center justify-between">
+                                                        <span className="hidden lg:inline">Citas:</span>
+                                                        <span className="bg-blue-600 text-white w-3 h-3 lg:w-3.5 lg:h-3.5 flex items-center justify-center rounded-full text-[7px] lg:text-[8px]">{count}</span>
                                                     </div>
                                                 ) : null;
                                             })()}
@@ -278,9 +297,9 @@ export default function Calendar({ isAdmin = false }) {
                                 {isAdmin && d.currentMonth && !isSunday && !isPast && (
                                     <button
                                         onClick={(e) => { e.stopPropagation(); handleBlockDate(dateStr); }}
-                                        className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 p-1 bg-white shadow-md rounded-lg text-gray-400 hover:text-red-500 transition-all"
+                                        className="absolute bottom-1 right-1 lg:bottom-2 lg:right-2 opacity-0 group-hover:opacity-100 p-0.5 lg:p-1 bg-white shadow-md rounded-lg text-gray-400 hover:text-red-500 transition-all"
                                     >
-                                        {isBlocked ? <LockOpenIcon className="h-4 w-4" /> : <LockClosedIcon className="h-4 w-4" />}
+                                        {isBlocked ? <LockOpenIcon className="h-3 w-3 lg:h-4 lg:w-4" /> : <LockClosedIcon className="h-3 w-3 lg:h-4 lg:w-4" />}
                                     </button>
                                 )}
                             </div>
@@ -289,36 +308,55 @@ export default function Calendar({ isAdmin = false }) {
                 </div>
             </div>
 
-            <div className="w-full lg:w-96 bg-white rounded-3xl shadow-xl border border-gray-100 flex flex-col">
-                <div className="p-8 border-b border-gray-50 bg-gray-50/50">
-                    <h3 className="text-secondary font-black uppercase tracking-widest text-lg flex items-center gap-3">
-                        <CalendarIcon className="h-6 w-6 text-primary" />
+            <div className="w-full lg:w-80 xl:w-96 bg-white rounded-2xl lg:rounded-3xl shadow-xl border border-gray-100 flex flex-col">
+                <div className="p-4 lg:p-8 border-b border-gray-50 bg-gray-50/50">
+                    <h3 className="text-secondary font-black uppercase tracking-widest text-sm lg:text-lg flex items-center gap-2 lg:gap-3">
+                        <CalendarIcon className="h-5 w-5 lg:h-6 lg:w-6 text-primary" />
                         Detalles del Día
                     </h3>
-                    <p className="text-gray-400 text-xs font-bold mt-1">
+                    <p className="text-gray-400 text-[10px] lg:text-xs font-bold mt-1">
                         {selectedDate ? new Date(`${selectedDate}T12:00:00`).toLocaleDateString('es-EC', { weekday: 'long', day: 'numeric', month: 'long' }) : 'Selecciona un día'}
                     </p>
                 </div>
 
-                <div className="flex-1 p-6 overflow-y-auto">
+                <div className="flex-1 p-4 lg:p-6 overflow-y-auto">
                     {!selectedDate ? (
-                        <div className="flex flex-col items-center justify-center h-full text-center text-gray-300 py-10">
-                            <ClockIcon className="h-12 w-12 mb-4 opacity-20" />
-                            <p className="text-sm font-medium">Selecciona un día en el calendario para ver disponibilidad</p>
+                        <div className="flex flex-col items-center justify-center h-full text-center text-gray-300 py-6 lg:py-10">
+                            <ClockIcon className="h-8 w-8 lg:h-12 lg:w-12 mb-3 lg:mb-4 opacity-20" />
+                            <p className="text-[11px] lg:text-sm font-medium px-4">Selecciona un día en el calendario para ver disponibilidad</p>
                         </div>
                     ) : isLoading ? (
-                        <div className="flex justify-center items-center h-40">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                        <div className="flex justify-center items-center h-32 lg:h-40">
+                            <div className="animate-spin rounded-full h-6 w-6 lg:h-8 lg:w-8 border-b-2 border-primary"></div>
                         </div>
                     ) : showBookingForm ? (
-                        <div className="animate-fade-in shadow-inner bg-gray-50 p-6 rounded-3xl border border-gray-100">
-                            <div className="flex items-center justify-between mb-6">
-                                <h4 className="text-xs font-black uppercase text-primary tracking-widest">Agendar: {bookingSlot}</h4>
-                                <button onClick={() => setShowBookingForm(false)} className="text-[10px] font-black text-red-400 uppercase hover:underline">Cancelar</button>
+                        <div className="animate-fade-in shadow-inner bg-gray-50 p-4 lg:p-6 rounded-2xl lg:rounded-3xl border border-gray-100">
+                            <div className="flex items-center justify-between mb-4 lg:mb-6">
+                                <div className="flex items-center gap-2">
+                                    <label className="text-[9px] lg:text-[10px] font-black uppercase text-gray-400">Inicio:</label>
+                                    <input
+                                        type="time"
+                                        required
+                                        className="bg-white border-2 border-primary rounded-xl px-2 lg:px-3 py-1.5 text-xs lg:text-sm font-black text-primary focus:outline-none transition-all w-24 lg:w-28"
+                                        value={customTime || bookingSlot || ''}
+                                        onChange={(e) => { setCustomTime(e.target.value); setBookingSlot(null); }}
+                                    />
+                                </div>
+                                <button onClick={() => { setShowBookingForm(false); setCustomTime(''); }} className="text-[9px] lg:text-[10px] font-black text-red-400 uppercase hover:underline">Cancelar</button>
                             </div>
-                            <form onSubmit={handleManualBook} className="space-y-4">
+                            <form onSubmit={handleManualBook} className="space-y-3 lg:space-y-4">
                                 <div>
-                                    <label className="text-[10px] font-black uppercase text-gray-400 ml-1">Nombre Completo *</label>
+                                    <label className="text-[9px] lg:text-[10px] font-black uppercase text-gray-400 ml-1">Hora de Fin *</label>
+                                    <input
+                                        required
+                                        type="time"
+                                        className="w-full bg-white border-2 border-gray-100 rounded-xl px-3 lg:px-4 py-2 text-xs lg:text-sm focus:border-primary outline-none transition-all font-bold"
+                                        value={bookingData.endTime}
+                                        onChange={(e) => setBookingData({ ...bookingData, endTime: e.target.value })}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-[9px] lg:text-[10px] font-black uppercase text-gray-400 ml-1">Nombre Completo *</label>
                                     <input
                                         required
                                         type="text"
@@ -327,50 +365,50 @@ export default function Calendar({ isAdmin = false }) {
                                         onChange={(e) => setBookingData({ ...bookingData, name: e.target.value })}
                                     />
                                 </div>
-                                <div className="grid grid-cols-2 gap-3">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     <div>
-                                        <label className="text-[10px] font-black uppercase text-gray-400 ml-1">Cédula</label>
+                                        <label className="text-[9px] lg:text-[10px] font-black uppercase text-gray-400 ml-1">Cédula</label>
                                         <input
                                             type="text"
-                                            className="w-full bg-white border-2 border-gray-100 rounded-xl px-4 py-2 text-sm focus:border-primary outline-none transition-all font-bold"
+                                            className="w-full bg-white border-2 border-gray-100 rounded-xl px-3 lg:px-4 py-2 text-xs lg:text-sm focus:border-primary outline-none transition-all font-bold"
                                             value={bookingData.cedula}
                                             onChange={(e) => setBookingData({ ...bookingData, cedula: e.target.value })}
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-[10px] font-black uppercase text-gray-400 ml-1">Edad *</label>
+                                        <label className="text-[9px] lg:text-[10px] font-black uppercase text-gray-400 ml-1">Edad *</label>
                                         <input
                                             required
                                             type="number"
-                                            className="w-full bg-white border-2 border-gray-100 rounded-xl px-4 py-2 text-sm focus:border-primary outline-none transition-all font-bold"
+                                            className="w-full bg-white border-2 border-gray-100 rounded-xl px-3 lg:px-4 py-2 text-xs lg:text-sm focus:border-primary outline-none transition-all font-bold"
                                             value={bookingData.age}
                                             onChange={(e) => setBookingData({ ...bookingData, age: e.target.value })}
                                         />
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="text-[10px] font-black uppercase text-gray-400 ml-1">Teléfono (WhatsApp)</label>
+                                    <label className="text-[9px] lg:text-[10px] font-black uppercase text-gray-400 ml-1">Teléfono (WhatsApp)</label>
                                     <input
                                         type="text"
                                         placeholder="Ej. 096..."
-                                        className="w-full bg-white border-2 border-gray-100 rounded-xl px-4 py-2 text-sm focus:border-primary outline-none transition-all font-bold"
+                                        className="w-full bg-white border-2 border-gray-100 rounded-xl px-3 lg:px-4 py-2 text-xs lg:text-sm focus:border-primary outline-none transition-all font-bold"
                                         value={bookingData.phone}
                                         onChange={(e) => setBookingData({ ...bookingData, phone: e.target.value })}
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-[10px] font-black uppercase text-gray-400 ml-1">Motivo / Tratamiento *</label>
+                                    <label className="text-[9px] lg:text-[10px] font-black uppercase text-gray-400 ml-1">Motivo / Tratamiento *</label>
                                     <textarea
                                         required
                                         rows="2"
-                                        className="w-full bg-white border-2 border-gray-100 rounded-xl px-4 py-2 text-sm focus:border-primary outline-none transition-all font-bold"
+                                        className="w-full bg-white border-2 border-gray-100 rounded-xl px-3 lg:px-4 py-2 text-xs lg:text-sm focus:border-primary outline-none transition-all font-bold"
                                         value={bookingData.motive}
                                         onChange={(e) => setBookingData({ ...bookingData, motive: e.target.value })}
                                     />
                                 </div>
                                 <button
                                     type="submit"
-                                    className="w-full bg-primary text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs shadow-lg shadow-blue-200 hover:scale-[1.02] active:scale-95 transition-all mt-4"
+                                    className="w-full bg-primary text-white py-3 lg:py-4 rounded-xl lg:rounded-2xl font-black uppercase tracking-widest text-[10px] lg:text-xs shadow-lg shadow-blue-200 hover:scale-[1.02] active:scale-95 transition-all mt-3 lg:mt-4"
                                 >
                                     Confirmar Cita
                                 </button>
@@ -378,24 +416,24 @@ export default function Calendar({ isAdmin = false }) {
                         </div>
                     ) : (
                         <div className="space-y-6">
-                            <div className="space-y-4">
-                                <h4 className="text-xs font-black uppercase text-gray-400 tracking-widest px-2">Citas Agendadas</h4>
+                            <div className="space-y-3 lg:space-y-4">
+                                <h4 className="text-[10px] lg:text-xs font-black uppercase text-gray-400 tracking-widest px-2">Citas Agendadas</h4>
                                 {appointments.filter(a => a.appointment_date.split('T')[0] === selectedDate && a.status !== 'cancelled').length === 0 ? (
-                                    <p className="text-sm text-gray-400 italic px-2">No hay citas activas para este día.</p>
+                                    <p className="text-xs lg:text-sm text-gray-400 italic px-2">No hay citas activas para este día.</p>
                                 ) : (
-                                    <div className="space-y-3">
+                                    <div className="space-y-2 lg:space-y-3">
                                         {appointments.filter(a => a.appointment_date.split('T')[0] === selectedDate && a.status !== 'cancelled').map(app => (
-                                            <div key={app.id} className="p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:shadow-md transition-all">
+                                            <div key={app.id} className="p-3 lg:p-4 bg-gray-50 rounded-xl lg:rounded-2xl border border-gray-100 hover:shadow-md transition-all">
                                                 <div className="flex justify-between items-start mb-2">
-                                                    <span className="text-xs font-black text-primary bg-blue-100 px-2 py-1 rounded-full">{app.appointment_time.substring(0, 5)}</span>
+                                                    <span className="text-[10px] lg:text-xs font-black text-primary bg-blue-100 px-2 py-1 rounded-full">{app.appointment_time.substring(0, 5)}</span>
                                                     <div className="flex items-center gap-2">
-                                                        <span className={`text-[9px] font-black uppercase px-2 py-1 rounded-full bg-green-100 text-green-700`}>
+                                                        <span className={`text-[8px] lg:text-[9px] font-black uppercase px-1.5 lg:px-2 py-0.5 lg:py-1 rounded-full bg-green-100 text-green-700`}>
                                                             Confirmada
                                                         </span>
                                                         {isAdmin && (
                                                             <button
                                                                 onClick={() => handleCancelAppointment(app.id)}
-                                                                className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                                                                className="p-1 lg:p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
                                                                 title="Cancelar Cita"
                                                             >
                                                                 <TrashIcon className="h-4 w-4" />
@@ -433,40 +471,60 @@ export default function Calendar({ isAdmin = false }) {
                             </div>
 
                             {isAdmin && !isPastSelected && (
-                                <div className="space-y-4 pt-4 border-t border-gray-100">
-                                    <h4 className="text-xs font-black uppercase text-primary tracking-widest px-2">Agendar Manualmente</h4>
+                                <div className="space-y-3 lg:space-y-4 pt-3 lg:pt-4 border-t border-gray-100">
+                                    <h4 className="text-[10px] lg:text-xs font-black uppercase text-primary tracking-widest px-2">Agendar Manualmente</h4>
+                                    
+                                    {/* Custom time input */}
+                                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 bg-blue-50/50 p-3 rounded-xl lg:rounded-2xl border border-blue-100">
+                                        <input
+                                            type="time"
+                                            className="flex-1 bg-white border-2 border-blue-200 rounded-xl px-3 py-2.5 lg:py-2 text-xs lg:text-sm font-black text-secondary focus:border-primary outline-none transition-all"
+                                            value={customTime}
+                                            onChange={(e) => setCustomTime(e.target.value)}
+                                        />
+                                        <button
+                                            onClick={() => { if (customTime) { setBookingSlot(null); setShowBookingForm(true); } else { alert('Selecciona una hora primero.'); } }}
+                                            className="bg-primary text-white px-4 py-2.5 lg:py-2 rounded-xl font-black uppercase text-[10px] tracking-wider hover:scale-[1.02] active:scale-95 transition-all shadow-md whitespace-nowrap"
+                                        >
+                                            + Hora Exacta
+                                        </button>
+                                    </div>
+
                                     {availableSlots.length === 0 ? (
-                                        <p className="text-[10px] text-gray-400 italic px-2">No hay horarios disponibles para agendamiento manual.</p>
+                                        <p className="text-[10px] text-gray-400 italic px-2">No hay horarios predefinidos. Usa el campo de arriba para agendar a cualquier hora.</p>
                                     ) : (
-                                        <div className="grid grid-cols-3 gap-2">
-                                            {availableSlots.map(slot => (
-                                                <button
-                                                    key={slot}
-                                                    onClick={() => { setBookingSlot(slot); setShowBookingForm(true); }}
-                                                    className="bg-white border-2 border-gray-100 py-2 rounded-xl text-[11px] font-black text-secondary hover:border-primary hover:text-primary transition-all shadow-sm active:scale-95"
-                                                >
-                                                    {slot}
-                                                </button>
-                                            ))}
-                                        </div>
+                                        <>
+                                            <p className="text-[8px] lg:text-[9px] font-black text-gray-400 uppercase tracking-widest px-1">O elige un horario rápido:</p>
+                                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 lg:gap-2">
+                                                {availableSlots.map(slot => (
+                                                    <button
+                                                        key={slot}
+                                                        onClick={() => { setBookingSlot(slot); setCustomTime(''); setShowBookingForm(true); }}
+                                                        className="bg-white border-2 border-gray-100 py-1.5 lg:py-2 rounded-xl text-[10px] lg:text-[11px] font-black text-secondary hover:border-primary hover:text-primary transition-all shadow-sm active:scale-95"
+                                                    >
+                                                        {slot}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </>
                                     )}
                                 </div>
                             )}
 
                             {appointments.filter(a => a.appointment_date.split('T')[0] === selectedDate && a.status === 'cancelled').length > 0 && (
-                                <div className="space-y-4 pt-4 border-t border-dashed border-gray-100">
-                                    <h4 className="text-xs font-black uppercase text-red-300 tracking-widest px-2">Historial / Canceladas</h4>
-                                    <div className="space-y-2 opacity-60">
+                                <div className="space-y-3 lg:space-y-4 pt-3 lg:pt-4 border-t border-dashed border-gray-100">
+                                    <h4 className="text-[10px] lg:text-xs font-black uppercase text-red-300 tracking-widest px-2">Historial / Canceladas</h4>
+                                    <div className="space-y-1.5 lg:space-y-2 opacity-60">
                                         {appointments.filter(a => a.appointment_date.split('T')[0] === selectedDate && a.status === 'cancelled').map(app => (
-                                            <div key={app.id} className="p-3 bg-red-50/30 rounded-xl border border-red-50 flex items-center justify-between gap-4 grayscale">
-                                                <div className="flex items-center gap-3">
-                                                    <span className="text-[9px] font-black text-red-400 bg-red-100/50 px-2 py-0.5 rounded-full line-through">{app.appointment_time.substring(0, 5)}</span>
-                                                    <div>
-                                                        <p className="text-xs font-bold text-gray-400 line-through">{app.patient_name}</p>
-                                                        <p className="text-[9px] text-gray-300">Cédula: {app.patient_cedula}</p>
+                                            <div key={app.id} className="p-2.5 lg:p-3 bg-red-50/30 rounded-xl border border-red-50 flex items-center justify-between gap-2 lg:gap-4 grayscale">
+                                                <div className="flex items-center gap-2 lg:gap-3 min-w-0">
+                                                    <span className="text-[8px] lg:text-[9px] font-black text-red-400 bg-red-100/50 px-1.5 lg:px-2 py-0.5 rounded-full line-through shrink-0">{app.appointment_time.substring(0, 5)}</span>
+                                                    <div className="min-w-0">
+                                                        <p className="text-[11px] lg:text-xs font-bold text-gray-400 line-through truncate">{app.patient_name}</p>
+                                                        <p className="text-[8px] lg:text-[9px] text-gray-300 truncate">Cédula: {app.patient_cedula}</p>
                                                     </div>
                                                 </div>
-                                                <span className="text-[8px] font-black uppercase text-red-300">Cancelada</span>
+                                                <span className="text-[7px] lg:text-[8px] font-black uppercase text-red-300 shrink-0">Cancelada</span>
                                             </div>
                                         ))}
                                     </div>

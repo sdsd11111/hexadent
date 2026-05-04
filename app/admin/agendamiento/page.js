@@ -186,18 +186,18 @@ export default function AgendamientoPage() {
     const qrToShow = currentQr;
 
     return (
-        <div className="max-w-7xl mx-auto pb-20">
-            <div className="mb-8 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto pb-20 px-3 lg:px-4">
+            <div className="mb-6 lg:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 lg:gap-0">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Monitor de Chatbot</h1>
-                    <p className="text-gray-600">Seguimiento en tiempo real de interacciones por WhatsApp</p>
+                    <h1 className="text-xl lg:text-3xl font-bold text-gray-900 mb-1 lg:mb-2">Monitor de Chatbot</h1>
+                    <p className="text-xs lg:text-sm text-gray-600">Seguimiento en tiempo real de interacciones por WhatsApp</p>
                 </div>
-                <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider border ${
+                <div className={`flex items-center gap-2 px-3 lg:px-4 py-1.5 lg:py-2 rounded-full text-[9px] lg:text-xs font-bold uppercase tracking-wider border self-start sm:self-auto ${
                     isConnected
                         ? 'bg-green-50 text-green-700 border-green-100'
                         : 'bg-yellow-50 text-yellow-700 border-yellow-100'
                 }`}>
-                    <span className={`w-2 h-2 rounded-full animate-pulse ${isConnected ? 'bg-green-500' : 'bg-yellow-500'}`} />
+                    <span className={`w-1.5 h-1.5 lg:w-2 lg:h-2 rounded-full animate-pulse ${isConnected ? 'bg-green-500' : 'bg-yellow-500'}`} />
                     {isConnected ? 'Bot Conectado' : 'Desconectado'}
                 </div>
             </div>
@@ -207,62 +207,62 @@ export default function AgendamientoPage() {
                 <Calendar isAdmin={true} />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8">
                 {/* Evolution API Connection */}
-                <div className="space-y-6">
+                <div className="space-y-4 lg:space-y-6">
                     {/* Conexión WhatsApp */}
-                    <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-xl">
-                        <h3 className="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
-                            <span className="w-2 h-8 bg-blue-600 rounded-full" />
+                    <div className="bg-white p-4 lg:p-8 rounded-2xl lg:rounded-3xl border border-gray-100 shadow-lg lg:shadow-xl">
+                        <h3 className="text-sm lg:text-lg font-bold text-gray-800 mb-4 lg:mb-6 flex items-center gap-2">
+                            <span className="w-1.5 h-6 lg:w-2 lg:h-8 bg-blue-600 rounded-full" />
                             Conexión WhatsApp
                         </h3>
-                        <div className="flex flex-col items-center gap-6 py-4">
+                        <div className="flex flex-col items-center gap-4 lg:gap-6 py-2 lg:py-4">
                             {isConnected ? (
                                 /* --- CONNECTED STATE --- */
-                                <div className="text-center p-8 bg-green-50 rounded-3xl w-full border border-green-100">
-                                    <div className="bg-green-500 text-white px-6 py-2 rounded-full text-sm font-black uppercase tracking-widest inline-block mb-4">
+                                <div className="text-center p-4 lg:p-8 bg-green-50 rounded-2xl lg:rounded-3xl w-full border border-green-100">
+                                    <div className="bg-green-500 text-white px-4 lg:px-6 py-1.5 lg:py-2 rounded-full text-[10px] lg:text-sm font-black uppercase tracking-widest inline-block mb-3 lg:mb-4">
                                         Bot Conectado
                                     </div>
-                                    <p className="text-gray-600 font-medium">Instancia activa: <span className="text-blue-600">{evolutionStatus.instance}</span></p>
-                                    <p className="text-xs text-gray-400 mt-2">El bot está listo para procesar citas.</p>
+                                    <p className="text-xs lg:text-sm text-gray-600 font-medium">Instancia activa: <span className="text-blue-600">{evolutionStatus.instance}</span></p>
+                                    <p className="text-[10px] lg:text-xs text-gray-400 mt-2">El bot está listo para procesar citas.</p>
 
                                     <button
                                         onClick={() => handleAction('logout', '¿Estás seguro de cerrar sesión en WhatsApp?')}
                                         disabled={isActionLoading}
-                                        className="mt-6 text-xs text-red-500 font-bold uppercase tracking-widest hover:underline disabled:opacity-50"
+                                        className="mt-4 lg:mt-6 text-[10px] lg:text-xs text-red-500 font-bold uppercase tracking-widest hover:underline disabled:opacity-50"
                                     >
-                                        {isActionLoading ? <ArrowPathIcon className="h-4 w-4 animate-spin inline" /> : 'Cerrar Sesión WhatsApp'}
+                                        {isActionLoading ? <ArrowPathIcon className="h-3 w-3 lg:h-4 lg:w-4 animate-spin inline" /> : 'Cerrar Sesión WhatsApp'}
                                     </button>
                                 </div>
                             ) : qrToShow ? (
                                 /* --- QR CODE VISIBLE: User should scan NOW --- */
-                                <div className="text-center">
-                                    <p className="text-sm text-gray-600 mb-2 font-bold">Escanea con tu WhatsApp Business:</p>
-                                    <p className="text-xs text-amber-600 mb-4 font-medium bg-amber-50 px-3 py-1 rounded-full inline-block">
+                                <div className="text-center w-full">
+                                    <p className="text-xs lg:text-sm text-gray-600 mb-2 font-bold">Escanea con tu WhatsApp Business:</p>
+                                    <p className="text-[9px] lg:text-xs text-amber-600 mb-3 lg:mb-4 font-medium bg-amber-50 px-2 lg:px-3 py-1 rounded-full inline-block">
                                         ⚠️ No recargues la página mientras escaneas
                                     </p>
-                                    <div className="p-4 bg-white border-4 border-dashed border-blue-100 rounded-3xl shadow-inner mb-4">
+                                    <div className="p-3 lg:p-4 bg-white border-4 border-dashed border-blue-100 rounded-2xl lg:rounded-3xl shadow-inner mb-4">
                                         <img
                                             src={qrToShow.startsWith('data:') ? qrToShow : `data:image/png;base64,${qrToShow}`}
                                             alt="WhatsApp QR"
-                                            className="w-64 h-64 object-contain mx-auto"
+                                            className="w-48 h-48 lg:w-64 lg:h-64 object-contain mx-auto"
                                         />
                                     </div>
                                     <div className="flex flex-col gap-3">
                                         <button
                                             onClick={handleRefreshQr}
                                             disabled={isActionLoading}
-                                            className="w-full py-3 px-4 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-2xl text-sm font-bold transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                                            className="w-full py-2.5 lg:py-3 px-4 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-xl lg:rounded-2xl text-[11px] lg:text-sm font-bold transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                                         >
-                                            {isActionLoading ? <ArrowPathIcon className="h-4 w-4 animate-spin" /> : 'OBTENER NUEVO QR'}
+                                            {isActionLoading ? <ArrowPathIcon className="h-3 w-3 lg:h-4 lg:w-4 animate-spin" /> : 'OBTENER NUEVO QR'}
                                         </button>
                                     </div>
                                 </div>
                             ) : (
                                 /* --- LOADING / WAITING FOR QR --- */
-                                <div className="text-center py-12">
-                                    <ArrowPathIcon className="h-12 w-12 text-blue-200 animate-spin mx-auto" />
-                                    <p className="text-sm text-gray-400 mt-4">Obteniendo QR de Evolution API...</p>
+                                <div className="text-center py-8 lg:py-12">
+                                    <ArrowPathIcon className="h-8 w-8 lg:h-12 lg:w-12 text-blue-200 animate-spin mx-auto" />
+                                    <p className="text-[11px] lg:text-sm text-gray-400 mt-3 lg:mt-4">Obteniendo QR de Evolution API...</p>
                                 </div>
                             )}
                         </div>
@@ -270,79 +270,79 @@ export default function AgendamientoPage() {
                 </div>
 
                 {/* Right Column: Exclusion and Stats */}
-                <div className="space-y-6">
+                <div className="space-y-4 lg:space-y-6">
                     {/* Blacklist / Ignored Numbers */}
-                    <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-xl">
-                        <h3 className="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
-                            <span className="w-2 h-8 bg-red-500 rounded-full" />
+                    <div className="bg-white p-4 lg:p-8 rounded-2xl lg:rounded-3xl border border-gray-100 shadow-lg lg:shadow-xl">
+                        <h3 className="text-sm lg:text-lg font-bold text-gray-800 mb-4 lg:mb-6 flex items-center gap-2">
+                            <span className="w-1.5 h-6 lg:w-2 lg:h-8 bg-red-500 rounded-full" />
                             Exclusión del Bot
                         </h3>
-                        <div className="space-y-4">
-                            <p className="text-xs text-gray-500 mb-2">Ingresa los números a los que el bot NO debe contestar automáticamente.</p>
+                        <div className="space-y-3 lg:space-y-4">
+                            <p className="text-[10px] lg:text-xs text-gray-500 mb-2">Ingresa los números a los que el bot NO debe contestar automáticamente.</p>
                         <div className="flex flex-col gap-2">
-                            <div className="flex gap-2">
+                            <div className="flex flex-col sm:flex-row gap-2">
                                 <input
                                     type="text"
                                     placeholder="Nombre (ej. Doctora)"
-                                    className="flex-1 text-sm border-2 border-gray-100 rounded-2xl px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-0 transition-all font-medium"
+                                    className="flex-1 text-xs lg:text-sm border-2 border-gray-100 rounded-xl lg:rounded-2xl px-3 lg:px-4 py-2.5 lg:py-3 focus:outline-none focus:border-blue-500 focus:ring-0 transition-all font-medium"
                                     value={newIgnoredName}
                                     onChange={(e) => setNewIgnoredName(e.target.value)}
                                 />
                                 <input
                                     type="text"
                                     placeholder="Número (ej. 593963410409)"
-                                    className="flex-1 text-sm border-2 border-gray-100 rounded-2xl px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-0 transition-all font-bold"
+                                    className="flex-1 text-xs lg:text-sm border-2 border-gray-100 rounded-xl lg:rounded-2xl px-3 lg:px-4 py-2.5 lg:py-3 focus:outline-none focus:border-blue-500 focus:ring-0 transition-all font-bold"
                                     value={newIgnoredNumber}
                                     onChange={(e) => setNewIgnoredNumber(e.target.value)}
                                 />
                             </div>
                             <button
                                 onClick={handleAddIgnored}
-                                className="w-full bg-blue-600 text-white px-6 py-3 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all"
+                                className="w-full bg-blue-600 text-white px-4 lg:px-6 py-2.5 lg:py-3 rounded-xl lg:rounded-2xl font-black text-[10px] lg:text-sm uppercase tracking-widest hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all"
                             >
                                 Añadir a Exclusión
                             </button>
                         </div>
-                            <div className="max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+                            <div className="max-h-48 lg:max-h-60 overflow-y-auto pr-1 lg:pr-2 custom-scrollbar">
                                 {ignoredNumbers.length === 0 ? (
-                                    <div className="text-center py-8 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-100 italic text-gray-400 text-sm">
+                                    <div className="text-center py-6 lg:py-8 bg-gray-50 rounded-xl lg:rounded-2xl border-2 border-dashed border-gray-100 italic text-gray-400 text-xs lg:text-sm">
                                         No hay números en la lista negra.
                                     </div>
                                 ) : (
-                                    <div className="grid grid-cols-1 gap-2">
+                                    <div className="grid grid-cols-1 gap-1.5 lg:gap-2">
                                         {ignoredNumbers.map(item => (
-                                            <div key={item.phone} className="flex items-center justify-between bg-gray-50 hover:bg-blue-50 px-4 py-3 rounded-2xl group transition-all border-2 border-transparent hover:border-blue-100">
+                                            <div key={item.phone} className="flex items-center justify-between bg-gray-50 hover:bg-blue-50 px-3 lg:px-4 py-2 lg:py-3 rounded-xl lg:rounded-2xl group transition-all border-2 border-transparent hover:border-blue-100">
                                                 {editingPhone === item.phone ? (
                                                     <div className="flex-1 flex gap-2 mr-2">
                                                         <input 
-                                                            className="flex-1 text-sm border-2 border-blue-200 rounded-xl px-3 py-1 focus:outline-none bg-white font-bold"
+                                                            className="flex-1 text-xs lg:text-sm border-2 border-blue-200 rounded-xl px-2 lg:px-3 py-1 focus:outline-none bg-white font-bold"
                                                             placeholder="Editar nombre..."
                                                             value={editingName}
                                                             onChange={(e) => setEditingName(e.target.value)}
                                                             autoFocus
                                                         />
-                                                        <button onClick={handleSaveEdit} className="text-green-600 font-black text-xs uppercase">Guardar</button>
-                                                        <button onClick={() => setEditingPhone(null)} className="text-gray-400 font-black text-xs uppercase">X</button>
+                                                        <button onClick={handleSaveEdit} className="text-green-600 font-black text-[9px] lg:text-xs uppercase">Guardar</button>
+                                                        <button onClick={() => setEditingPhone(null)} className="text-gray-400 font-black text-[9px] lg:text-xs uppercase">X</button>
                                                     </div>
                                                 ) : (
-                                                    <div className="flex flex-col">
-                                                        <span className="text-xs font-black uppercase tracking-widest text-blue-500">{item.name || 'Sin Nombre'}</span>
-                                                        <span className="text-sm font-bold text-gray-700">{item.phone}</span>
+                                                    <div className="flex flex-col min-w-0">
+                                                        <span className="text-[10px] lg:text-xs font-black uppercase tracking-widest text-blue-500 truncate">{item.name || 'Sin Nombre'}</span>
+                                                        <span className="text-xs lg:text-sm font-bold text-gray-700">{item.phone}</span>
                                                     </div>
                                                 )}
                                                 
-                                                <div className="flex gap-3 opacity-0 group-hover:opacity-100 transition-all">
+                                                <div className="flex gap-2 lg:gap-3 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-all shrink-0">
                                                     {editingPhone !== item.phone && (
                                                         <button
                                                             onClick={() => handleStartEdit(item)}
-                                                            className="text-blue-400 hover:text-blue-600 font-bold p-1 text-[10px] uppercase tracking-tighter"
+                                                            className="text-blue-400 hover:text-blue-600 font-bold p-1 text-[8px] lg:text-[10px] uppercase tracking-tighter"
                                                         >
-                                                            Editar nombre
+                                                            Editar
                                                         </button>
                                                     )}
                                                     <button
                                                         onClick={() => handleRemoveIgnored(item.phone)}
-                                                        className="text-gray-300 hover:text-red-500 font-bold p-1 text-[10px] uppercase tracking-tighter"
+                                                        className="text-gray-300 hover:text-red-500 font-bold p-1 text-[8px] lg:text-[10px] uppercase tracking-tighter"
                                                     >
                                                         Eliminar
                                                     </button>
