@@ -30,6 +30,11 @@ export default function Calendar({ isAdmin = false }) {
     const [availableSlots, setAvailableSlots] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
+    // Time-blocking state
+    const [blockedTimeSlots, setBlockedTimeSlots] = useState([]);
+    const [showBlockForm, setShowBlockForm] = useState(false);
+    const [blockForm, setBlockForm] = useState({ start_time: '', end_time: '' });
+
     const [showBookingForm, setShowBookingForm] = useState(false);
     const [bookingSlot, setBookingSlot] = useState(null);
     const [customTime, setCustomTime] = useState('');
@@ -107,6 +112,10 @@ export default function Calendar({ isAdmin = false }) {
                     const otherDays = prev.filter(a => a.appointment_date.split('T')[0] !== dateStr);
                     return [...otherDays, ...data];
                 });
+                // Also fetch time blocks for this date
+                const blocksRes = await fetch(`/api/admin/calendar/blocked-times?date=${dateStr}`);
+                const blocksData = await blocksRes.json();
+                setBlockedTimeSlots(Array.isArray(blocksData) ? blocksData : []);
             }
         } catch (e) {
             console.error("Error fetching day details:", e);
@@ -184,6 +193,63 @@ export default function Calendar({ isAdmin = false }) {
             }
         } catch (e) {
             alert('Error al conectar con el servidor');
+        }
+        setIsLoading(false);
+    };
+
+    // Time-block handlers
+    const handleAddTimeBlock = async (e) => {
+        e.preventDefault();
+        if (!blockForm.start_time || !blockForm.end_time) { alert('Selecciona inicio y fin.'); return; }
+        if (blockForm.start_time >= blockForm.end_time) { alert('La hora de fin debe ser después del inicio.'); return; }
+        setIsLoading(true);
+        try {
+            const res = await fetch('/api/admin/calendar/blocked-times', {
+                method: 'POST',
+                body: JSON.stringify({
+                    date: selectedDate,
+                    start_time: blockForm.start_time,
+                    end_time: blockForm.end_time,
+                    reason: 'Bloque manual'
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                setShowBlockForm(false);
+                setBlockForm({ start_time: '', end_time: '' });
+                fetchDayDetails(selectedDate);
+                fetchMetadata();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        } catch (e) {
+            alert('Error al bloquear: ' + e.message);
+        }
+        setIsLoading(false);
+    };
+
+    const handleDeleteTimeBlock = async (id) => {
+        if (!confirm('¿Eliminar este bloque horario?')) return;
+        setIsLoading(true);
+        try {
+            await fetch(`/api/admin/calendar/blocked-times?id=${id}`, { method: 'DELETE' });
+            fetchDayDetails(selectedDate);
+            fetchMetadata();
+        } catch (e) {
+            alert('Error al eliminar bloque: ' + e.message);
+        }
+        setIsLoading(false);
+    };
+
+    const handleDeleteAllTimeBlocks = async () => {
+        if (!confirm('¿Eliminar TODOS los bloques horarios de este día?')) return;
+        setIsLoading(true);
+        try {
+            await fetch(`/api/admin/calendar/blocked-times?date=${selectedDate}`, { method: 'DELETE' });
+            fetchDayDetails(selectedDate);
+            fetchMetadata();
+        } catch (e) {
+            alert('Error al eliminar: ' + e.message);
         }
         setIsLoading(false);
     };
@@ -317,7 +383,6 @@ export default function Calendar({ isAdmin = false }) {
                                             })()}
                                         </>
                                     )}
-                                </div>
 
 
                                 {isAdmin && d.currentMonth && !isSunday && !isPast && (
@@ -328,13 +393,14 @@ export default function Calendar({ isAdmin = false }) {
                                         {isBlocked ? <LockOpenIcon className="h-3 w-3 lg:h-4 lg:w-4" /> : <LockClosedIcon className="h-3 w-3 lg:h-4 lg:w-4" />}
                                     </button>
                                 )}
+                                </div>
                             </div>
                         );
                     })}
                 </div>
             </div>
 
-            <div className="w-full lg:w-80 xl:w-96 bg-white rounded-2xl lg:rounded-3xl shadow-xl border border-gray-100 flex flex-col">
+            <div className="w-full lg:w-72 xl:w-80 bg-white rounded-2xl lg:rounded-3xl shadow-xl border border-gray-100 flex flex-col">
                 <div className="p-4 lg:p-8 border-b border-gray-50 bg-gray-50/50">
                     <h3 className="text-secondary font-black uppercase tracking-widest text-sm lg:text-lg flex items-center gap-2 lg:gap-3">
                         <CalendarIcon className="h-5 w-5 lg:h-6 lg:w-6 text-primary" />
@@ -562,7 +628,6 @@ export default function Calendar({ isAdmin = false }) {
                                 <div className="space-y-3 lg:space-y-4 pt-3 lg:pt-4 border-t border-gray-100">
                                     <h4 className="text-[10px] lg:text-xs font-black uppercase text-primary tracking-widest px-2">Agendar Manualmente</h4>
                                     
-                                    {/* Custom time input */}
                                     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 bg-blue-50/50 p-3 rounded-xl lg:rounded-2xl border border-blue-100">
                                         <input
                                             type="time"
@@ -622,6 +687,100 @@ export default function Calendar({ isAdmin = false }) {
                     )}
                 </div>
             </div>
+
+            {/* Time-block panel - separate column for admin */}
+            {isAdmin && selectedDate && (
+                <div className="w-full lg:w-56 xl:w-64 bg-white rounded-2xl lg:rounded-3xl shadow-xl border border-gray-100 flex flex-col self-start">
+                    <div className="p-4 lg:p-5 border-b border-gray-50 bg-gray-50/50">
+                        <h3 className="text-secondary font-black uppercase tracking-widest text-sm lg:text-base flex items-center gap-2">
+                            <LockClosedIcon className="h-4 w-4 lg:h-5 lg:w-5 text-orange-500" />
+                            Bloques
+                        </h3>
+                    </div>
+                    <div className="flex-1 p-4 lg:p-5 overflow-y-auto">
+                        <div className="space-y-3 lg:space-y-4">
+                            <button
+                                onClick={() => handleBlockDate(selectedDate)}
+                                className={`w-full py-2.5 rounded-xl font-black uppercase text-[9px] lg:text-[10px] tracking-wider transition-all ${
+                                    blockedDates.includes(selectedDate)
+                                        ? 'bg-green-50 text-green-600 border border-green-200 hover:bg-green-100'
+                                        : 'bg-red-50 text-red-500 border border-red-200 hover:bg-red-100'
+                                }`}
+                            >
+                                {blockedDates.includes(selectedDate) ? 'Desbloquear Todo el Día' : 'Bloquear Todo el Día'}
+                            </button>
+
+                            {blockedDates.includes(selectedDate) && (
+                                <p className="text-[9px] lg:text-[10px] text-red-400 italic text-center">Día completamente bloqueado.</p>
+                            )}
+
+                            {!blockedDates.includes(selectedDate) && (
+                                <>
+                                    {blockedTimeSlots.length > 0 && (
+                                        <div className="space-y-1.5">
+                                            <p className="text-[8px] lg:text-[9px] font-black uppercase text-orange-400 tracking-widest">Horarios bloqueados</p>
+                                            {blockedTimeSlots.map(tb => (
+                                                <div key={tb.id} className="flex items-center justify-between bg-orange-50 border border-orange-200 rounded-lg px-2.5 py-1.5">
+                                                    <span className="text-[10px] lg:text-xs font-bold text-orange-700">{tb.start_time} - {tb.end_time}</span>
+                                                    <button
+                                                        onClick={() => handleDeleteTimeBlock(tb.id)}
+                                                        className="text-orange-400 hover:text-red-500 font-black text-xs p-0.5"
+                                                    >
+                                                        ✕
+                                                    </button>
+                                                </div>
+                                            ))}
+                                            {blockedTimeSlots.length > 1 && (
+                                                <button onClick={handleDeleteAllTimeBlocks} className="w-full text-[8px] font-black uppercase text-red-300 hover:text-red-500 py-1">
+                                                    Eliminar todos
+                                                </button>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {!showBlockForm ? (
+                                        <button
+                                            onClick={() => setShowBlockForm(true)}
+                                            className="w-full py-2.5 border-2 border-dashed border-orange-200 rounded-xl text-[9px] lg:text-[10px] font-black uppercase text-orange-400 hover:border-orange-400 hover:text-orange-600 hover:bg-orange-50/50 transition-all"
+                                        >
+                                            + Bloquear Horas
+                                        </button>
+                                    ) : (
+                                        <form onSubmit={handleAddTimeBlock} className="bg-orange-50/50 p-3 rounded-xl border border-orange-200 space-y-2">
+                                            <div className="flex gap-2">
+                                                <div className="flex-1">
+                                                    <label className="text-[8px] font-black uppercase text-gray-400">Inicio</label>
+                                                    <input type="time" required
+                                                        className="w-full bg-white border-2 border-orange-200 rounded-lg px-2 py-1.5 text-xs font-bold focus:border-orange-500 outline-none"
+                                                        value={blockForm.start_time}
+                                                        onChange={(e) => setBlockForm({ ...blockForm, start_time: e.target.value })} />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <label className="text-[8px] font-black uppercase text-gray-400">Fin</label>
+                                                    <input type="time" required
+                                                        className="w-full bg-white border-2 border-orange-200 rounded-lg px-2 py-1.5 text-xs font-bold focus:border-orange-500 outline-none"
+                                                        value={blockForm.end_time}
+                                                        onChange={(e) => setBlockForm({ ...blockForm, end_time: e.target.value })} />
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <button type="submit" className="flex-1 bg-orange-500 text-white py-2 rounded-lg font-black uppercase text-[9px] tracking-wider hover:bg-orange-600 transition-all">
+                                                    Bloquear
+                                                </button>
+                                                <button type="button"
+                                                    onClick={() => { setShowBlockForm(false); setBlockForm({ start_time: '', end_time: '' }); }}
+                                                    className="px-4 py-2 bg-gray-100 text-gray-500 rounded-lg font-black uppercase text-[9px] hover:bg-gray-200 transition-all">
+                                                    Cancelar
+                                                </button>
+                                            </div>
+                                        </form>
+                                    )}
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
