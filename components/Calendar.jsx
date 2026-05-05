@@ -39,8 +39,28 @@ export default function Calendar({ isAdmin = false }) {
         age: '',
         phone: '',
         motive: '',
-        endTime: ''
+        endTime: '',
+        isSpecial: false
     });
+
+    // Helper: detect if a time falls outside normal business hours
+    const checkIfSpecial = (dateStr, timeStr) => {
+        if (!dateStr || !timeStr) return false;
+        const d = new Date(dateStr + 'T12:00:00-05:00');
+        const day = d.getDay();
+        const [h, m] = timeStr.split(':').map(Number);
+        const mins = h * 60 + m;
+        
+        if (day === 0) return true; // Sunday - always special
+        if (day === 6) { // Saturday: normal 08:30-15:00
+            const isNormal = mins >= (8*60+30) && mins < (15*60);
+            return !isNormal;
+        }
+        // Weekdays: normal 09:00-13:00 and 15:00-18:00
+        const isMorning = mins >= (9*60) && mins < (13*60);
+        const isAfternoon = mins >= (15*60) && mins < (18*60);
+        return !isMorning && !isAfternoon;
+    };
 
     useEffect(() => {
         fetchMetadata();
@@ -111,6 +131,11 @@ export default function Calendar({ isAdmin = false }) {
             duration = diff;
         }
         
+        // Mark special appointments with [ESPECIAL] prefix in motive
+        const finalMotive = bookingData.isSpecial
+            ? `[ESPECIAL] ${bookingData.motive}`
+            : bookingData.motive;
+        
         setIsLoading(true);
         try {
             const res = await fetch('/api/admin/calendar/book', {
@@ -119,6 +144,7 @@ export default function Calendar({ isAdmin = false }) {
                     ...bookingData,
                     date: selectedDate,
                     time: finalTime,
+                    motive: finalMotive,
                     duration
                 })
             });
@@ -128,7 +154,7 @@ export default function Calendar({ isAdmin = false }) {
                 setShowBookingForm(false);
                 setBookingSlot(null);
                 setCustomTime('');
-                setBookingData({ name: '', cedula: '', age: '', phone: '', motive: '', endTime: '' });
+                setBookingData({ name: '', cedula: '', age: '', phone: '', motive: '', endTime: '', isSpecial: false });
                 fetchDayDetails(selectedDate);
                 fetchMetadata(); // Update markers
             } else {
@@ -339,7 +365,7 @@ export default function Calendar({ isAdmin = false }) {
                                         required
                                         className="bg-white border-2 border-primary rounded-xl px-2 lg:px-3 py-1.5 text-xs lg:text-sm font-black text-primary focus:outline-none transition-all w-24 lg:w-28"
                                         value={customTime || bookingSlot || ''}
-                                        onChange={(e) => { setCustomTime(e.target.value); setBookingSlot(null); }}
+                                        onChange={(e) => { setCustomTime(e.target.value); setBookingSlot(null); if (selectedDate) setBookingData(prev => ({ ...prev, isSpecial: checkIfSpecial(selectedDate, e.target.value) })); }}
                                     />
                                 </div>
                                 <button onClick={() => { setShowBookingForm(false); setCustomTime(''); }} className="text-[9px] lg:text-[10px] font-black text-red-400 uppercase hover:underline">Cancelar</button>
@@ -355,6 +381,11 @@ export default function Calendar({ isAdmin = false }) {
                                         onChange={(e) => setBookingData({ ...bookingData, endTime: e.target.value })}
                                     />
                                 </div>
+                                {bookingData.isSpecial && (
+                                    <div className="flex items-center gap-1.5 px-1 py-1.5">
+                                        <span className="text-[9px] lg:text-[10px] font-black uppercase text-purple-500 bg-purple-50 px-2.5 py-1 rounded-full border border-purple-200 tracking-wider">⭐ Horario Especial</span>
+                                    </div>
+                                )}
                                 <div>
                                     <label className="text-[9px] lg:text-[10px] font-black uppercase text-gray-400 ml-1">Nombre Completo *</label>
                                     <input
@@ -416,59 +447,116 @@ export default function Calendar({ isAdmin = false }) {
                         </div>
                     ) : (
                         <div className="space-y-6">
-                            <div className="space-y-3 lg:space-y-4">
-                                <h4 className="text-[10px] lg:text-xs font-black uppercase text-gray-400 tracking-widest px-2">Citas Agendadas</h4>
-                                {appointments.filter(a => a.appointment_date.split('T')[0] === selectedDate && a.status !== 'cancelled').length === 0 ? (
-                                    <p className="text-xs lg:text-sm text-gray-400 italic px-2">No hay citas activas para este día.</p>
-                                ) : (
-                                    <div className="space-y-2 lg:space-y-3">
-                                        {appointments.filter(a => a.appointment_date.split('T')[0] === selectedDate && a.status !== 'cancelled').map(app => (
-                                            <div key={app.id} className="p-3 lg:p-4 bg-gray-50 rounded-xl lg:rounded-2xl border border-gray-100 hover:shadow-md transition-all">
-                                                <div className="flex justify-between items-start mb-2">
-                                                    <span className="text-[10px] lg:text-xs font-black text-primary bg-blue-100 px-2 py-1 rounded-full">{app.appointment_time.substring(0, 5)}</span>
-                                                    <div className="flex items-center gap-2">
-                                                        <span className={`text-[8px] lg:text-[9px] font-black uppercase px-1.5 lg:px-2 py-0.5 lg:py-1 rounded-full bg-green-100 text-green-700`}>
-                                                            Confirmada
-                                                        </span>
-                                                        {isAdmin && (
-                                                            <button
-                                                                onClick={() => handleCancelAppointment(app.id)}
-                                                                className="p-1 lg:p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                                                                title="Cancelar Cita"
-                                                            >
-                                                                <TrashIcon className="h-4 w-4" />
-                                                            </button>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                                <div className="flex items-center gap-2 mb-1">
-                                                    <UserIcon className="h-4 w-4 text-secondary" />
-                                                    <p className="text-sm font-bold text-secondary">{app.patient_name}</p>
-                                                    <span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-black">
-                                                        {app.patient_age} años
-                                                    </span>
-                                                </div>
-                                                <div className="space-y-1 ml-6 mt-2">
-                                                    <p className="text-[10px] text-gray-500 flex items-center gap-2">
-                                                        <PhoneIcon className="h-3 w-3" /> {app.patient_phone}
-                                                    </p>
-                                                    <p className="text-[10px] text-gray-500 font-medium flex items-center gap-2">
-                                                        <span className="font-black text-gray-300">ID:</span> {app.patient_cedula}
-                                                    </p>
-                                                    {app.motive && (
-                                                        <div className="pt-1 mt-1 border-t border-gray-100 flex items-start gap-1">
-                                                            <ChatBubbleBottomCenterTextIcon className="h-3 w-3 text-blue-400 mt-0.5" />
-                                                            <p className="text-[10px] text-blue-600/90 italic font-medium break-words pr-2">
-                                                                {app.motive}
-                                                            </p>
+                            {/* Helper to check if appointment is special */}
+                            {(() => {
+                                const dayAppts = appointments.filter(a => a.appointment_date.split('T')[0] === selectedDate && a.status !== 'cancelled');
+                                const normalAppts = dayAppts.filter(a => !a.motive?.startsWith('[ESPECIAL]'));
+                                const specialAppts = dayAppts.filter(a => a.motive?.startsWith('[ESPECIAL]'));
+                                
+                                return (
+                                    <div className="space-y-4 lg:space-y-6">
+                                        {/* Normal appointments */}
+                                        <div className="space-y-3 lg:space-y-4">
+                                            <h4 className="text-[10px] lg:text-xs font-black uppercase text-gray-400 tracking-widest px-2">Citas Agendadas</h4>
+                                            {normalAppts.length === 0 ? (
+                                                <p className="text-xs lg:text-sm text-gray-400 italic px-2">No hay citas normales para este día.</p>
+                                            ) : (
+                                                <div className="space-y-2 lg:space-y-3">
+                                                    {normalAppts.map(app => (
+                                                        <div key={app.id} className="p-3 lg:p-4 bg-gray-50 rounded-xl lg:rounded-2xl border border-gray-100 hover:shadow-md transition-all">
+                                                            <div className="flex justify-between items-start mb-2">
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-[10px] lg:text-xs font-black text-primary bg-blue-100 px-2 py-1 rounded-full">{app.appointment_time.substring(0, 5)}</span>
+                                                                    {app.duration_minutes && (
+                                                                        <span className="text-[8px] lg:text-[9px] text-gray-400 font-bold">({app.duration_minutes} min)</span>
+                                                                    )}
+                                                                </div>
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-[8px] lg:text-[9px] font-black uppercase px-1.5 lg:px-2 py-0.5 lg:py-1 rounded-full bg-green-100 text-green-700">
+                                                                        Confirmada
+                                                                    </span>
+                                                                    {isAdmin && (
+                                                                        <button onClick={() => handleCancelAppointment(app.id)} className="p-1 lg:p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Cancelar Cita">
+                                                                            <TrashIcon className="h-4 w-4" />
+                                                                        </button>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex items-center gap-2 mb-1">
+                                                                <UserIcon className="h-4 w-4 text-secondary" />
+                                                                <p className="text-sm font-bold text-secondary">{app.patient_name}</p>
+                                                                <span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-black">{app.patient_age} años</span>
+                                                            </div>
+                                                            <div className="space-y-1 ml-6 mt-2">
+                                                                <p className="text-[10px] text-gray-500 flex items-center gap-2"><PhoneIcon className="h-3 w-3" /> {app.patient_phone}</p>
+                                                                <p className="text-[10px] text-gray-500 font-medium flex items-center gap-2"><span className="font-black text-gray-300">ID:</span> {app.patient_cedula}</p>
+                                                                {app.motive && (
+                                                                    <div className="pt-1 mt-1 border-t border-gray-100 flex items-start gap-1">
+                                                                        <ChatBubbleBottomCenterTextIcon className="h-3 w-3 text-blue-400 mt-0.5" />
+                                                                        <p className="text-[10px] text-blue-600/90 italic font-medium break-words pr-2">{app.motive}</p>
+                                                                    </div>
+                                                                )}
+                                                            </div>
                                                         </div>
-                                                    )}
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Special appointments */}
+                                        {specialAppts.length > 0 && (
+                                            <div className="space-y-3 lg:space-y-4 pt-3 lg:pt-4 border-t-2 border-dashed border-purple-200">
+                                                <h4 className="text-[10px] lg:text-xs font-black uppercase text-purple-500 tracking-widest px-2 flex items-center gap-2">
+                                                    <span>⭐ Horarios Especiales</span>
+                                                </h4>
+                                                <div className="space-y-2 lg:space-y-3">
+                                                    {specialAppts.map(app => {
+                                                        const cleanMotive = app.motive?.replace('[ESPECIAL]', '').trim();
+                                                        return (
+                                                            <div key={app.id} className="p-3 lg:p-4 bg-purple-50 rounded-xl lg:rounded-2xl border-2 border-purple-200 hover:shadow-md transition-all">
+                                                                <div className="flex justify-between items-start mb-2">
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="text-[10px] lg:text-xs font-black text-purple-700 bg-purple-200 px-2 py-1 rounded-full">{app.appointment_time.substring(0, 5)}</span>
+                                                                        {app.duration_minutes && (
+                                                                            <span className="text-[8px] lg:text-[9px] text-purple-400 font-bold">({app.duration_minutes} min)</span>
+                                                                        )}
+                                                                        <span className="text-[10px]">⭐</span>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="text-[8px] lg:text-[9px] font-black uppercase px-1.5 lg:px-2 py-0.5 lg:py-1 rounded-full bg-purple-200 text-purple-700">
+                                                                            Especial
+                                                                        </span>
+                                                                        {isAdmin && (
+                                                                            <button onClick={() => handleCancelAppointment(app.id)} className="p-1 lg:p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Cancelar Cita">
+                                                                                <TrashIcon className="h-4 w-4" />
+                                                                            </button>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                                <div className="flex items-center gap-2 mb-1">
+                                                                    <UserIcon className="h-4 w-4 text-purple-700" />
+                                                                    <p className="text-sm font-bold text-purple-800">{app.patient_name}</p>
+                                                                    <span className="text-[10px] bg-purple-200 text-purple-700 px-2 py-0.5 rounded-full font-black">{app.patient_age} años</span>
+                                                                </div>
+                                                                <div className="space-y-1 ml-6 mt-2">
+                                                                    <p className="text-[10px] text-purple-500 flex items-center gap-2"><PhoneIcon className="h-3 w-3" /> {app.patient_phone}</p>
+                                                                    <p className="text-[10px] text-purple-500 font-medium flex items-center gap-2"><span className="font-black text-purple-300">ID:</span> {app.patient_cedula}</p>
+                                                                    {cleanMotive && (
+                                                                        <div className="pt-1 mt-1 border-t border-purple-200 flex items-start gap-1">
+                                                                            <ChatBubbleBottomCenterTextIcon className="h-3 w-3 text-purple-400 mt-0.5" />
+                                                                            <p className="text-[10px] text-purple-600/90 italic font-medium break-words pr-2">{cleanMotive}</p>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })}
                                                 </div>
                                             </div>
-                                        ))}
+                                        )}
                                     </div>
-                                )}
-                            </div>
+                                );
+                            })()}
 
                             {isAdmin && !isPastSelected && (
                                 <div className="space-y-3 lg:space-y-4 pt-3 lg:pt-4 border-t border-gray-100">
@@ -480,7 +568,7 @@ export default function Calendar({ isAdmin = false }) {
                                             type="time"
                                             className="flex-1 bg-white border-2 border-blue-200 rounded-xl px-3 py-2.5 lg:py-2 text-xs lg:text-sm font-black text-secondary focus:border-primary outline-none transition-all"
                                             value={customTime}
-                                            onChange={(e) => setCustomTime(e.target.value)}
+                                            onChange={(e) => { setCustomTime(e.target.value); if (selectedDate) setBookingData(prev => ({ ...prev, isSpecial: checkIfSpecial(selectedDate, e.target.value) })); }}
                                         />
                                         <button
                                             onClick={() => { if (customTime) { setBookingSlot(null); setShowBookingForm(true); } else { alert('Selecciona una hora primero.'); } }}
@@ -499,7 +587,7 @@ export default function Calendar({ isAdmin = false }) {
                                                 {availableSlots.map(slot => (
                                                     <button
                                                         key={slot}
-                                                        onClick={() => { setBookingSlot(slot); setCustomTime(''); setShowBookingForm(true); }}
+                                                        onClick={() => { setBookingSlot(slot); setCustomTime(''); setBookingData(prev => ({ ...prev, isSpecial: false })); setShowBookingForm(true); }}
                                                         className="bg-white border-2 border-gray-100 py-1.5 lg:py-2 rounded-xl text-[10px] lg:text-[11px] font-black text-secondary hover:border-primary hover:text-primary transition-all shadow-sm active:scale-95"
                                                     >
                                                         {slot}
