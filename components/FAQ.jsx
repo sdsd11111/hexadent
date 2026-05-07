@@ -8,7 +8,7 @@ export default function FAQ() {
     const faqs = [
         {
             question: '¿Dónde está ubicada la clínica Hexadent en Loja?',
-            answer: 'Nos encontramos estratégicamente ubicados en el corazón del casco central de Loja, en el tradicional sector de San Sebastián. Nuestra dirección exacta es Calles Lourdes 156-46, entre Bolívar y Sucre. Contamos con fácil acceso y cercanía a las principales vías de la ciudad.'
+            answer: 'Nos encontramos estratégicamente ubicados en el corazón del casco central de Loja, en el tradicional sector de San Sebastián. Nuestra dirección exacta es Calles Lourdes, entre Bolívar y Sucre. Contamos con fácil acceso y cercanía a las principales vías de la ciudad.'
         },
         {
             question: '¿Qué tipos de ortodoncia ofrece la Dra. Diana Rodríguez?',

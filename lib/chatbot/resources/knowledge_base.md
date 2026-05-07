@@ -2,7 +2,9 @@
 
 ## Información de la Clínica
 - **Nombre**: Hexadent Odontología Especializada
-- **Ubicación**: Calle Lourdes entre Simón Bolívar y Bernardo Valdivieso (Loja - Ecuador)
+- **Ubicación**: Calle Lourdes, entre Bolívar y Sucre, San Sebastián (Loja - Ecuador)
+- **Google Maps**: https://maps.app.goo.gl/6NcHF86TzWDoBDZ69
+- **REGLA DE UBICACIÓN**: Cuando te pregunten por la dirección o ubicación, RESPONDE DIRECTAMENTE con la dirección completa + el link de Google Maps. NO preguntes si quiere la ubicación, envíala de una vez.
 - **Teléfono/WhatsApp**: 096 341 0409
 - **Zona Horaria**: UTC-5 (Ecuador)
 - **Métodos de Pago**: Efectivo y tarjeta
