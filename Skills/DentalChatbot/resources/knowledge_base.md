@@ -7,25 +7,20 @@
 ## Services & Pricing
 
 ### General Consultation
-- **Clinical Evaluation**: $15.
+- **Clinical Evaluation**: Handled directly by the doctor.
 - **Promotion**: Free consultation during specific months (e.g., "Fiesta de Loja").
 
 ### Orthodontics (Brackets)
 - **General Rule**: Requires a clinical evaluation first. Patient must have "zero cavities" (or start restoring them) before placement.
-- **Brackets Autoligado**: $1200
-  - Entrance: $250
-  - Monthly installment: $50
-  - Estimated duration: 19 months
-- **Brackets Convencionales**: $1050
-  - Entrance: $250
-  - Monthly installment: $50
-- **Range**: Usually between $800 - $1500 depending on complexity.
+- **Brackets Autoligado**: Pricing determined after clinical evaluation.
+- **Brackets Convencionales**: Pricing determined after clinical evaluation.
+- **Range**: Pricing determined after clinical evaluation.
 
 ### General Dentistry
-- **Molar Filling (Calce)**: $25+ (depends on level of destruction).
-- **Cavity Restoration**: $20 per cavity.
-- **Dental Cleaning / Gingivitis Treatment**: $20.
-- **Third Molar Surgery**: $150.
+- **Molar Filling (Calce)**: Pricing depends on clinical evaluation.
+- **Cavity Restoration**: Pricing depends on clinical evaluation.
+- **Dental Cleaning / Gingivitis Treatment**: Pricing depends on clinical evaluation.
+- **Third Molar Surgery**: Pricing depends on clinical evaluation.
 
 ## Scheduling Workflow
 1. **Greeting**: "Gracias por comunicarte con Hexadent odontología especializada. ¿Cómo podemos ayudarte?"
@@ -36,5 +31,5 @@
 
 ## FAQ
 - **Where to get X-rays (Radiografías)?**: The clinic refers patients to specialized radiological centers.
-- **Payment flexibility?**: Installments are available for long-term treatments (Orthodontics).
+- **Payment flexibility?**: Installments are available for long-term treatments (Orthodontics), details handled by the doctor.
 - **Emergencies**: "Empezamos por el tratamiento más urgente".

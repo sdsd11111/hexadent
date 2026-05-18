@@ -25,7 +25,7 @@ This skill allows the Antigravity agent to act as a virtual assistant for **Hexa
 
 ### 2. Information Requests
 - If the patient asks for pricing, provide the ranges or specific values from the knowledge base.
-- For treatments like **Orthodontics**, always emphasize that a **Clinical Evaluation ($15)** is required first for a definitive quote.
+- For treatments like **Orthodontics**, always emphasize that a **Clinical Evaluation** is required first for a definitive quote.
 
 ### 3. Scheduling Flow
 
