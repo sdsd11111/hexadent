@@ -1,0 +1,23 @@
+Ran command: `npm run build`
+
+¡Perfecto! Una vez que subas los cambios y el servidor se actualice, aquí tienes los textos exactos para verificar que todo esté funcionando al 100%.
+
+Borrando la memoria de nuevo o simplemente continuando, haz estas pruebas:
+
+### 1. La prueba de fuego (La del 29 de mayo que fallaba)
+*   **Mensaje exacto a enviar:** `deseo agendar una cita para el 29 de mayo por favor.`
+*   **Lo que esperamos:** Que ahora sí entienda la fecha completa, consulte el sistema, vea que está bloqueado y te responda: *"No tenemos disponibilidad para ese día"*.
+
+### 2. Prueba de no dar precios
+*   **Mensaje exacto a enviar:** `Hola, ¿cuánto cuesta la consulta de valoración?`
+*   **Lo que esperamos:** Que te diga que los valores se tratan directamente con la doctora y no mencione ningún precio.
+
+### 3. Prueba de horarios reales (Hoy en la tarde)
+*   **Mensaje exacto a enviar:** `Hola, quiero una cita para hoy en la tarde.`
+*   **Lo que esperamos:** Que NO te diga "a partir de las 15:00" (porque está ocupado). Debe ofrecerte las **16:30** (que es el único hueco libre real de 45 min) o el horario especial de las 14:00.
+
+### 4. Prueba de reconocimiento de cita
+*   **Mensaje exacto a enviar:** `Hola, ¿tengo alguna cita agendada para hoy?`
+*   **Lo que esperamos:** Que verifique tu número y te diga que ya tienes una cita (por ejemplo, la de las 15:45 si estás usando ese mismo número).
+
+Súbelo con confianza y me avisas cómo te va con estas pruebas. ¡Cruzo los dedos para que todo salga perfecto!sadasd

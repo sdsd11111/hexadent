@@ -16,7 +16,7 @@ const dancingScript = Dancing_Script({
 })
 
 export const metadata = {
-    metadataBase: new URL('https://hexadent.com.ec'),
+    metadataBase: new URL('https://www.hexadentdradianarodriguez.com'),
     title: 'Hexadent - Ortodoncia Especializada en Loja | Dra. Diana Rodríguez',
     description: 'Centro Odontológico Hexadent en San Sebastián, Loja. Especialistas en Ortodoncia de vanguardia. Dra. Diana Rodríguez - Registro SENESCYT. Agenda tu cita al 0967885039.',
     keywords: 'ortodoncia Loja, dentista Loja, brackets Loja, clínica dental Loja, San Sebastián Loja, odontología especializada, Dra Diana Rodríguez, Hexadent',
@@ -31,7 +31,7 @@ export const metadata = {
     openGraph: {
         title: 'Hexadent - Ortodoncia Especializada en Loja',
         description: 'Transforma tu sonrisa con tratamientos de ortodoncia de vanguardia en el corazón de Loja. Dra. Diana Rodríguez.',
-        url: 'https://hexadent.com.ec',
+        url: 'https://www.hexadentdradianarodriguez.com',
         siteName: 'Hexadent',
         locale: 'es_EC',
         type: 'website',
@@ -72,6 +72,70 @@ export const metadata = {
 
 import WhatsAppButton from '@/components/WhatsAppButton'
 
+const dentistSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Dentist',
+    '@id': 'https://www.hexadentdradianarodriguez.com/#dentist',
+    'name': 'Hexadent - Ortodoncia Especializada',
+    'alternateName': 'Dra. Diana Rodríguez - Ortodoncia en Loja',
+    'image': 'https://www.hexadentdradianarodriguez.com/logo.jpg',
+    'url': 'https://www.hexadentdradianarodriguez.com',
+    'telephone': '+593967885039',
+    'priceRange': '$$',
+    'address': {
+        '@type': 'PostalAddress',
+        'streetAddress': 'Calle Lourdes entre Simón Bolívar y Sucre (Sector San Sebastián)',
+        'addressLocality': 'Loja',
+        'addressRegion': 'Loja',
+        'postalCode': '110150',
+        'addressCountry': 'EC'
+    },
+    'geo': {
+        '@type': 'GeoCoordinates',
+        'latitude': -3.9933,
+        'longitude': -79.2042
+    },
+    'openingHoursSpecification': [
+        {
+            '@type': 'OpeningHoursSpecification',
+            'dayOfWeek': [
+                'Monday',
+                'Tuesday',
+                'Wednesday',
+                'Thursday',
+                'Friday'
+            ],
+            'opens': '09:00',
+            'closes': '13:00'
+        },
+        {
+            '@type': 'OpeningHoursSpecification',
+            'dayOfWeek': [
+                'Monday',
+                'Tuesday',
+                'Wednesday',
+                'Thursday',
+                'Friday'
+            ],
+            'opens': '15:00',
+            'closes': '18:30'
+        },
+        {
+            '@type': 'OpeningHoursSpecification',
+            'dayOfWeek': 'Saturday',
+            'opens': '09:30',
+            'closes': '13:00'
+        }
+    ],
+    'contactPoint': {
+        '@type': 'ContactPoint',
+        'telephone': '+593967885039',
+        'contactType': 'customer service',
+        'areaServed': 'EC',
+        'availableLanguage': 'Spanish'
+    }
+}
+
 export default function RootLayout({ children }) {
     return (
         <html lang="es-EC">
@@ -81,6 +145,10 @@ export default function RootLayout({ children }) {
                 <meta name="geo.placename" content="Loja" />
                 <meta name="geo.position" content="-3.9933;-79.2042" />
                 <meta name="ICBM" content="-3.9933, -79.2042" />
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{ __html: JSON.stringify(dentistSchema) }}
+                />
             </head>
             <body className={`${outfit.variable} ${dancingScript.variable} font-sans`}>
                 {children}

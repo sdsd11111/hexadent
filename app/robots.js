@@ -7,6 +7,6 @@ export default function robots() {
         disallow: ['/admin', '/api'],
       },
     ],
-    sitemap: 'https://hexadent.com.ec/sitemap.xml',
+    sitemap: 'https://www.hexadentdradianarodriguez.com/sitemap.xml',
   }
 }

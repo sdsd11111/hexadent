@@ -1,5 +1,5 @@
 export default function sitemap() {
-  const baseUrl = 'https://hexadent.com.ec';
+  const baseUrl = 'https://www.hexadentdradianarodriguez.com';
 
   // Define static routes
   const routes = [
