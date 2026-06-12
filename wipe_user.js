@@ -10,7 +10,7 @@ if (fs.existsSync('.env')) {
 const { default: db } = await import('./lib/db.js');
 
 // Change this to the phone number you want to wipe
-const phoneToWipe = '593963410409'; // Your test number
+const phoneToWipe = '593967491847'; // User test number
 
 console.log(`🗑️  Borrando memoria para: ${phoneToWipe}\n`);
 
