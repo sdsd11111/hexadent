@@ -2,11 +2,11 @@ import mysql from 'mysql2/promise';
 import fs from 'fs';
 import path from 'path';
 
-async function check() {
+async function clearHandoff() {
     const envPath = path.join(process.cwd(), '.env');
     const env = fs.readFileSync(envPath, 'utf8').split('\n').reduce((acc, line) => {
         const [key, ...val] = line.split('=');
-        if (key && val.length > 0) acc[key.trim()] = val.join('=').trim();
+        if (key && val.length > 0) acc[key.trim()] = val.join('=').trim().replace(/^['"]|['"]$/g, '');
         return acc;
     }, {});
 
@@ -20,17 +20,14 @@ async function check() {
 
     try {
         const connection = await mysql.createConnection(config);
+        const phone = '593967491847';
         
-        console.log('--- ALL LOGS TODAY FOR 593981586981 ---');
-        const [rows] = await connection.execute(
-            'SELECT * FROM chatbot_logs WHERE phone = "593981586981" ORDER BY id DESC LIMIT 20'
+        console.log(`🗑️ Borrando handoff para: ${phone}`);
+        const [res] = await connection.execute(
+            'DELETE FROM handoff_sessions WHERE phone = ? OR phone LIKE ?',
+            [phone, `%${phone.slice(-9)}`]
         );
-        for (const r of rows) {
-            console.log(`ID: ${r.id} | TS: ${r.timestamp} | User: ${r.user_msg}`);
-            console.log(`Bot: ${r.bot_resp}`);
-            console.log(`Tool Result: ${r.tool_execution_result}`);
-            console.log('----------------------------------------------------');
-        }
+        console.log(`✅ Handoff borrado: ${res.affectedRows} registro(s)`);
 
         await connection.end();
     } catch (e) {
@@ -38,4 +35,4 @@ async function check() {
     }
 }
 
-check();
+clearHandoff();
