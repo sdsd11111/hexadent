@@ -2,7 +2,7 @@ import mysql from 'mysql2/promise';
 import fs from 'fs';
 import path from 'path';
 
-async function clearHandoff() {
+async function fixDatabaseSchema() {
     const envPath = path.join(process.cwd(), '.env');
     const env = fs.readFileSync(envPath, 'utf8').split('\n').reduce((acc, line) => {
         const [key, ...val] = line.split('=');
@@ -20,14 +20,14 @@ async function clearHandoff() {
 
     try {
         const connection = await mysql.createConnection(config);
-        const phone = '593967491847';
         
-        console.log(`🗑️ Borrando handoff para: ${phone}`);
-        const [res] = await connection.execute(
-            'DELETE FROM handoff_sessions WHERE phone = ? OR phone LIKE ?',
-            [phone, `%${phone.slice(-9)}`]
-        );
-        console.log(`✅ Handoff borrado: ${res.affectedRows} registro(s)`);
+        console.log('--- Dropping UNIQUE index idx_slot from appointments ---');
+        await connection.execute('ALTER TABLE appointments DROP INDEX idx_slot');
+        console.log('✅ UNIQUE index idx_slot successfully dropped!');
+
+        console.log('--- SHOW INDEX FROM appointments ---');
+        const [indexes] = await connection.execute('SHOW INDEX FROM appointments');
+        console.table(indexes);
 
         await connection.end();
     } catch (e) {
@@ -35,4 +35,4 @@ async function clearHandoff() {
     }
 }
 
-clearHandoff();
+fixDatabaseSchema();
