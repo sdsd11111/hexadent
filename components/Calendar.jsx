@@ -22,7 +22,10 @@ const MONTHS = [
 
 export default function Calendar({ isAdmin = false }) {
     // Use Ecuador timezone (America/Guayaquil) for correct date display
-    const today = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Guayaquil' }));
+    // Get current UTC time and subtract 5 hours to get Ecuador time (UTC-5)
+    const now = new Date();
+    const ecuadorOffset = -5 * 60 * 60 * 1000; // -5 hours in ms
+    const today = new Date(now.getTime() + ecuadorOffset);
     const [currentMonth, setCurrentMonth] = useState(today.getMonth());
     const [currentYear, setCurrentYear] = useState(today.getFullYear());
     const [selectedDate, setSelectedDate] = useState(null);
