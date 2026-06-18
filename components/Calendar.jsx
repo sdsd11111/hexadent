@@ -21,7 +21,8 @@ const MONTHS = [
 ];
 
 export default function Calendar({ isAdmin = false }) {
-    const today = new Date();
+    // Use Ecuador timezone (America/Guayaquil) for correct date display
+    const today = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Guayaquil' }));
     const [currentMonth, setCurrentMonth] = useState(today.getMonth());
     const [currentYear, setCurrentYear] = useState(today.getFullYear());
     const [selectedDate, setSelectedDate] = useState(null);
