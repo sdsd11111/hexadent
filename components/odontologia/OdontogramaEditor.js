@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
+import { XMarkIcon } from '@heroicons/react/24/outline';
 import Tooth5Parts from './Tooth5Parts';
 
 // Símbolos y etiquetas según la imagen de referencia del usuario
@@ -115,6 +116,31 @@ const ToothEditorModal = ({ isOpen, onClose, toothId, data = {}, onConfirm }) =>
                     {/* Responsive modal for tablet (Tabwee T20 10.1" - 1280x800) */}
                     <div className="flex min-h-full items-center justify-center p-2 sm:p-4 md:p-6">
                         <Dialog.Panel className="w-full max-w-[95vw] sm:max-w-[90vw] lg:max-w-7xl max-h-[98vh] transform overflow-hidden rounded-xl sm:rounded-2xl lg:rounded-[2rem] bg-white p-3 sm:p-6 shadow-[0_35px_60px_-15px_rgba(0,0,0,0.3)] transition-all">
+                            {/* Header with close button */}
+                            <div className="flex items-center justify-between mb-3 sm:mb-4 pb-2 border-b border-slate-100">
+                                <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Editor de Pieza</span>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        const hasChanges = JSON.stringify(localData) !== JSON.stringify(data);
+                                        if (hasChanges) {
+                                            const confirm = window.confirm('¿Guardar cambios antes de salir?');
+                                            if (confirm) {
+                                                onConfirm(toothId, localData);
+                                                onClose();
+                                            } else {
+                                                onClose();
+                                            }
+                                        } else {
+                                            onClose();
+                                        }
+                                    }}
+                                    className="p-1.5 sm:p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-all"
+                                >
+                                    <XMarkIcon className="h-5 w-5 sm:h-6 sm:w-6" />
+                                </button>
+                            </div>
+
                             {/* Responsive flex layout: column on mobile/tablet, row on desktop */}
                             <div className="flex flex-col sm:flex-col lg:flex-row gap-3 sm:gap-6 h-full max-h-[95vh] overflow-hidden">
                                 {/* Left Side: Tooth and Buttons - Responsive sizing */}
