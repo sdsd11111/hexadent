@@ -11,7 +11,8 @@ import {
     ClockIcon,
     PhoneIcon,
     ChatBubbleBottomCenterTextIcon,
-    TrashIcon
+    TrashIcon,
+    ArrowPathIcon
 } from '@heroicons/react/24/outline';
 
 const DAYS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
@@ -38,6 +39,13 @@ export default function Calendar({ isAdmin = false }) {
     const [blockedTimeSlots, setBlockedTimeSlots] = useState([]);
     const [showBlockForm, setShowBlockForm] = useState(false);
     const [blockForm, setBlockForm] = useState({ start_time: '', end_time: '' });
+
+    // Subsecuente appointment state
+    const [showSubsecuenteModal, setShowSubsecuenteModal] = useState(false);
+    const [subsecuenteData, setSubsecuenteData] = useState(null);
+    const [subsecuenteDate, setSubsecuenteDate] = useState('');
+    const [subsecuenteTime, setSubsecuenteTime] = useState('');
+    const [subsecuenteEndTime, setSubsecuenteEndTime] = useState('');
 
     const [showBookingForm, setShowBookingForm] = useState(false);
     const [bookingSlot, setBookingSlot] = useState(null);
@@ -197,6 +205,66 @@ export default function Calendar({ isAdmin = false }) {
             }
         } catch (e) {
             alert('Error al conectar con el servidor');
+        }
+        setIsLoading(false);
+    };
+
+    // Handler for creating subsecuente appointments
+    const handleSubsecuente = async () => {
+        if (!subsecuenteDate || !subsecuenteTime) {
+            alert('Selecciona fecha y hora para la nueva cita.');
+            return;
+        }
+
+        let duration = 45;
+        if (subsecuenteEndTime) {
+            const [startH, startM] = subsecuenteTime.split(':').map(Number);
+            const [endH, endM] = subsecuenteEndTime.split(':').map(Number);
+            const startMin = startH * 60 + startM;
+            const endMin = endH * 60 + endM;
+            const diff = endMin - startMin;
+            if (diff <= 0) { alert('La hora de fin debe ser después de la hora de inicio.'); return; }
+            duration = diff;
+        }
+
+        // Preserve the original motive, adding [SUBSECUENTE] if it's a special appointment
+        let originalMotive = subsecuenteData?.motive || '';
+        if (originalMotive.startsWith('[ESPECIAL]')) {
+            originalMotive = '[SUBSECUENTE] ' + originalMotive;
+        } else {
+            originalMotive = '[SUBSECUENTE] ' + originalMotive;
+        }
+
+        setIsLoading(true);
+        try {
+            const res = await fetch('/api/admin/calendar/book', {
+                method: 'POST',
+                body: JSON.stringify({
+                    name: subsecuenteData?.patient_name || '',
+                    cedula: subsecuenteData?.patient_cedula || '',
+                    age: subsecuenteData?.patient_age || '',
+                    phone: subsecuenteData?.patient_phone || '',
+                    motive: originalMotive,
+                    date: subsecuenteDate,
+                    time: subsecuenteTime,
+                    duration: duration
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert('Cita subsecuente creada con éxito');
+                setShowSubsecuenteModal(false);
+                setSubsecuenteData(null);
+                setSubsecuenteDate('');
+                setSubsecuenteTime('');
+                setSubsecuenteEndTime('');
+                fetchDayDetails(selectedDate);
+                fetchMetadata();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        } catch (e) {
+            alert('Error al crear cita subsecuente: ' + e.message);
         }
         setIsLoading(false);
     };
@@ -425,6 +493,72 @@ export default function Calendar({ isAdmin = false }) {
                         <div className="flex justify-center items-center h-32 lg:h-40">
                             <div className="animate-spin rounded-full h-6 w-6 lg:h-8 lg:w-8 border-b-2 border-primary"></div>
                         </div>
+                    ) : showSubsecuenteModal && subsecuenteData ? (
+                        <div className="animate-fade-in shadow-inner bg-blue-50 p-4 lg:p-6 rounded-2xl lg:rounded-3xl border-2 border-blue-200">
+                            <div className="flex items-center justify-between mb-4 lg:mb-6">
+                                <div className="flex items-center gap-2">
+                                    <ArrowPathIcon className="h-5 w-5 text-blue-500" />
+                                    <span className="text-xs lg:text-sm font-black text-blue-700 uppercase">Cita Subsecuente</span>
+                                </div>
+                                <button onClick={() => { setShowSubsecuenteModal(false); }} className="text-[9px] lg:text-[10px] font-black text-red-400 uppercase hover:underline">Cerrar</button>
+                            </div>
+                            <div className="space-y-3 lg:space-y-4">
+                                <div className="bg-white p-3 rounded-xl border border-blue-100">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <UserIcon className="h-4 w-4 text-secondary" />
+                                        <span className="text-xs lg:text-sm font-black text-gray-700">{subsecuenteData.patient_name}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-[10px] lg:text-xs text-gray-400">
+                                        <PhoneIcon className="h-3 w-3" />
+                                        <span>{subsecuenteData.phone}</span>
+                                        {subsecuenteData.cedula && (
+                                            <>
+                                                <span className="ml-2">•</span>
+                                                <span>Céd: {subsecuenteData.cedula}</span>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label className="text-[9px] lg:text-[10px] font-black uppercase text-gray-400">Nueva Fecha:</label>
+                                        <input
+                                            type="date"
+                                            required
+                                            className="w-full bg-white border-2 border-blue-200 rounded-xl px-2 lg:px-3 py-1.5 text-xs lg:text-sm font-black text-gray-700 focus:outline-none transition-all"
+                                            value={subsecuenteDate}
+                                            onChange={(e) => setSubsecuenteDate(e.target.value)}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-[9px] lg:text-[10px] font-black uppercase text-gray-400">Hora:</label>
+                                        <input
+                                            type="time"
+                                            required
+                                            className="w-full bg-white border-2 border-blue-200 rounded-xl px-2 lg:px-3 py-1.5 text-xs lg:text-sm font-black text-gray-700 focus:outline-none transition-all"
+                                            value={subsecuenteTime}
+                                            onChange={(e) => setSubsecuenteTime(e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="text-[9px] lg:text-[10px] font-black uppercase text-gray-400">Duración (min):</label>
+                                    <input
+                                        type="number"
+                                        className="w-full bg-white border-2 border-blue-200 rounded-xl px-2 lg:px-3 py-1.5 text-xs lg:text-sm font-black text-gray-700 focus:outline-none transition-all"
+                                        value={subsecuenteEndTime}
+                                        onChange={(e) => setSubsecuenteEndTime(e.target.value)}
+                                        placeholder="30"
+                                    />
+                                </div>
+                                <button
+                                    onClick={() => handleSubsecuente()}
+                                    className="w-full bg-blue-500 text-white py-3 lg:py-4 rounded-xl lg:rounded-2xl font-black uppercase tracking-widest text-[10px] lg:text-xs shadow-lg shadow-blue-200 hover:scale-[1.02] active:scale-95 transition-all mt-3 lg:mt-4"
+                                >
+                                    Confirmar Cita
+                                </button>
+                            </div>
+                        </div>
                     ) : showBookingForm ? (
                         <div className="animate-fade-in shadow-inner bg-gray-50 p-4 lg:p-6 rounded-2xl lg:rounded-3xl border border-gray-100">
                             <div className="flex items-center justify-between mb-4 lg:mb-6">
@@ -546,9 +680,14 @@ export default function Calendar({ isAdmin = false }) {
                                                                         Confirmada
                                                                     </span>
                                                                     {isAdmin && (
-                                                                        <button onClick={() => handleCancelAppointment(app.id)} className="p-1 lg:p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Cancelar Cita">
-                                                                            <TrashIcon className="h-4 w-4" />
-                                                                        </button>
+                                                                        <>
+                                                                            <button onClick={() => { setSubsecuenteData(app); setSubsecuenteDate(selectedDate); setSubsecuenteTime(''); setSubsecuenteEndTime(''); setShowSubsecuenteModal(true); }} className="p-1 lg:p-1.5 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Crear Cita Subsecuente">
+                                                                                <ArrowPathIcon className="h-4 w-4" />
+                                                                            </button>
+                                                                            <button onClick={() => handleCancelAppointment(app.id)} className="p-1 lg:p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Cancelar Cita">
+                                                                                <TrashIcon className="h-4 w-4" />
+                                                                            </button>
+                                                                        </>
                                                                     )}
                                                                 </div>
                                                             </div>
@@ -597,9 +736,14 @@ export default function Calendar({ isAdmin = false }) {
                                                                             Especial
                                                                         </span>
                                                                         {isAdmin && (
-                                                                            <button onClick={() => handleCancelAppointment(app.id)} className="p-1 lg:p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Cancelar Cita">
-                                                                                <TrashIcon className="h-4 w-4" />
-                                                                            </button>
+                                                                            <>
+                                                                                <button onClick={() => { setSubsecuenteData(app); setSubsecuenteDate(selectedDate); setSubsecuenteTime(''); setSubsecuenteEndTime(''); setShowSubsecuenteModal(true); }} className="p-1 lg:p-1.5 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-all" title="Crear Cita Subsecuente">
+                                                                                    <ArrowPathIcon className="h-4 w-4" />
+                                                                                </button>
+                                                                                <button onClick={() => handleCancelAppointment(app.id)} className="p-1 lg:p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Cancelar Cita">
+                                                                                    <TrashIcon className="h-4 w-4" />
+                                                                                </button>
+                                                                            </>
                                                                         )}
                                                                     </div>
                                                                 </div>

@@ -45,6 +45,7 @@ const ortopediaSchema = z.object({
     pais_ciudad: z.string().optional(),
     tutor: z.string().optional(),
     celular: z.string().optional(),
+    direccion: z.string().optional(),
     // Section 1 additions
     gustos_personales: z.string().optional(),
     queja_principal: z.string().optional(),
@@ -750,12 +751,17 @@ export default function OrtopediaFichasPage() {
                                                                                 <label className="text-xs font-bold text-slate-700 uppercase">Nombre del Tutor</label>
                                                                                 <input {...register('tutor')} className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-purple-500 font-bold" />
                                                                             </div>
+                                                                        </div>
+                                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                                                                             <div className="space-y-2">
                                                                                 <label className="text-xs font-bold text-slate-700 uppercase">Celular Contacto</label>
                                                                                 <input {...register('celular')} className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-purple-500 font-bold" />
                                                                             </div>
+                                                                            <div className="space-y-2">
+                                                                                <label className="text-xs font-bold text-slate-700 uppercase">Dirección</label>
+                                                                                <input {...register('direccion')} placeholder="Dirección domiciliaria" className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-purple-500 font-bold" />
+                                                                            </div>
                                                                         </div>
-                                                                        {/* Otros campos básicos de la sección 1 si es necesario, pero usualmente son estos 3 los mandatorios */}
                                                                     </div>
                                                                 </div>
                                                             ))}

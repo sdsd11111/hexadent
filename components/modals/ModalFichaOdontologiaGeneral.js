@@ -658,7 +658,7 @@ export default function ModalFichaOdontologiaGeneral({ isOpen, onClose, onSucces
                                                                                                 </div>
                                                                                                 <div className="space-y-2">
                                                                                                     <label>Fecha</label>
-                                                                                                    <input type="date" {...register('fecha')} className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+                                                                                                    <input type="text" {...register('fecha')} placeholder="DD/MM/AAAA" className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
                                                                                                 </div>
                                                                                                 <div className="space-y-2 md:col-span-2">
                                                                                                     <label>Dirección</label>
@@ -1057,7 +1057,8 @@ export default function ModalFichaOdontologiaGeneral({ isOpen, onClose, onSucces
                                                                                                         <div className="space-y-1">
                                                                                                             <label className="text-[10px] font-bold text-slate-500 uppercase">Fecha Apertura</label>
                                                                                                             <input
-                                                                                                                type="date"
+                                                                                                                type="text"
+                                                                                                                placeholder="DD/MM/AAAA"
                                                                                                                 {...register('diagnostico.fecha_apertura')}
                                                                                                                 className="w-full p-2 bg-white border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 text-xs font-bold"
                                                                                                             />
@@ -1065,7 +1066,8 @@ export default function ModalFichaOdontologiaGeneral({ isOpen, onClose, onSucces
                                                                                                         <div className="space-y-1">
                                                                                                             <label className="text-[10px] font-bold text-slate-500 uppercase">Fecha Control</label>
                                                                                                             <input
-                                                                                                                type="date"
+                                                                                                                type="text"
+                                                                                                                placeholder="DD/MM/AAAA"
                                                                                                                 {...register('diagnostico.fecha_control')}
                                                                                                                 className="w-full p-2 bg-white border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 text-xs font-bold"
                                                                                                             />
@@ -1138,7 +1140,8 @@ export default function ModalFichaOdontologiaGeneral({ isOpen, onClose, onSucces
                                                                                                                     <tr key={field.id}>
                                                                                                                         <td className="p-1 border border-slate-200">
                                                                                                                             <input
-                                                                                                                                type="date"
+                                                                                                                                type="text"
+                                                                                                                                placeholder="DD/MM/AAAA"
                                                                                                                                 {...register(`tratamiento.${index}.fecha`)}
                                                                                                                                 className="w-full p-2 bg-white border border-slate-100 rounded text-[10px] font-bold outline-none focus:ring-1 focus:ring-blue-500"
                                                                                                                             />
@@ -1468,7 +1471,7 @@ export default function ModalFichaOdontologiaGeneral({ isOpen, onClose, onSucces
                                                                 </div>
                                                                 <div className="space-y-2">
                                                                     <label>Fecha</label>
-                                                                    <input type="date" {...register('fecha')} className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+                                                                    <input type="text" {...register('fecha')} placeholder="DD/MM/AAAA" className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
                                                                 </div>
                                                             </div>
                                                         </div>

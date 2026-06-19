@@ -319,6 +319,7 @@ export default function ModalFichaOrtodoncia({ isOpen, onClose, onSuccess, editD
         defaultValues: {
             fecha: new Date().toISOString().split('T')[0],
             sexo: 'Femenino',
+            direccion: '',
             tratamiento: [{ fecha: new Date().toISOString().split('T')[0], procedimiento: '', pago: '' }],
             imagenes: [],
             s16_ppto_fecha: new Date().toLocaleDateString('es-ES'),
@@ -661,6 +662,12 @@ export default function ModalFichaOrtodoncia({ isOpen, onClose, onSuccess, editD
                             <div className="space-y-1">
                                 <label className="text-[10px] font-bold text-slate-500 uppercase">Celular Contacto</label>
                                 <input {...register('celular')} className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-orange-500 font-bold" />
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-1 gap-4">
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-slate-500 uppercase">Dirección</label>
+                                <input {...register('direccion')} placeholder="Dirección domiciliaria" className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-orange-500 font-bold" />
                             </div>
                         </div>
                         {step === 2 && (
