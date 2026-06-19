@@ -115,7 +115,7 @@ const ToothEditorModal = ({ isOpen, onClose, toothId, data = {}, onConfirm }) =>
                 <div className="fixed inset-0 overflow-y-auto">
                     {/* Responsive modal for tablet (Tabwee T20 10.1" - 1280x800) */}
                     <div className="flex min-h-full items-center justify-center p-2 sm:p-4 md:p-6">
-                        <Dialog.Panel className="w-full max-w-[95vw] sm:max-w-[90vw] lg:max-w-7xl max-h-[98vh] transform overflow-hidden rounded-xl sm:rounded-2xl lg:rounded-[2rem] bg-white p-3 sm:p-6 shadow-[0_35px_60px_-15px_rgba(0,0,0,0.3)] transition-all">
+                        <Dialog.Panel className="w-full max-w-[95vw] sm:max-w-[90vw] lg:max-w-7xl max-h-[85vh] md:max-h-[90vh] lg:max-h-[95vh] transform overflow-auto rounded-xl sm:rounded-2xl lg:rounded-[2rem] bg-white p-3 sm:p-6 shadow-[0_35px_60px_-15px_rgba(0,0,0,0.3)] transition-all">
                             {/* Header with close button */}
                             <div className="flex items-center justify-between mb-3 sm:mb-4 pb-2 border-b border-slate-100">
                                 <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Editor de Pieza</span>
@@ -142,7 +142,7 @@ const ToothEditorModal = ({ isOpen, onClose, toothId, data = {}, onConfirm }) =>
                             </div>
 
                             {/* Responsive flex layout: column on mobile/tablet, row on desktop */}
-                            <div className="flex flex-col sm:flex-col lg:flex-row gap-3 sm:gap-6 h-full max-h-[95vh] overflow-hidden">
+                            <div className="flex flex-col sm:flex-col lg:flex-row gap-3 sm:gap-6 h-full max-h-[80vh] md:max-h-[85vh] lg:max-h-[90vh] overflow-auto">
                                 {/* Left Side: Tooth and Buttons - Responsive sizing */}
                                 <div className="flex flex-col items-center justify-center w-full sm:w-auto lg:min-w-[260px] xl:min-w-[300px] flex-shrink-0">
                                     <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 mb-2 sm:mb-4 tracking-tighter uppercase italic">PIEZA {toothId}</h2>
@@ -449,7 +449,7 @@ export default function OdontogramaEditor({ value = {}, onChange }) {
     );
 
     return (
-        <div className="w-full bg-white p-2 sm:p-3 md:p-6 rounded-xl sm:rounded-2xl border border-slate-100 shadow-xl select-none overflow-hidden flex flex-col gap-4 sm:gap-6">
+        <div className="w-full bg-white p-2 sm:p-3 md:p-4 rounded-xl sm:rounded-2xl border border-slate-100 shadow-xl select-none overflow-auto flex flex-col gap-3 sm:gap-4 max-h-[70vh] md:max-h-[75vh] lg:max-h-[85vh]">
 
             {/* Global Toolbar */}
             <div className="flex flex-wrap gap-2 justify-center bg-slate-50 p-3 rounded-2xl border border-slate-200">
@@ -526,7 +526,7 @@ export default function OdontogramaEditor({ value = {}, onChange }) {
                     return (
                         <>
                             {/* Upper Teeth Quadrants - Responsive with horizontal scroll on tablet */}
-                            <div className="flex justify-center items-center gap-1 sm:gap-2 mb-4 sm:mb-6 w-full pt-2 sm:pt-6 overflow-x-auto px-1">
+                            <div className="flex justify-center items-center gap-1 sm:gap-2 mb-4 sm:mb-6 w-full pt-2 sm:pt-6 overflow-x-auto px-1 pb-8">
                                 <div className="hidden sm:block flex-shrink-0">
                                     <LabelColumn labels={['RECESIÓN', 'MOVILIDAD', 'VESTIBULAR']} />
                                 </div>
@@ -539,7 +539,7 @@ export default function OdontogramaEditor({ value = {}, onChange }) {
                             </div>
 
                             {/* Temporal / Lingual Section - Responsive */}
-                            <div className="flex justify-center items-center gap-2 sm:gap-4 py-2 sm:py-4 bg-slate-50/50 rounded-xl sm:rounded-2xl border border-slate-100/50 mb-4 sm:mb-6 w-full overflow-x-auto px-1">
+                            <div className="flex justify-center items-center gap-2 sm:gap-4 py-2 sm:py-4 bg-slate-50/50 rounded-xl sm:rounded-2xl border border-slate-100/50 mb-4 sm:mb-6 w-full overflow-x-auto px-1 pb-8">
                                 <div className="text-[7px] sm:text-[9px] font-black text-blue-600 tracking-widest rotate-[-90deg] hidden sm:block">LINGUAL</div>
                                 <div className="flex flex-col gap-2 sm:gap-4">
                                     <div className="flex gap-1 sm:gap-2">
@@ -563,7 +563,7 @@ export default function OdontogramaEditor({ value = {}, onChange }) {
                             </div>
 
                             {/* Lower Teeth Quadrants - Responsive */}
-                            <div className="flex justify-center items-center gap-1 sm:gap-2 w-full overflow-x-auto px-1">
+                            <div className="flex justify-center items-center gap-1 sm:gap-2 w-full overflow-x-auto px-1 pb-8">
                                 <div className="hidden sm:block flex-shrink-0">
                                     <LabelColumn labels={['VESTIBULAR', 'MOVILIDAD', 'RECESIÓN']} />
                                 </div>

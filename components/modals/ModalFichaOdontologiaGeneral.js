@@ -547,7 +547,7 @@ export default function ModalFichaOdontologiaGeneral({ isOpen, onClose, onSucces
                                 leaveFrom="opacity-100 scale-100"
                                 leaveTo="opacity-0 scale-95"
                             >
-                                <Dialog.Panel className="w-full max-w-[95vw] transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all h-[90vh] flex flex-col">
+                                <Dialog.Panel className="w-full max-w-[95vw] md:max-w-[98vw] lg:max-w-6xl transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all h-[90vh] md:h-[92vh] lg:h-[95vh] xl:h-[98vh] flex flex-col">
                                     {/* Header */}
                                     <div className="bg-gradient-to-r from-blue-700 to-cyan-600 px-6 py-4 flex items-center justify-between shadow-lg shrink-0">
                                         <div className="flex items-center gap-3">

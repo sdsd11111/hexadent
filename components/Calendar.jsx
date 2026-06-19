@@ -12,7 +12,8 @@ import {
     PhoneIcon,
     ChatBubbleBottomCenterTextIcon,
     TrashIcon,
-    ArrowPathIcon
+    ArrowPathIcon,
+    PencilSquareIcon
 } from '@heroicons/react/24/outline';
 
 const DAYS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
@@ -58,6 +59,20 @@ export default function Calendar({ isAdmin = false }) {
         motive: '',
         endTime: '',
         isSpecial: false
+    });
+
+    // Edit appointment state
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [editAppointment, setEditAppointment] = useState(null);
+    const [editData, setEditData] = useState({
+        patient_name: '',
+        patient_cedula: '',
+        patient_age: '',
+        patient_phone: '',
+        appointment_date: '',
+        appointment_time: '',
+        duration_minutes: 45,
+        motive: ''
     });
 
     // Helper: detect if a time falls outside normal business hours
@@ -202,6 +217,49 @@ export default function Calendar({ isAdmin = false }) {
                 fetchMetadata(); // Update markers
             } else {
                 alert('Error al cancelar: ' + data.error);
+            }
+        } catch (e) {
+            alert('Error al conectar con el servidor');
+        }
+        setIsLoading(false);
+    };
+
+    // Handler for editing appointments
+    const handleEditAppointment = (app) => {
+        setEditAppointment(app);
+        setEditData({
+            patient_name: app.patient_name || '',
+            patient_cedula: app.patient_cedula || '',
+            patient_age: app.patient_age || '',
+            patient_phone: app.patient_phone || '',
+            appointment_date: app.appointment_date ? app.appointment_date.split('T')[0] : '',
+            appointment_time: app.appointment_time ? app.appointment_time.substring(0, 5) : '',
+            duration_minutes: app.duration_minutes || 45,
+            motive: app.motive || ''
+        });
+        setShowEditModal(true);
+    };
+
+    // Save edited appointment
+    const handleSaveEdit = async () => {
+        if (!editAppointment?.id) return;
+        setIsLoading(true);
+        try {
+            const res = await fetch('/api/admin/calendar/appointments', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id: editAppointment.id,
+                    ...editData
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                setShowEditModal(false);
+                fetchDayDetails(selectedDate);
+                fetchMetadata();
+            } else {
+                alert('Error al editar: ' + data.error);
             }
         } catch (e) {
             alert('Error al conectar con el servidor');
@@ -559,6 +617,104 @@ export default function Calendar({ isAdmin = false }) {
                                 </button>
                             </div>
                         </div>
+                    ) : showEditModal ? (
+                        <div className="animate-fade-in shadow-inner bg-amber-50 p-4 lg:p-6 rounded-2xl lg:rounded-3xl border-2 border-amber-200">
+                            <div className="flex items-center justify-between mb-4 lg:mb-6">
+                                <div className="flex items-center gap-2">
+                                    <PencilSquareIcon className="h-5 w-5 text-amber-500" />
+                                    <span className="text-xs lg:text-sm font-black text-amber-700 uppercase">Editar Cita</span>
+                                </div>
+                                <button onClick={() => { setShowEditModal(false); }} className="text-[9px] lg:text-[10px] font-black text-red-400 uppercase hover:underline">Cerrar</button>
+                            </div>
+                            <div className="space-y-3 lg:space-y-4">
+                                <div className="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label className="text-[9px] lg:text-[10px] font-black uppercase text-gray-400">Fecha:</label>
+                                        <input
+                                            type="date"
+                                            required
+                                            className="w-full bg-white border-2 border-amber-200 rounded-xl px-2 lg:px-3 py-1.5 text-xs lg:text-sm font-black text-gray-700 focus:outline-none transition-all"
+                                            value={editData.appointment_date}
+                                            onChange={(e) => setEditData({ ...editData, appointment_date: e.target.value })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-[9px] lg:text-[10px] font-black uppercase text-gray-400">Hora:</label>
+                                        <input
+                                            type="time"
+                                            required
+                                            className="w-full bg-white border-2 border-amber-200 rounded-xl px-2 lg:px-3 py-1.5 text-xs lg:text-sm font-black text-gray-700 focus:outline-none transition-all"
+                                            value={editData.appointment_time}
+                                            onChange={(e) => setEditData({ ...editData, appointment_time: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="text-[9px] lg:text-[10px] font-black uppercase text-gray-400 ml-1">Nombre del Paciente:</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        className="w-full bg-white border-2 border-amber-200 rounded-xl px-3 lg:px-4 py-2 text-xs lg:text-sm font-bold text-gray-700 focus:outline-none transition-all"
+                                        value={editData.patient_name}
+                                        onChange={(e) => setEditData({ ...editData, patient_name: e.target.value })}
+                                    />
+                                </div>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label className="text-[9px] lg:text-[10px] font-black uppercase text-gray-400">Cédula:</label>
+                                        <input
+                                            type="text"
+                                            className="w-full bg-white border-2 border-amber-200 rounded-xl px-2 lg:px-3 py-1.5 text-xs lg:text-sm font-bold text-gray-700 focus:outline-none transition-all"
+                                            value={editData.patient_cedula}
+                                            onChange={(e) => setEditData({ ...editData, patient_cedula: e.target.value })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-[9px] lg:text-[10px] font-black uppercase text-gray-400">Edad:</label>
+                                        <input
+                                            type="number"
+                                            className="w-full bg-white border-2 border-amber-200 rounded-xl px-2 lg:px-3 py-1.5 text-xs lg:text-sm font-bold text-gray-700 focus:outline-none transition-all"
+                                            value={editData.patient_age}
+                                            onChange={(e) => setEditData({ ...editData, patient_age: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="text-[9px] lg:text-[10px] font-black uppercase text-gray-400 ml-1">Teléfono:</label>
+                                    <input
+                                        type="text"
+                                        className="w-full bg-white border-2 border-amber-200 rounded-xl px-3 lg:px-4 py-2 text-xs lg:text-sm font-bold text-gray-700 focus:outline-none transition-all"
+                                        value={editData.patient_phone}
+                                        onChange={(e) => setEditData({ ...editData, patient_phone: e.target.value })}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-[9px] lg:text-[10px] font-black uppercase text-gray-400 ml-1">Duración (min):</label>
+                                    <input
+                                        type="number"
+                                        className="w-full bg-white border-2 border-amber-200 rounded-xl px-2 lg:px-3 py-1.5 text-xs lg:text-sm font-bold text-gray-700 focus:outline-none transition-all"
+                                        value={editData.duration_minutes}
+                                        onChange={(e) => setEditData({ ...editData, duration_minutes: parseInt(e.target.value) || 45 })}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-[9px] lg:text-[10px] font-black uppercase text-gray-400 ml-1">Motivo / Tratamiento:</label>
+                                    <textarea
+                                        rows="2"
+                                        className="w-full bg-white border-2 border-amber-200 rounded-xl px-3 lg:px-4 py-2 text-xs lg:text-sm font-bold text-gray-700 focus:outline-none transition-all"
+                                        value={editData.motive}
+                                        onChange={(e) => setEditData({ ...editData, motive: e.target.value })}
+                                    />
+                                </div>
+                                <button
+                                    onClick={handleSaveEdit}
+                                    disabled={isLoading}
+                                    className="w-full bg-amber-500 text-white py-3 lg:py-4 rounded-xl lg:rounded-2xl font-black uppercase tracking-widest text-[10px] lg:text-xs shadow-lg shadow-amber-200 hover:scale-[1.02] active:scale-95 transition-all mt-3 lg:mt-4 disabled:opacity-50"
+                                >
+                                    {isLoading ? 'Guardando...' : 'Guardar Cambios'}
+                                </button>
+                            </div>
+                        </div>
                     ) : showBookingForm ? (
                         <div className="animate-fade-in shadow-inner bg-gray-50 p-4 lg:p-6 rounded-2xl lg:rounded-3xl border border-gray-100">
                             <div className="flex items-center justify-between mb-4 lg:mb-6">
@@ -684,6 +840,9 @@ export default function Calendar({ isAdmin = false }) {
                                                                             <button onClick={() => { setSubsecuenteData(app); setSubsecuenteDate(selectedDate); setSubsecuenteTime(''); setSubsecuenteEndTime(''); setShowSubsecuenteModal(true); }} className="p-1 lg:p-1.5 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Crear Cita Subsecuente">
                                                                                 <ArrowPathIcon className="h-4 w-4" />
                                                                             </button>
+                                                                            <button onClick={() => handleEditAppointment(app)} className="p-1 lg:p-1.5 text-amber-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all" title="Editar Cita">
+                                                                                <PencilSquareIcon className="h-4 w-4" />
+                                                                            </button>
                                                                             <button onClick={() => handleCancelAppointment(app.id)} className="p-1 lg:p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Cancelar Cita">
                                                                                 <TrashIcon className="h-4 w-4" />
                                                                             </button>
@@ -739,6 +898,9 @@ export default function Calendar({ isAdmin = false }) {
                                                                             <>
                                                                                 <button onClick={() => { setSubsecuenteData(app); setSubsecuenteDate(selectedDate); setSubsecuenteTime(''); setSubsecuenteEndTime(''); setShowSubsecuenteModal(true); }} className="p-1 lg:p-1.5 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-all" title="Crear Cita Subsecuente">
                                                                                     <ArrowPathIcon className="h-4 w-4" />
+                                                                                </button>
+                                                                                <button onClick={() => handleEditAppointment(app)} className="p-1 lg:p-1.5 text-amber-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all" title="Editar Cita">
+                                                                                    <PencilSquareIcon className="h-4 w-4" />
                                                                                 </button>
                                                                                 <button onClick={() => handleCancelAppointment(app.id)} className="p-1 lg:p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Cancelar Cita">
                                                                                     <TrashIcon className="h-4 w-4" />
