@@ -438,15 +438,18 @@ export default function OdontogramaEditor({ value = {}, onChange }) {
         onChange({ ...value, [id]: data });
     };
 
-    const LabelColumn = ({ labels, colors }) => (
-        <div className="flex flex-col gap-3 sm:gap-5 pr-1 sm:pr-2">
-            {labels.map((l, i) => (
-                <div key={l} className={`text-[7px] sm:text-[9px] font-black uppercase text-right tracking-tighter h-5 sm:h-7 flex items-center justify-end ${colors?.[i] || 'text-black'}`}>
-                    {l}
-                </div>
-            ))}
-        </div>
-    );
+    const LabelColumn = ({ labels, colors }) => {
+        // Full words - with wider column for xl screens (1280px)
+        return (
+            <div className="flex flex-col gap-0.5 sm:gap-1">
+                {labels.map((l, i) => (
+                    <div key={l} className={`text-[6px] sm:text-[7px] xl:text-[8px] font-black uppercase whitespace-nowrap h-3 sm:h-4 flex items-center justify-end w-14 sm:w-16 xl:w-32 ${colors?.[i] || 'text-black'}`}>
+                        {l}
+                    </div>
+                ))}
+            </div>
+        );
+    };
 
     return (
         <div className="w-full bg-white p-2 sm:p-3 md:p-4 rounded-xl sm:rounded-2xl border border-slate-100 shadow-xl select-none overflow-auto flex flex-col gap-3 sm:gap-4 max-h-[70vh] md:max-h-[75vh] lg:max-h-[85vh]">

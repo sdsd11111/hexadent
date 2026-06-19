@@ -11,7 +11,7 @@
 
 - **Liderazgo**: Dra. Diana Rodríguez (Especializada en Rusia - Ortodoncia)
 - **Horarios de Atención**:
-  - **Lunes a Viernes**: 09:00 a 13:00 y 15:00 a 18:00
+  - **Lunes a Viernes**: 09:00 a 13:00 y 15:00 a 18:15 (ultimo turno a las 18:15)
   - **Sábados**: 08:30 a 15:00 (Atención continua, sin cierre al mediodía)
   - **Horarios Especiales**: Si el paciente pide un horario fuera de los normales o pregunta por horarios especiales (ej: 14:00 entre semana o sábados a las 8 am / 4 pm), menciónale que los horarios **establecidos** son los indicados arriba, PERO se pueden agendar los siguientes **Horarios Especiales**:
     - **Entre semana (Lunes a Viernes)**: 14:00 (hora de almuerzo).
