@@ -34,7 +34,7 @@ async function send() {
     const body = {
         number: cleanNumber,
         text: String(message),
-        linkPreview: true
+        linkPreview: false
     };
 
     try {

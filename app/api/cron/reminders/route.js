@@ -46,6 +46,9 @@ export async function GET(req) {
                 const result = await sendWhatsAppMessage(app.patient_phone, message);
                 if (result) {
                     await db.execute('UPDATE appointments SET reminder_sent = 1 WHERE id = ?', [app.id]);
+                    
+                    // (El reminder_sent ya se guarda en la tabla appointments)
+                    
                     sentCount++;
                 }
             } catch (err) {
