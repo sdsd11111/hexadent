@@ -2,7 +2,9 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import {
-    ArrowPathIcon
+    ArrowPathIcon,
+    MagnifyingGlassIcon,
+    XMarkIcon
 } from '@heroicons/react/24/outline';
 import Calendar from '@/components/Calendar';
 
@@ -29,6 +31,52 @@ export default function AgendamientoPage() {
     const [newIgnoredName, setNewIgnoredName] = useState('');
     const [editingPhone, setEditingPhone] = useState(null);
     const [editingName, setEditingName] = useState('');
+
+    // --- SEARCH STATE: Buscador de citas por nombre o cédula ---
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+    const [isSearching, setIsSearching] = useState(false);
+    const [showSearchResults, setShowSearchResults] = useState(false);
+
+    // Función de búsqueda
+    const handleSearch = useCallback(async (query) => {
+        if (!query || query.trim().length < 2) {
+            setSearchResults([]);
+            setShowSearchResults(false);
+            return;
+        }
+        
+        setIsSearching(true);
+        try {
+            const res = await fetch(`/api/admin/calendar/appointments?q=${encodeURIComponent(query.trim())}`);
+            const data = await res.json();
+            setSearchResults(Array.isArray(data) ? data : []);
+            setShowSearchResults(true);
+        } catch (e) {
+            console.error("Error en búsqueda:", e);
+            setSearchResults([]);
+        }
+        setIsSearching(false);
+    }, []);
+
+    // Debounced search effect
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (searchQuery.trim().length >= 2) {
+                handleSearch(searchQuery);
+            } else {
+                setSearchResults([]);
+                setShowSearchResults(false);
+            }
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [searchQuery, handleSearch]);
+
+    const clearSearch = () => {
+        setSearchQuery('');
+        setSearchResults([]);
+        setShowSearchResults(false);
+    };
 
     // --- STATUS POLLING: Only checks connection state, never touches QR ---
     const checkStatus = useCallback(async () => {
@@ -200,6 +248,80 @@ export default function AgendamientoPage() {
                     <span className={`w-1.5 h-1.5 lg:w-2 lg:h-2 rounded-full animate-pulse ${isConnected ? 'bg-green-500' : 'bg-yellow-500'}`} />
                     {isConnected ? 'Bot Conectado' : 'Desconectado'}
                 </div>
+            </div>
+
+            {/* BUSCADOR DE CITAS */}
+            <div className="mb-6 bg-white p-4 lg:p-6 rounded-2xl border border-gray-100 shadow-lg">
+                <h3 className="text-sm lg:text-base font-bold text-gray-800 mb-3 flex items-center gap-2">
+                    <MagnifyingGlassIcon className="h-4 w-4 lg:h-5 lg:w-5 text-blue-600" />
+                    Buscar Citas por Nombre o Cédula
+                </h3>
+                <div className="relative">
+                    <input
+                        type="text"
+                        placeholder="Ingresa nombre o número de cédula..."
+                        className="w-full text-xs lg:text-sm border-2 border-gray-100 rounded-xl lg:rounded-2xl px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-0 transition-all font-medium"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onFocus={() => searchResults.length > 0 && setShowSearchResults(true)}
+                    />
+                    {searchQuery && (
+                        <button
+                            onClick={clearSearch}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        >
+                            <XMarkIcon className="h-5 w-5" />
+                        </button>
+                    )}
+                    {isSearching && (
+                        <div className="absolute right-10 top-1/2 -translate-y-1/2">
+                            <ArrowPathIcon className="h-5 w-5 text-blue-500 animate-spin" />
+                        </div>
+                    )}
+                </div>
+                
+                {/* RESULTADOS DE BÚSQUEDA */}
+                {showSearchResults && (
+                    <div className="mt-3 border-t border-gray-100 pt-3 max-h-64 overflow-y-auto">
+                        {searchResults.length === 0 ? (
+                            <p className="text-xs text-gray-500 text-center py-4">No se encontraron citas</p>
+                        ) : (
+                            <div className="space-y-2">
+                                {searchResults
+                                    .filter(appt => appt.status !== 'no-show')
+                                    .map((appt) => {
+                                    // Solo verde (scheduled/completed) y rojo (cancelled)
+                                    const isCancelled = appt.status === 'cancelled';
+                                    const statusBadge = isCancelled 
+                                        ? { bg: 'bg-red-100', text: 'text-red-700', label: 'Cancelada' }
+                                        : { bg: 'bg-green-100', text: 'text-green-700', label: appt.status === 'completed' ? 'Completada' : 'Programada' };
+                                    
+                                    return (
+                                    <div key={appt.id} className="flex items-center justify-between bg-gray-50 p-3 rounded-xl text-xs lg:text-sm">
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <p className="font-bold text-gray-800">{appt.patient_name}</p>
+                                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${statusBadge.bg} ${statusBadge.text}`}>
+                                                    {statusBadge.label}
+                                                </span>
+                                            </div>
+                                            <p className="text-gray-500">Cédula: {appt.patient_cedula}</p>
+                                            <p className="text-gray-500">Teléfono: {appt.patient_phone}</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="font-bold text-blue-600">
+                                                {new Date(appt.appointment_date).toLocaleDateString('es-EC', { weekday: 'short', day: 'numeric', month: 'short' })}
+                                            </p>
+                                            <p className="text-blue-600 font-bold">{appt.appointment_time}</p>
+                                            <p className="text-gray-400 text-[10px]">{appt.motive || 'Consulta'}</p>
+                                        </div>
+                                    </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
 
             {/* Internal Calendar Integration */}

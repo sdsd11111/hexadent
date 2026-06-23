@@ -5,8 +5,33 @@ export async function GET(request) {
     try {
         const { searchParams } = new URL(request.url);
         const date = searchParams.get('date');
+        const query = searchParams.get('q'); // Búsqueda por nombre o cédula
 
         let rows;
+
+        // Endpoint de búsqueda inteligente
+        if (query) {
+            // Normalizar búsqueda de teléfono: quitar +, 593, 09, etc y dejar solo dígitos
+            const cleanQuery = query.replace(/\D/g, '');
+            const searchTerm = `%${query}%`;
+            
+            // Si es búsqueda de teléfono (solo números), normalizar para buscar
+            let phoneSearch = searchTerm;
+            if (cleanQuery.length >= 7) {
+                // Buscar con o sin código de país
+                phoneSearch = `%${cleanQuery}%`;
+            }
+
+            [rows] = await db.execute(
+                `SELECT id, patient_name, patient_phone, patient_cedula, patient_age, appointment_date, appointment_time, duration_minutes, status, motive 
+                FROM appointments 
+                WHERE patient_name LIKE ? OR patient_cedula LIKE ? OR patient_phone LIKE ? OR REPLACE(REPLACE(REPLACE(REPLACE(patient_phone, '+', ''), '593', ''), '09', ''), ' ', '') LIKE ?
+                ORDER BY appointment_date DESC, appointment_time ASC
+                LIMIT 50`,
+                [searchTerm, searchTerm, searchTerm, phoneSearch]
+            );
+            return NextResponse.json(rows, { status: 200 });
+        }
 
         if (date) {
             [rows] = await db.execute(
