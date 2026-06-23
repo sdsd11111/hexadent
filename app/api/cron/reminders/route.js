@@ -16,14 +16,23 @@ export async function GET(req) {
         const ecuadorToday = new Date(now.getTime() - (5 * 60 * 60 * 1000));
         const todayStr = ecuadorToday.toISOString().split('T')[0];
 
-        console.log(`[Cron Reminders] Checking appointments for TODAY (${todayStr})...`);
+        // Optional: filter by specific phone number (for testing)
+        const { searchParams } = new URL(req.url);
+        const filterPhone = searchParams.get('phone');
+        
+        console.log(`[Cron Reminders] Checking appointments for TODAY (${todayStr})...${filterPhone ? ` [filter: ${filterPhone}]` : ''}`);
 
-        const [appointments] = await db.execute(
-            `SELECT id, patient_name, patient_phone, appointment_time 
+        let query = `SELECT id, patient_name, patient_phone, appointment_time 
              FROM appointments 
-             WHERE appointment_date = ? AND status = 'scheduled' AND reminder_sent = 0`,
-            [todayStr]
-        );
+             WHERE appointment_date = ? AND status = 'scheduled' AND reminder_sent = 0`;
+        let params = [todayStr];
+        
+        if (filterPhone) {
+            query += ` AND patient_phone LIKE ?`;
+            params.push(`%${filterPhone.replace(/\D/g, '')}%`);
+        }
+        
+        const [appointments] = await db.execute(query, params);
 
         console.log(`[Cron Reminders] Found ${appointments.length} appointments to remind.`);
 
