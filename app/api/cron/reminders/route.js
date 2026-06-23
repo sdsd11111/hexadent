@@ -47,7 +47,29 @@ export async function GET(req) {
                 if (result) {
                     await db.execute('UPDATE appointments SET reminder_sent = 1 WHERE id = ?', [app.id]);
                     
-                    // (El reminder_sent ya se guarda en la tabla appointments)
+                    // Guardar contexto de confirmación en sesión
+                    const cleanPhone = app.patient_phone.replace(/\D/g, '');
+                    const sessionData = {
+                        current_flow: 'awaiting_confirmation',
+                        metadata: {
+                            awaiting_confirmation: {
+                                appointmentId: app.id,
+                                date: todayStr,
+                                time: app.appointment_time,
+                                patientName: app.patient_name
+                            }
+                        }
+                    };
+                    
+                    await db.execute(`
+                        INSERT INTO chatbot_sessions (phone, current_flow, metadata) 
+                        VALUES (?, ?, ?)
+                        ON DUPLICATE KEY UPDATE 
+                            current_flow = VALUES(current_flow),
+                            metadata = VALUES(metadata)
+                    `, [cleanPhone, sessionData.current_flow, JSON.stringify(sessionData.metadata)]);
+                    
+                    console.log(`[Cron Reminders] Saved confirmation context for ${cleanPhone}`);
                     
                     sentCount++;
                 }
