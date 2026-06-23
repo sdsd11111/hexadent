@@ -310,9 +310,9 @@ export default function AgendamientoPage() {
                                         </div>
                                         <div className="text-right">
                                             <p className="font-bold text-blue-600">
-                                                {new Date(appt.appointment_date).toLocaleDateString('es-EC', { weekday: 'short', day: 'numeric', month: 'short' })}
+                                                {appt.appointment_date ? new Date(`${appt.appointment_date.split('T')[0]}T12:00:00`).toLocaleDateString('es-EC', { weekday: 'short', day: 'numeric', month: 'short' }) : 'Sin fecha'}
                                             </p>
-                                            <p className="text-blue-600 font-bold">{appt.appointment_time}</p>
+                                            <p className="text-blue-600 font-bold">{appt.appointment_time || '--:--'}</p>
                                             <p className="text-gray-400 text-[10px]">{appt.motive || 'Consulta'}</p>
                                         </div>
                                     </div>
