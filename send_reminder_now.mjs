@@ -7,7 +7,7 @@ const EVOLUTION_INSTANCE = 'Odontologa';
 
 async function sendReminderNow() {
     const phone = '593967491847';
-    const message = `¡Hola! 👋 Te recordamos tu cita en Hexadent para hoy 2026-06-22 a las 19:30. ¿Confirmas tu asistencia? (Responde SÍ o NO). Si respondes NO, tu cita se cancelará automáticamente para liberar el espacio.`;
+    const message = `¡Hola! 👋 Te recordamos tu cita en Hexadent para hoy 2026-06-22 a las 22:00. ¿Confirmas tu asistencia? (Responde SÍ o NO). Si respondes NO, tu cita se cancelará automáticamente para liberar el espacio.`;
     
     console.log(`[SENDING] To: ${phone}`);
     
