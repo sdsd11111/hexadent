@@ -24,7 +24,7 @@ export async function GET(req) {
 
         let query = `SELECT id, patient_name, patient_phone, appointment_time 
              FROM appointments 
-             WHERE appointment_date = ? AND status = 'scheduled' AND reminder_sent = 0`;
+             WHERE appointment_date = ? AND status != 'cancelled' AND status != 'confirmed' AND reminder_sent = 0`;
         let params = [todayStr];
         
         if (filterPhone) {
