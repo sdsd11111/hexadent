@@ -537,7 +537,7 @@ export default function Calendar({ isAdmin = false }) {
                         Detalles del Día
                     </h3>
                     <p className="text-gray-400 text-[10px] lg:text-xs font-bold mt-1">
-                        {selectedDate ? new Date(`${selectedDate}T12:00:00`).toLocaleDateString('es-EC', { weekday: 'long', day: 'numeric', month: 'long' }) : 'Selecciona un día'}
+                        {selectedDate ? new Date(`${selectedDate}T12:00:00-05:00`).toLocaleDateString('es-EC', { weekday: 'long', day: 'numeric', month: 'long' }) : 'Selecciona un día'}
                     </p>
                 </div>
 
