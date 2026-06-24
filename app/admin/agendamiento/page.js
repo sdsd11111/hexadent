@@ -31,6 +31,7 @@ export default function AgendamientoPage() {
     const [newIgnoredName, setNewIgnoredName] = useState('');
     const [editingPhone, setEditingPhone] = useState(null);
     const [editingName, setEditingName] = useState('');
+    const [ignoredSearch, setIgnoredSearch] = useState('');
 
     // --- SEARCH STATE: Buscador de citas por nombre o cédula ---
     const [searchQuery, setSearchQuery] = useState('');
@@ -123,10 +124,11 @@ export default function AgendamientoPage() {
         return () => clearInterval(interval);
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-    // --- Auto-request QR once when status is not connected and no QR cached ---
+    // --- Auto-request QR only when DISCONNECTED (not on transient states like 'connecting') ---
     useEffect(() => {
         const isConnected = ['open', 'CONNECTED', 'connected'].includes(evolutionStatus.status);
-        const needsQr = !isConnected && !currentQr && !qrRequested && evolutionStatus.status !== 'loading';
+        const isDisconnected = ['disconnected', 'not_found', 'error', 'unknown'].includes(evolutionStatus.status);
+        const needsQr = isDisconnected && !currentQr && !qrRequested && evolutionStatus.status !== 'loading';
 
         if (needsQr) {
             requestQr();
@@ -426,13 +428,32 @@ export default function AgendamientoPage() {
                             </button>
                         </div>
                             <div className="max-h-48 lg:max-h-60 overflow-y-auto pr-1 lg:pr-2 custom-scrollbar">
+                                {/* Buscador de excluidos */}
+                                {ignoredNumbers.length > 0 && (
+                                    <div className="relative mb-2">
+                                        <input
+                                            type="text"
+                                            placeholder="Buscar por nombre o número..."
+                                            className="w-full text-[10px] lg:text-xs border-2 border-gray-100 rounded-xl px-3 py-2 focus:outline-none focus:border-red-300 focus:ring-0 transition-all font-medium"
+                                            value={ignoredSearch}
+                                            onChange={(e) => setIgnoredSearch(e.target.value)}
+                                        />
+                                    </div>
+                                )}
                                 {ignoredNumbers.length === 0 ? (
                                     <div className="text-center py-6 lg:py-8 bg-gray-50 rounded-xl lg:rounded-2xl border-2 border-dashed border-gray-100 italic text-gray-400 text-xs lg:text-sm">
                                         No hay números en la lista negra.
                                     </div>
                                 ) : (
                                     <div className="grid grid-cols-1 gap-1.5 lg:gap-2">
-                                        {ignoredNumbers.map(item => (
+                                        {ignoredNumbers
+                                            .filter(item => {
+                                                if (!ignoredSearch) return true;
+                                                const q = ignoredSearch.toLowerCase();
+                                                return (item.name || '').toLowerCase().includes(q) || 
+                                                       (item.phone || '').includes(q);
+                                            })
+                                            .map(item => (
                                             <div key={item.phone} className="flex items-center justify-between bg-gray-50 hover:bg-blue-50 px-3 lg:px-4 py-2 lg:py-3 rounded-xl lg:rounded-2xl group transition-all border-2 border-transparent hover:border-blue-100">
                                                 {editingPhone === item.phone ? (
                                                     <div className="flex-1 flex gap-2 mr-2">

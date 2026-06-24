@@ -164,6 +164,7 @@ export default function Calendar({ isAdmin = false }) {
             const endMin = endH * 60 + endM;
             const diff = endMin - startMin;
             if (diff <= 0) { alert('La hora de fin debe ser después de la hora de inicio.'); setIsLoading(false); return; }
+            if (diff > 120) { alert('La duración máxima es de 120 minutos (2 horas). Reduce la hora de fin.'); setIsLoading(false); return; }
             duration = diff;
         }
         
@@ -282,6 +283,7 @@ export default function Calendar({ isAdmin = false }) {
             const endMin = endH * 60 + endM;
             const diff = endMin - startMin;
             if (diff <= 0) { alert('La hora de fin debe ser después de la hora de inicio.'); return; }
+            if (diff > 120) { alert('La duración máxima es de 120 minutos (2 horas). Reduce la hora de fin.'); return; }
             duration = diff;
         }
 
@@ -732,14 +734,29 @@ export default function Calendar({ isAdmin = false }) {
                             </div>
                             <form onSubmit={handleManualBook} className="space-y-3 lg:space-y-4">
                                 <div>
-                                    <label className="text-[9px] lg:text-[10px] font-black uppercase text-gray-400 ml-1">Hora de Fin *</label>
+                                    <label className="text-[9px] lg:text-[10px] font-black uppercase text-gray-400 ml-1">Hora de Fin (opcional, default 45 min)</label>
                                     <input
-                                        required
                                         type="time"
                                         className="w-full bg-white border-2 border-gray-100 rounded-xl px-3 lg:px-4 py-2 text-xs lg:text-sm focus:border-primary outline-none transition-all font-bold"
                                         value={bookingData.endTime}
                                         onChange={(e) => setBookingData({ ...bookingData, endTime: e.target.value })}
                                     />
+                                    {bookingData.endTime && customTime && (() => {
+                                        const [sh, sm] = customTime.split(':').map(Number);
+                                        const [eh, em] = bookingData.endTime.split(':').map(Number);
+                                        const diff = (eh * 60 + em) - (sh * 60 + sm);
+                                        if (diff > 0) {
+                                            const hours = Math.floor(diff / 60);
+                                            const mins = diff % 60;
+                                            const isHuge = diff > 180;
+                                            return (
+                                                <p className={`text-[10px] mt-1 font-bold ${isHuge ? 'text-red-500' : 'text-blue-600'}`}>
+                                                    ⏱ Duración real: {hours > 0 ? `${hours}h ` : ''}{mins}min {isHuge ? '⚠️ MUY LARGO' : ''}
+                                                </p>
+                                            );
+                                        }
+                                        return null;
+                                    })()}
                                 </div>
                                 {bookingData.isSpecial && (
                                     <div className="flex items-center gap-1.5 px-1 py-1.5">

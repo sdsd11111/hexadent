@@ -81,9 +81,22 @@ export async function GET(request) {
 
         // --- ACTION=qr: Fetch a QR code ---
         if (action === 'qr') {
-            // First make sure instance exists
-            const { exists } = await checkConnectionStatus();
-            if (!exists) {
+            // CRITICAL: Check if already connected BEFORE fetching QR
+            const statusInfo = await checkConnectionStatus();
+            const currentState = (statusInfo.state || '').toLowerCase();
+            const isAlreadyConnected = ['open', 'connected'].includes(currentState);
+            
+            if (isAlreadyConnected) {
+                console.log("[Evolution] Already connected. Skipping QR fetch to avoid disconnecting.");
+                return NextResponse.json({
+                    instance: EVOLUTION_INSTANCE,
+                    status: 'connected',
+                    qr: null
+                });
+            }
+
+            // Only create instance if it doesn't exist
+            if (!statusInfo.exists) {
                 try {
                     await createInstance();
                     await new Promise(r => setTimeout(r, 2000));

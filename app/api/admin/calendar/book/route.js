@@ -11,6 +11,11 @@ export async function POST(request) {
             return NextResponse.json({ error: 'Faltan campos obligatorios: Nombre, Fecha, Hora y Motivo son requeridos.' }, { status: 400 });
         }
 
+        // CAP MAX DURATION: Prevent endTime errors from creating 800+ min appointments
+        let safeDuration = parseInt(duration) || 45;
+        if (safeDuration < 10) safeDuration = 45;
+        if (safeDuration > 120) safeDuration = 120;
+
         const result = await bookAppointment({
             name,
             phone: phone || '', // Optional
@@ -19,7 +24,7 @@ export async function POST(request) {
             date,
             time,
             motive,
-            duration: parseInt(duration) || 45 // Duration from form, default 45
+            duration: safeDuration
         }, true); // isAdmin = true
 
         return NextResponse.json(result, { status: 201 });
