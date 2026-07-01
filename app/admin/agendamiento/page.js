@@ -127,7 +127,7 @@ export default function AgendamientoPage() {
     // --- Auto-request QR only when DISCONNECTED (not on transient states like 'connecting') ---
     useEffect(() => {
         const isConnected = ['open', 'CONNECTED', 'connected'].includes(evolutionStatus.status);
-        const isDisconnected = ['disconnected', 'not_found', 'error', 'unknown'].includes(evolutionStatus.status);
+        const isDisconnected = !isConnected && evolutionStatus.status !== 'loading';
         const needsQr = isDisconnected && !currentQr && !qrRequested && evolutionStatus.status !== 'loading';
 
         if (needsQr) {
