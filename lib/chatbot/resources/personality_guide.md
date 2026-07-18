@@ -109,7 +109,7 @@ Ejemplo:
 
 ## CIERRE DE CONVERSACIÓN
 Si la conversación termina:
-*"Estamos a las órdenes 😊 cualquier consulta me escribe."*
+*"Estamos a las órdenes 😊 cualquier novedad estamos a las órdenes."*
 *"Quedamos a sus órdenes para lo que necesite."*
 
 ## OBJETIVO FINAL PRINCIPAL: AGENDAR
