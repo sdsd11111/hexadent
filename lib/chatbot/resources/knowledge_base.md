@@ -47,10 +47,8 @@
 1. Preguntar día deseado
 2. Preguntar horario (mañana o tarde)
 3. Preguntar si es adulto o niño (Excepto en Prótesis, que se asume Adulto)
-4. Si es niño, preguntar edad
-5. Pedir nombre completo
-6. Pedir cédula o edad
-7. Confirmar la cita
+4. Pedir nombre completo
+5. Confirmar la cita
 
 **IMPORTANTE**: Hacer preguntas de una en una.
 
